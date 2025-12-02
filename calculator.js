@@ -296,36 +296,9 @@ function handleStateChange(newState) {
     bondCalculations.cashFlows,
     bondCalculations.bondPrice,
     bondCalculations.periods,
-    bondCalculations.periodicCoupon
+    bondCalculations.periodicCoupon,
+    newState.ytm
   );
-  
-  // Update legend values
-  updateLegend(bondCalculations, newState);
-}
-
-/**
- * Update legend with dynamic values
- * @param {Object} calculations - Bond calculations
- * @param {Object} state - Current state
- */
-function updateLegend(calculations, state) {
-  const purchaseEl = $('#legend-purchase-value');
-  const couponEl = $('#legend-coupon-value');
-  const principalEl = $('#legend-principal-value');
-  const ytmEl = $('#legend-ytm-value');
-  
-  if (purchaseEl) {
-    purchaseEl.textContent = `(${formatCurrency(calculations.bondPrice, false)})`;
-  }
-  if (couponEl) {
-    couponEl.textContent = formatCurrency(calculations.periodicCoupon);
-  }
-  if (principalEl) {
-    principalEl.textContent = formatCurrency(state.faceValue);
-  }
-  if (ytmEl) {
-    ytmEl.textContent = `${state.ytm.toFixed(2)}%`;
-  }
 }
 
 // =============================================================================
@@ -430,19 +403,19 @@ function runSelfTests() {
       if (test.expected.price !== undefined) {
         const diff = Math.abs(result.bondPrice - test.expected.price);
         if (diff <= test.expected.tolerance) {
-          console.log(`ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ ${test.name} passed`);
+          console.log(`✓ ${test.name} passed`);
         } else {
           console.warn(`✗ ${test.name} failed: expected ${test.expected.price}, got ${result.bondPrice}`);
         }
       } else if (test.expected.priceShouldBe === 'greater than 100') {
         if (result.bondPrice > 100) {
-          console.log(`ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ ${test.name} passed`);
+          console.log(`✓ ${test.name} passed`);
         } else {
           console.warn(`✗ ${test.name} failed: price should be > 100, got ${result.bondPrice}`);
         }
       } else if (test.expected.priceShouldBe === 'less than 100') {
         if (result.bondPrice < 100) {
-          console.log(`ÃƒÂ¢Ã…â€œÃ¢â‚¬Å“ ${test.name} passed`);
+          console.log(`✓ ${test.name} passed`);
         } else {
           console.warn(`✗ ${test.name} failed: price should be < 100, got ${result.bondPrice}`);
         }

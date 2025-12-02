@@ -17,7 +17,7 @@
 }
 
 /* ==========================================================================
-   2. RESULT BOXES â€“ Bond-Specific
+   2. RESULT BOXES — Bond-Specific
    ========================================================================== */
 .result-box.price {
   background-color: var(--color-bg-orange);
@@ -104,7 +104,7 @@
 }
 
 /* ==========================================================================
-   4. INPUT LAYOUT â€“ Inline with Labels
+   4. INPUT LAYOUT — Inline with Labels
    ========================================================================== */
 .input-group-inline {
   display: flex;
@@ -176,7 +176,7 @@
 }
 
 /* ==========================================================================
-   5. EQUATION DISPLAY â€“ Bond-specific
+   5. EQUATION DISPLAY — Bond-specific
    ========================================================================== */
 .equation-container {
   padding: 1rem;
@@ -334,4 +334,28 @@ math mo {
   font-size: 0.75rem;
   color: var(--color-gray-500);
   margin-bottom: 1rem;
+}
+
+/* ==========================================================================
+   RESPONSIVE TABLE - Bond-Specific (6 columns)
+   ========================================================================== */
+
+/* At very narrow widths, hide the Period column since Year is more meaningful */
+@media (max-width: 480px) {
+  .data-table th:first-child,
+  .data-table td:first-child {
+    display: none;
+  }
+}
+
+/* Alternative: Make YTM column abbreviate on very narrow screens */
+@media (max-width: 400px) {
+  .data-table {
+    font-size: 0.625rem;
+  }
+  
+  .data-table th,
+  .data-table td {
+    padding: 0.25rem 0.3rem;
+  }
 }

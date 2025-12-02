@@ -118,7 +118,7 @@ onHover: (event, activeElements) => {
   // Announce hovered data point
   if (activeElements.length > 0) {
     const index = activeElements[0].index;
-    announceDataPoint(cashFlows[index], totalData[index]);
+    announceDataPoint(cashFlows[index], totalData[index], ytm);
   }
 }
 
@@ -131,6 +131,7 @@ onHover: (event, activeElements) => {
           display: false // Using custom legend in HTML
         },
         tooltip: {
+          usePointStyle: true,
           callbacks: {
             title: (context) => {
               const index = context[0].dataIndex;
@@ -138,10 +139,27 @@ onHover: (event, activeElements) => {
             },
             label: (context) => {
               const value = context.parsed.y;
-              // Check if this is the YTM line
+              const index = context.dataIndex;
+              const isInitialPeriod = index === 0;
+              
+              // YTM line - add (r) with indication it's purple
               if (context.dataset.label === 'Yield-to-maturity (r)') {
-                return `${context.dataset.label}: ${value.toFixed(2)}%`;
+                return `Yield-to-maturity (r): ${value.toFixed(2)}%`;
               }
+              
+              // For period 0, change "Principal repayment" to "Present value bond price"
+              if (isInitialPeriod && context.dataset.label === 'Principal repayment') {
+                return `Present value bond price (PV): ${formatCurrency(value, true)}`;
+              }
+              
+              // Regular labels with variables highlighted
+              if (context.dataset.label === 'Principal repayment') {
+                return `Principal repayment (FV): ${formatCurrency(value, true)}`;
+              }
+              if (context.dataset.label === 'Coupon payment') {
+                return `Coupon payment (PMT): ${formatCurrency(value, true)}`;
+              }
+              
               return `${context.dataset.label}: ${formatCurrency(value, true)}`;
             },
             footer: (context) => {
@@ -183,7 +201,7 @@ onHover: (event, activeElements) => {
         y2: {
           title: {
             display: true,
-            text: 'Rate (%)',
+            text: 'Yield to Maturity (%)',
             color: '#7a46ff'
           },
           position: 'right',
@@ -351,7 +369,7 @@ function setupKeyboardNavigation(canvas, cashFlows, totalData) {
     if (newIndex !== currentFocusIndex) {
       currentFocusIndex = newIndex;
       chartInstance.update('none'); // Update without animation
-      announceDataPoint(cashFlows[currentFocusIndex], totalData[currentFocusIndex]);
+      announceDataPoint(cashFlows[currentFocusIndex], totalData[currentFocusIndex], ytm);
       
       // Show tooltip at focused bar
       showTooltipAtIndex(currentFocusIndex);
@@ -366,7 +384,7 @@ function setupKeyboardNavigation(canvas, cashFlows, totalData) {
   const focusListener = () => {
     isKeyboardMode = true;
     showTooltipAtIndex(currentFocusIndex);
-    announceDataPoint(cashFlows[currentFocusIndex], totalData[currentFocusIndex]);
+    announceDataPoint(cashFlows[currentFocusIndex], totalData[currentFocusIndex], ytm);
   };
   
   const blurListener = () => {
@@ -417,7 +435,7 @@ function showTooltipAtIndex(index) {
  * @param {Object} cashFlow - Cash flow object
  * @param {number} total - Total cash flow
  */
-function announceDataPoint(cashFlow, total) {
+function announceDataPoint(cashFlow, total, ytm) {
   // Create or update live region for screen reader announcements
   let liveRegion = document.getElementById('chart-live-region');
   if (!liveRegion) {
@@ -429,9 +447,13 @@ function announceDataPoint(cashFlow, total) {
     document.body.appendChild(liveRegion);
   }
   
+  const isInitialPeriod = cashFlow.period === 0;
+  const principalLabel = isInitialPeriod ? 'Present value bond price (PV)' : 'Principal repayment (FV)';
+  
   const announcement = `Period ${cashFlow.yearLabel} years. ` +
-    `Coupon payment: ${formatCurrency(cashFlow.couponPayment, true)}. ` +
-    `Principal repayment: ${formatCurrency(cashFlow.principalPayment, true)}. ` +
+    `Yield-to-maturity (r): ${ytm ? ytm.toFixed(2) : '0'}%. ` +
+    `Coupon payment (PMT): ${formatCurrency(cashFlow.couponPayment, true)}. ` +
+    `${principalLabel}: ${formatCurrency(cashFlow.principalPayment, true)}. ` +
     `Total: ${formatCurrency(total, true)}.`;
   
   liveRegion.textContent = announcement;

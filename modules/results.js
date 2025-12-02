@@ -21,11 +21,7 @@ export function renderResults(calculations, params) {
   // Clear existing content
   container.innerHTML = '';
   
-  // Create bond price result box
-  const priceBox = createPriceBox(calculations.bondPrice);
-  container.appendChild(priceBox);
-  
-  // Create premium/discount analysis box
+  // Create premium/discount analysis box only
   const analysisBox = createAnalysisBox(calculations, params);
   container.appendChild(analysisBox);
 }

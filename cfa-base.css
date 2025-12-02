@@ -5,7 +5,7 @@
    ========================================================================== */
 
 /* ==========================================================================
-   1. CSS VARIABLES Ã¢â‚¬â€œ Complete WCAG AA Compliant Color Palette
+   1. CSS VARIABLES - Complete WCAG AA Compliant Color Palette
    ========================================================================== */
 :root {
   /* Primary Data Colors - All meet WCAG AA (4.5:1 minimum) */
@@ -189,7 +189,7 @@ canvas[tabindex]:focus {
   gap: 1.5rem;
 }
 
-/* Middle Row Ã¢â‚¬â€œ Side-by-side on desktop */
+/* Middle Row - Side-by-side on desktop */
 .middle-row {
   display: flex;
   flex-direction: column;
@@ -326,7 +326,7 @@ canvas[tabindex]:focus {
 }
 
 /* ==========================================================================
-   7. FORM INPUTS Ã¢â‚¬â€œ Shared Styles
+   7. FORM INPUTS - Shared Styles
    ========================================================================== */
 .input-section {
   display: flex;
@@ -476,7 +476,7 @@ canvas[tabindex]:focus {
 }
 
 /* ==========================================================================
-   9. RESULTS DISPLAY Ã¢â‚¬â€œ Base Styles
+   9. RESULTS DISPLAY - Base Styles
    ========================================================================== */
 #results-content {
   display: flex;
@@ -623,7 +623,7 @@ canvas[tabindex]:focus {
 
 .data-table th {
   font-weight: 600;
-  background: var(--color-gray-100);
+  background: #ffffff;
   color: var(--color-gray-700);
   position: sticky;
   top: 0;
@@ -655,7 +655,7 @@ canvas[tabindex]:focus {
 
 .data-table tfoot tr {
   border-top: 2px solid var(--color-gray-300);
-  background-color: var(--color-gray-50);
+  background-color: #ffffff;
   font-weight: 600;
 }
 
@@ -669,6 +669,40 @@ canvas[tabindex]:focus {
   color: var(--color-gray-500);
   margin-top: 0.75rem;
 }
+/* Responsive table improvements for narrow widths */
+@media (max-width: 768px) {
+  .data-table {
+    font-size: 0.8125rem;
+  }
+  
+  .data-table th,
+  .data-table td {
+    padding: 0.4rem 0.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .data-table {
+    font-size: 0.75rem;
+  }
+  
+  .data-table th,
+  .data-table td {
+    padding: 0.35rem 0.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .data-table {
+    font-size: 0.6875rem;
+  }
+  
+  .data-table th,
+  .data-table td {
+    padding: 0.3rem 0.35rem;
+  }
+}
+
 
 /* ==========================================================================
    RESPONSIVE TABLE - CARD LAYOUT (OPTIONAL)
@@ -847,7 +881,7 @@ canvas[tabindex]:focus {
 }
 
 .validation-title::before {
-  content: "Ã¢Å¡Â  ";
+  content: "\26A0  ";
   font-size: 1.25rem;
   line-height: 1;
 }
@@ -872,7 +906,7 @@ canvas[tabindex]:focus {
 }
 
 .validation-summary li::before {
-  content: "Ã¢â‚¬Â¢";
+  content: "\2022";
   position: absolute;
   left: 0.5rem;
   font-weight: bold;

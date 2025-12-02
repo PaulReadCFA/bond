@@ -53,7 +53,7 @@ export function renderDynamicEquation(calculations, params) {
             <mn>1</mn>
             <msup>
               <mrow><mo>(</mo><mn>1</mn><mo>+</mo><mtext mathcolor="#7a46ff">${rPercent}%</mtext><mo>)</mo></mrow>
-              <mn>${periods}</mn>
+              <mn mathcolor="#15803d">${periods}</mn>
             </msup>
           </mfrac>
         </mrow>

@@ -213,10 +213,10 @@ canvas[tabindex]:focus {
 
 @media (min-width: 640px) {
   .grid-container {
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(12, 1fr);
   }
-  .grid-item-left { grid-column: span 2; }
-  .grid-item-right { grid-column: span 4; }
+  .grid-item-left { grid-column: span 3; }
+  .grid-item-right { grid-column: span 9; }
 }
 
 /* ==========================================================================
@@ -533,7 +533,7 @@ canvas[tabindex]:focus {
    10. CHART & TABLE
    ========================================================================== */
 .chart-wrapper {
-  height: 24rem;
+  height: 28rem;
   position: relative;
   border-radius: 0.5rem;
   background: var(--color-gray-50);
@@ -547,7 +547,7 @@ canvas[tabindex]:focus {
 
 @media (max-width: 640px) {
   .chart-wrapper {
-    height: 20rem;
+    height: 24rem;
   }
 }
 

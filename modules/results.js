@@ -79,8 +79,13 @@ function createAnalysisBox(calculations, params) {
   const content = createElement('div', { 
     className: 'analysis-content',
     'aria-live': 'polite',
-    'aria-atomic': 'true'
+    'aria-atomic': 'true',
+    'role': 'region',
+    'aria-labelledby': 'analysis-heading'
   });
+  
+  // Add ID to title for aria-labelledby
+  title.id = 'analysis-heading';
   
   // Bond type (par, premium, or discount)
   const typeDiv = createElement('div', { className: 'analysis-type' }, 

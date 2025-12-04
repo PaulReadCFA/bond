@@ -5,11 +5,11 @@
 
 import { formatCurrency } from './utils.js';
 
-// CFA Brand Colors (WCAG AA verified)
+// Bond Explorer Colors (matching CSS variables)
 const COLORS = {
-  coupon: '#3369FF',      // 4.55:1 contrast
-  mint: '#49b2b8',
-  purchase: '#f2af81',
+  coupon: '#3c6ae5',      // Blue - matches --color-bond-coupon
+  principal: '#0079a6',   // Teal - matches --color-bond-face
+  purchase: '#b95b1d',    // Orange - matches --color-bond-pv
   darkText: '#06005a'
 };
 
@@ -38,7 +38,7 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
   canvas.setAttribute('aria-roledescription', 'interactive chart');
   canvas.setAttribute(
     'aria-label',
-    'Interactive chart. Press Enter to focus, then use arrow keys to explore data points.'
+    'Interactive bond cash flow chart showing present value, coupon payments, principal repayment, and yield to maturity over time. Press Tab to focus, then use Left and Right arrow keys to navigate between time periods. Home goes to first period, End goes to last period.'
   );
 
   const ctx = canvas.getContext('2d');
@@ -72,7 +72,7 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
           label: 'Principal repayment',
           data: principalData,
           backgroundColor: principalData.map(val => 
-            val >= 0 ? COLORS.mint : COLORS.purchase
+            val >= 0 ? COLORS.principal : COLORS.purchase
           ),
           borderWidth: 0,
           stack: 'cashflow',
@@ -220,10 +220,10 @@ onHover: (event, activeElements) => {
       },
       layout: {
         padding: {
-          left: 20, // Important for zoom support (not 50)
-          right: 30,
-          top: showLabels ? 40 : 20, // More top padding for labels
-          bottom: 60
+          left: 10,
+          right: 10,
+          top: showLabels ? 35 : 15,
+          bottom: 10
         }
       }
     },

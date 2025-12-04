@@ -26,8 +26,8 @@ export function renderTable(cashFlows, bondPrice, periods, periodicCoupon, ytm) 
   // --------------------------------------------------------------
   let html = `
     <caption class="sr-only">
-      Bond cash flow schedule showing period, yield to maturity, coupon payments,
-      principal repayment, and total cash flows
+      Bond cash flow schedule showing period, year, yield to maturity, coupon payments,
+      principal repayment, and total cash flows. Note: Values in parentheses indicate negative cash flows.
     </caption>
 
     <thead>

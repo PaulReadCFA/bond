@@ -29,7 +29,7 @@
   </p>
   
   <!-- Dynamic equation with actual values -->
-  <div class="equation-container" role="region" aria-label="Bond valuation with your values" aria-live="polite" tabindex="0" id="dynamic-equation-container">
+  <div class="equation-container" role="region" aria-label="Bond valuation with your values" aria-live="polite" id="dynamic-equation-container">
     <div id="dynamic-mathml-equation">
       <!-- Populated by JavaScript -->
     </div>
@@ -60,20 +60,20 @@
             <div class="card-content">
               <!-- View toggle buttons -->
               <div class="view-controls">
-                <div class="legend" id="chart-legend">
-                  <span class="legend-item">
+                <div class="legend" id="chart-legend" role="list" aria-label="Chart legend">
+                  <span class="legend-item" role="listitem">
                     <span class="legend-color" style="background-color: var(--color-bond-purchase);"></span>
                     Present value of bond <span style="color: #b95b1d;">(PV)</span>
                   </span>
-                  <span class="legend-item">
+                  <span class="legend-item" role="listitem">
                     <span class="legend-color" style="background-color: var(--color-bond-coupon);"></span>
                     Coupon payment <span style="color: #3c6ae5;">(PMT)</span>
                   </span>
-                  <span class="legend-item">
+                  <span class="legend-item" role="listitem">
                     <span class="legend-color" style="background-color: var(--color-bond-face);"></span>
                     Principal repayment <span style="color: #0079a6;">(FV)</span>
                   </span>
-                  <span class="legend-item">
+                  <span class="legend-item" role="listitem">
                     <span class="legend-color legend-dashed-line" style="border-bottom: 2px dashed var(--color-purple-bold); background: none; width: 1.5rem; height: 0; border-left: none; border-right: none; border-top: none;"></span>
                     Yield-to-maturity <span style="color: #7a46ff;">(r)</span>
                   </span>
@@ -102,8 +102,11 @@
     At the final maturity date, both the last coupon payment and the principal repayment 
     (FV, shown in teal) are received. The stacked bars show how coupon and principal payments 
     combine at each period. A dashed purple line shows the yield-to-maturity rate (r) on the right axis.
-    Use the arrow keys to navigate between data points and hear 
-    the specific values for each period.
+  </p>
+  <p>
+    Keyboard navigation: Tab to focus the chart. Use Left and Right arrow keys to move between periods. 
+    Press Home to jump to the first period, or End to jump to the last period. 
+    Each period will announce its year, yield to maturity, coupon payment, principal repayment, and total cash flow.
   </p>
 </div>
 
@@ -121,7 +124,7 @@
      role="region"  
      aria-label="Bond cash flow table"  
      tabindex="-1">  <!-- Added tabindex="-1" -->
-  <table id="cash-flow-table" class="data-table">  <!-- Removed tabindex="0" -->
+  <table id="cash-flow-table" class="data-table" aria-describedby="table-note" tabindex="0">  <!-- Removed tabindex="0" -->
     <!-- Populated by JavaScript -->
   </table>
   <p id="table-note" class="table-note">

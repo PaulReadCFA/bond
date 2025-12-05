@@ -54,10 +54,10 @@ export function renderTable(cashFlows, bondPrice, periods, periodicCoupon, ytm) 
       <tr>
         <td class="text-left">${cf.period}</td>
         <td class="text-left">${cf.yearLabel.toFixed(1)}</td>
-        <td class="text-right" style="color: #7a46ff;">${ytm.toFixed(2)}%</td>
-        <td class="text-right" style="color: #3c6ae5;">${formatCurrency(cf.couponPayment)}</td>
-        <td class="text-right" style="color: #0079a6;">${formatCurrency(cf.principalPayment)}</td>
-        <td class="text-right"><strong>${formatCurrency(cf.totalCashFlow)}</strong></td>
+        <td class="text-right" style="color: #7a46ff;" data-tooltip="Annual yield-to-maturity rate" tabindex="0">${ytm.toFixed(2)}%</td>
+        <td class="text-right" style="color: #3c6ae5;" data-tooltip="Annual coupon payment = Face Value × (Coupon Rate / Payment Frequency)" tabindex="0">${formatCurrency(cf.couponPayment)}</td>
+        <td class="text-right" style="color: #0079a6;" tabindex="0" data-tooltip="${isInitial ? 'Initial bond purchase price (negative cash flow)' : (isFinal ? 'Face value returned at maturity = $100.00' : 'No principal payment until maturity')}">${formatCurrency(cf.principalPayment)}</td>
+        <td class="text-right" tabindex="0" data-tooltip="${isInitial ? 'Amount paid to purchase bond' : 'Coupon payment' + (isFinal ? ' + Face value' : '') + ' = ' + formatCurrency(cf.totalCashFlow)}"><strong>${formatCurrency(cf.totalCashFlow)}</strong></td>
       </tr>`;
   });
 
@@ -72,7 +72,7 @@ export function renderTable(cashFlows, bondPrice, periods, periodicCoupon, ytm) 
         <td colspan="5" class="text-right" style="color: #b95b1d;">
           <strong>Bond Price <span style="color: #b95b1d;">(PV</span> of all cash flows):</strong>
         </td>
-        <td class="text-right" style="color: #b95b1d;"><strong>${formatCurrency(bondPrice)}</strong></td>
+        <td class="text-right" style="color: #b95b1d;" data-tooltip="Sum of present values of all future cash flows, discounted at the yield-to-maturity rate" tabindex="0"><strong>${formatCurrency(bondPrice)}</strong></td>
       </tr>
     </tfoot>
   `;
@@ -88,8 +88,40 @@ export function renderTable(cashFlows, bondPrice, periods, periodicCoupon, ytm) 
   // The table itself should be focusable for keyboard users.
   // We keep tabindex="0" (already on the <table> in index.html)
   // and add a clear, concise aria-label.
-  table.setAttribute('aria-label', 'Bond cash flow table');
+  table.setAttribute('aria-label', 'Bond cash flow table. Press Escape to exit table.');
 
   // Optional: announce the switch to screen-reader users
   announceToScreenReader('Table view loaded with bond cash flows.');
+  
+  // Add keyboard navigation to escape the table
+  setupTableKeyboardEscape();
+}
+
+/**
+ * Set up Escape key to exit table and move to next section
+ */
+function setupTableKeyboardEscape() {
+  const table = document.getElementById('cash-flow-table');
+  
+  if (!table) return;
+  
+  // Remove old listener if exists
+  if (table._escapeListener) {
+    table.removeEventListener('keydown', table._escapeListener);
+  }
+  
+  const escapeListener = (e) => {
+    // Press Escape to jump out of table to calculator section
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      const calculator = document.getElementById('calculator');
+      if (calculator) {
+        calculator.focus();
+        announceToScreenReader('Exited table, moved to calculator section');
+      }
+    }
+  };
+  
+  table._escapeListener = escapeListener;
+  table.addEventListener('keydown', escapeListener);
 }

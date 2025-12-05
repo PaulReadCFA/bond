@@ -73,4 +73,22 @@ export function renderDynamicEquation(calculations, params) {
   `;
   
   container.innerHTML = mathML;
+  
+  // Create screen-reader friendly announcement
+  const announcement = `Bond price equals ${pvFormatted}. ` +
+    `Calculated as: coupon payment ${pmtFormatted} divided by yield ${rPercent} percent, ` +
+    `times 1 minus 1 over quantity 1 plus ${rPercent} percent to the power ${periods}, ` +
+    `plus face value ${fvFormatted} divided by quantity 1 plus ${rPercent} percent to the power ${periods}.`;
+  
+  // Update aria-live region for screen readers
+  let liveRegion = document.getElementById('equation-live-region');
+  if (!liveRegion) {
+    liveRegion = document.createElement('div');
+    liveRegion.id = 'equation-live-region';
+    liveRegion.className = 'sr-only';
+    liveRegion.setAttribute('aria-live', 'polite');
+    liveRegion.setAttribute('aria-atomic', 'true');
+    document.body.appendChild(liveRegion);
+  }
+  liveRegion.textContent = announcement;
 }

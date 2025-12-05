@@ -192,7 +192,10 @@ onHover: (event, activeElements) => {
           ticks: {
             callback: function(value) {
               return formatCurrency(value);
-            }
+            },
+            autoSkip: true,
+            maxRotation: 0,
+            minRotation: 0
           },
           grid: {
             color: 'rgba(0, 0, 0, 0.05)'
@@ -200,9 +203,7 @@ onHover: (event, activeElements) => {
         },
         y2: {
           title: {
-            display: true,
-            text: 'Yield to Maturity (%)',
-            color: '#7a46ff'
+            display: false  // We'll draw it manually
           },
           position: 'right',
           min: 0,
@@ -211,7 +212,10 @@ onHover: (event, activeElements) => {
             callback: function(value) {
               return value.toFixed(1) + '%';
             },
-            color: '#7a46ff'
+            color: '#7a46ff',
+            autoSkip: true,
+            maxRotation: 0,
+            minRotation: 0
           },
           grid: {
             display: false
@@ -228,6 +232,27 @@ onHover: (event, activeElements) => {
       }
     },
     plugins: [{
+      // Custom plugin to draw horizontal Y2 axis title
+      id: 'horizontalY2Title',
+      afterDraw: (chart) => {
+        const ctx = chart.ctx;
+        const chartArea = chart.chartArea;
+        
+        ctx.save();
+        ctx.fillStyle = '#7a46ff';
+        // Use relative font size based on chart area for zoom compatibility
+        const fontSize = Math.max(11, Math.min(14, chartArea.width / 50));
+        ctx.font = `bold ${fontSize}px sans-serif`;
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'top';
+        
+        // Draw title at top right
+        ctx.fillText('Yield to Maturity (%)', chartArea.right, chartArea.top - 25);
+        
+        ctx.restore();
+      }
+    },
+    {
       // Custom plugin to draw labels on top of stacked bars
       id: 'stackedBarLabels',
       afterDatasetsDraw: (chart) => {

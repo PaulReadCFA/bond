@@ -4,6 +4,12 @@
    WCAG AA compliant, responsive, accessible
    ========================================================================== */
 
+
+/* No JavaScript fallback */
+.noscript-hidden {
+  display: none;
+}
+
 /* ==========================================================================
 /* Keyboard key styling */
 kbd {

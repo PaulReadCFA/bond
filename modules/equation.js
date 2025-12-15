@@ -35,7 +35,7 @@ export function renderDynamicEquation(calculations, params) {
       <mrow>
         <msub>
           <mi mathcolor="#b95b1d">PV</mi>
-          <mtext mathcolor="#b95b1d">coupon bond</mtext>
+          <mtext mathcolor="#b95b1d">Coupon bond</mtext>
         </msub>
         <mo>=</mo>
         <mfrac linethickness="1.2px">
@@ -76,7 +76,7 @@ export function renderDynamicEquation(calculations, params) {
   
   // Create screen-reader friendly announcement
   const announcement = `Bond price equals ${pvFormatted}. ` +
-    `Calculated as: coupon payment ${pmtFormatted} divided by yield ${rPercent} percent, ` +
+    `Calculated as: Coupon payment ${pmtFormatted} divided by yield ${rPercent} percent, ` +
     `times 1 minus 1 over quantity 1 plus ${rPercent} percent to the power ${periods}, ` +
     `plus face value ${fvFormatted} divided by quantity 1 plus ${rPercent} percent to the power ${periods}.`;
   

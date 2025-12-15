@@ -42,203 +42,190 @@
   </div>
 </section>
 
-
-
-
-      <!-- Cards 2 & 3: Results and Visualizer (side by side on desktop) -->
-      <div class="grid-container">
-        <!-- Card 2: Results & Analysis -->
-        <div class="grid-item-left">
-          <section class="card" id="results-card">
-            <h4 class="card-title">Results and Analysis</h4>
-            <div class="card-content">
-              <div id="results-content">
-                <!-- Populated by JavaScript -->
-                <noscript>
-                  <div style="padding: 2rem; text-align: center; background: #fef2f2; border: 2px solid #b91c1c; border-radius: 0.5rem;">
-                    <h5 style="color: #991b1c; margin-bottom: 1rem; font-size: 1.125rem;">JavaScript Required</h5>
-                    <p style="color: #374151; line-height: 1.6; margin-bottom: 0.75rem;">
-                      This bond calculator is an interactive tool that requires JavaScript to function.
-                    </p>
-                    <p style="color: #374151; line-height: 1.6; font-size: 0.875rem;">
-                      Please enable JavaScript in your browser settings to:
-                    </p>
-                    <ul style="text-align: left; margin: 1rem auto; max-width: 20rem; color: #374151; font-size: 0.875rem; line-height: 1.6;">
-                      <li>Calculate bond prices and cash flows</li>
-                      <li>View interactive charts and tables</li>
-                      <li>Explore dynamic equations</li>
-                      <li>Adjust parameters in real-time</li>
-                    </ul>
-                  </div>
-                </noscript>
+      <!-- Card 4: Calculator (Sticky) -->
+      <div class="sticky-calculator-wrapper" role="region" aria-label="Input calculator - stays visible when scrolling">
+        <section class="card" id="calculator" tabindex="-1">
+          <h4 class="card-title">Bond Cash Flow Calculator</h4>
+          <div class="card-content">
+            <!-- Static info row -->
+            <div class="info-box">
+              <div class="info-item">
+                <span class="info-label">Face value:</span>
+                <span class="info-value">$100.00</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Payment frequency:</span>
+                <span class="info-value">Annual</span>
               </div>
             </div>
-          </section>
-        </div>
 
-        <!-- Card 3: Visualizer -->
-        <div class="grid-item-right">
-          <section class="card" id="visualizer" tabindex="-1">
-            <h4 class="card-title">Bond Cash Flows: Annual Payment Frequency</h4>
-            <div class="card-content">
-              <!-- View toggle buttons -->
-              <div class="view-controls">
-                <div class="legend" id="chart-legend" role="list" aria-label="Chart legend">
-                  <span class="legend-item" role="listitem">
-                    <span class="legend-color" style="background-color: var(--color-bond-purchase);"></span>
-                    Present value of bond <span style="color: #b95b1d;">(PV)</span>
-                  </span>
-                  <span class="legend-item" role="listitem">
-                    <span class="legend-color" style="background-color: var(--color-bond-coupon);"></span>
-                    Coupon payment <span style="color: #3c6ae5;">(PMT)</span>
-                  </span>
-                  <span class="legend-item" role="listitem">
-                    <span class="legend-color" style="background-color: var(--color-bond-face);"></span>
-                    Principal repayment <span style="color: #0079a6;">(FV)</span>
-                  </span>
-                  <span class="legend-item" role="listitem">
-                    <span class="legend-color legend-dashed-line" style="border-bottom: 2px dashed var(--color-purple-bold); background: none; width: 1.5rem; height: 0; border-left: none; border-right: none; border-top: none;"></span>
-                    Yield-to-maturity <span style="color: #7a46ff;">(r)</span>
-                  </span>
+            <!-- Input controls -->
+            <div class="input-section">
+              <p class="sr-only" id="inputHelp">
+                Enter values and the calculator updates results and the chart automatically.
+              </p>
+
+              <div class="input-group-inline">
+                <div class="input-inline">
+                  <label for="coupon-rate" class="input-label-inline">
+                    Coupon rate:
+                  </label>
+                  <div class="input-with-suffix-inline">
+                    <input 
+                      type="number" 
+                      id="coupon-rate" 
+                      class="input-field-inline"
+                      min="0" max="10" step="0.1" value="8.6">
+                    <span class="input-suffix-inline">%</span>
+                  </div>
                 </div>
-                
-                 <div class="button-group" role="group" aria-label="View mode - switch between chart and table">
-    <button id="chart-view-btn" class="toggle-btn active" aria-pressed="true">
-      Show Chart
-    </button>
-    <button id="table-view-btn" class="toggle-btn" aria-pressed="false">
-      Show Table
-    </button>
-  </div>
-</div>
 
-              <!-- Screen reader announcement for view changes -->
-              <div class="sr-only" aria-live="polite" aria-atomic="true" id="view-announcement"></div>
+                <div class="input-inline">
+                  <label for="ytm" class="input-label-inline">
+                    Yield-to-maturity <span style="color: #7a46ff;">(r)</span>:
+                  </label>
+                  <div class="input-with-suffix-inline">
+                    <input 
+                      type="number" 
+                      id="ytm" 
+                      class="input-field-inline"
+                      min="0" max="10" step="0.1" value="6.5">
+                    <span class="input-suffix-inline">%</span>
+                  </div>
+                </div>
 
-              <!-- Hidden chart description -->
-<div class="sr-only" id="bond-chart-desc">
-  <h4 id="bond-chart-title">Bond cash flows over time</h4>
-  <p>
-    This chart displays the complete cash flow timeline for a bond investment. 
-    At period 0, the present value bond price (PV) is shown as a negative cash flow (money paid out). 
-    Then, at each annual period, the bond pays a coupon payment (PMT) shown in blue. 
-    At the final maturity date, both the last coupon payment and the principal repayment 
-    (FV, shown in teal) are received. The stacked bars show how coupon and principal payments 
-    combine at each period. A dashed purple line shows the yield-to-maturity rate (r) on the right axis.
-  </p>
-  <p>
-    Keyboard navigation: Tab to focus the chart. Use Left and Right arrow keys to move between periods. 
-    Press Home to jump to the first period, or End to jump to the last period. 
-    Each period will announce its year, yield to maturity, coupon payment, principal repayment, and total cash flow.
-  </p>
-</div>
+                <div class="input-inline">
+                  <label for="years" class="input-label-inline">
+                    Years-to-maturity <span style="color: #15803d;">(T)</span>:
+                  </label>
+                  <div class="input-with-suffix-inline">
+                    <input 
+                      type="number" 
+                      id="years" 
+                      class="input-field-inline"
+                      min="1" max="5" step="1" value="5">
+                    <span class="input-suffix-inline">&nbsp;</span>
+                  </div>
+                </div>
+              </div>
 
-             <!-- Chart container (add tabindex="-1" for programmatic focus) -->
-<div id="chart-container" class="chart-wrapper" 
-     role="region" 
-     aria-labelledby="bond-chart-title" 
-     aria-describedby="bond-chart-desc"
-     tabindex="-1">  <!-- Added tabindex="-1" -->
-  <canvas id="bond-chart"></canvas>
-</div>
-
-<!-- Table container (add role, aria-label, and tabindex="-1") -->
-<div id="table-container" class="table-wrapper" style="display: none;"
-     role="region"  
-     aria-label="Bond cash flow table"  
-     tabindex="-1">  <!-- Added tabindex="-1" -->
-  <table id="cash-flow-table" class="data-table" aria-describedby="table-note" tabindex="0">  <!-- Removed tabindex="0" -->
-    <!-- Populated by JavaScript -->
-  </table>
-  <p id="table-note" class="table-note">
-    Note: Values in parentheses indicate negative cash flows (outflows). Hover over values to see calculations. Press <kbd>Escape</kbd> to exit table navigation.
-  </p>
-</div>
+              <!-- Validation summary -->
+              <div id="validation-summary" class="validation-summary" role="alert" tabindex="-1" aria-live="assertive" style="display: none;">
+                <div class="validation-title">Please correct the following:</div>
+                <ul id="validation-list"></ul>
+              </div>
             </div>
-          </section>
-        </div>
+          </div>
+        </section>
       </div>
 
-      <!-- Card 4: Calculator -->
-      <section class="card" id="calculator" tabindex="-1">
-        <h4 class="card-title">Bond Cash Flow Calculator</h4>
+      <!-- Card 3: Visualizer (Full Width) -->
+      <section class="card" id="visualizer" tabindex="-1">
+        <h4 class="card-title">Bond Cash Flows: Annual Payment Frequency</h4>
         <div class="card-content">
-          <!-- Static info row -->
-          <div class="info-box">
-            <div class="info-item">
-              <span class="info-label">Face value:</span>
-              <span class="info-value">$100.00</span>
+          <!-- View toggle buttons -->
+          <div class="view-controls">
+            <div class="legend" id="chart-legend" role="list" aria-label="Chart legend">
+              <span class="legend-item" role="listitem">
+                <span class="legend-color" style="background-color: var(--color-bond-purchase);"></span>
+                Present value of bond <span style="color: #b95b1d;">(PV)</span>
+              </span>
+              <span class="legend-item" role="listitem">
+                <span class="legend-color" style="background-color: var(--color-bond-coupon);"></span>
+                Coupon payment <span style="color: #3c6ae5;">(PMT)</span>
+              </span>
+              <span class="legend-item" role="listitem">
+                <span class="legend-color" style="background-color: var(--color-bond-face);"></span>
+                Principal repayment <span style="color: #0079a6;">(FV)</span>
+              </span>
+              <span class="legend-item" role="listitem">
+                <span class="legend-color legend-dashed-line" style="border-bottom: 2px dashed var(--color-purple-bold); background: none; width: 2rem; height: 0; border-left: none; border-right: none; border-top: none;"></span>
+                Yield-to-maturity <span style="color: #7a46ff;">(r)</span>
+              </span>
             </div>
-            <div class="info-item">
-              <span class="info-label">Payment frequency:</span>
-              <span class="info-value">Annual</span>
+            
+            <div class="button-group" role="toolbar" aria-label="View mode - switch between chart and table">
+              <button id="chart-view-btn" class="toggle-btn active" aria-pressed="true" aria-label="Chart view">
+                Chart
+              </button>
+              <button id="table-view-btn" class="toggle-btn" aria-pressed="false" aria-label="Table view">
+                Table
+              </button>
             </div>
           </div>
 
-          <!-- Required fields indicator -->
-          
+          <!-- Screen reader announcement for view changes -->
+          <div class="sr-only" aria-live="polite" aria-atomic="true" id="view-announcement"></div>
 
-          <!-- Input controls -->
-          <div class="input-section">
-            <p class="sr-only" id="inputHelp">
-              Enter values and the calculator updates results and the chart automatically.
+          <!-- Hidden chart description -->
+          <div class="sr-only" id="bond-chart-desc">
+            <h4 id="bond-chart-title">Bond cash flows over time</h4>
+            <p>
+              This chart displays the complete cash flow timeline for a bond investment. 
+              At period 0, the present value bond price (PV) is shown as a negative cash flow (money paid out). 
+              Then, at each annual period, the bond pays a coupon payment (PMT) shown in blue. 
+              At the final maturity date, both the last coupon payment and the principal repayment 
+              (FV, shown in teal) are received. The stacked bars show how coupon and principal payments 
+              combine at each period. A dashed purple line shows the yield-to-maturity rate (r) on the right axis.
             </p>
+            <p>
+              Keyboard navigation: Tab to focus the chart. Use Left and Right arrow keys to move between periods. 
+              Press Home to jump to the first period, or End to jump to the last period. 
+              Each period will announce its year, yield to maturity, coupon payment, principal repayment, and total cash flow.
+            </p>
+          </div>
 
-            <div class="input-group-inline">
-  <div class="input-inline">
-  <label for="coupon-rate" class="input-label-inline">
-    Coupon rate:
-  </label>
-  <div class="input-with-suffix-inline">
-    <input 
-      type="number" 
-      id="coupon-rate" 
-      class="input-field-inline"
-      min="0" max="10" step="0.1" value="8.6">
-    <span class="input-suffix-inline">%</span>
-  </div>
-</div>
+          <!-- Chart container -->
+          <div id="chart-container" class="chart-wrapper" 
+               role="region" 
+               aria-labelledby="bond-chart-title" 
+               aria-describedby="bond-chart-desc"
+               tabindex="-1">
+            <canvas id="bond-chart"></canvas>
+          </div>
 
-<div class="input-inline">
-  <label for="ytm" class="input-label-inline">
-    Yield-to-maturity <span style="color: #7a46ff;">(r)</span>:
-  </label>
-  <div class="input-with-suffix-inline">
-    <input 
-      type="number" 
-      id="ytm" 
-      class="input-field-inline"
-      min="0" max="10" step="0.1" value="6.5">
-    <span class="input-suffix-inline">%</span>
-  </div>
-</div>
-
-<div class="input-inline">
-  <label for="years" class="input-label-inline">
-    Years-to-maturity <span style="color: #15803d;">(T)</span>:
-  </label>
-  <div class="input-with-suffix-inline">
-    <input 
-      type="number" 
-      id="years" 
-      class="input-field-inline"
-      min="1" max="5" step="0.5" value="5">
-    <span class="input-suffix-inline">&nbsp;</span>
-  </div>
-</div>
-
-
-</div>
-
-
-            <!-- Validation summary -->
-            <div id="validation-summary" class="validation-summary" role="alert" style="display: none;">
-              <div class="validation-title">Please correct the following:</div>
-              <ul id="validation-list"></ul>
-            </div>
+          <!-- Table container -->
+          <div id="table-container" class="table-wrapper" style="display: none;"
+               role="region"  
+               aria-label="Bond cash flow table"  
+               tabindex="-1">
+            <table id="cash-flow-table" class="data-table" aria-describedby="table-note">
+              <!-- Populated by JavaScript -->
+            </table>
+            <p id="table-note" class="table-note">
+              Note: Values in parentheses indicate negative cash flows (outflows). Hover over colored values to see calculation details.
+            </p>
           </div>
         </div>
       </section>
+
+      <!-- Card 2: Results & Analysis -->
+      <section class="card" id="results-card">
+        <h4 class="card-title">Results and Analysis</h4>
+        <div class="card-content">
+          <div id="results-content">
+            <!-- Populated by JavaScript -->
+            <noscript>
+              <div style="padding: 2rem; text-align: center; background: #fef2f2; border: 2px solid #b91c1c; border-radius: 0.5rem;">
+                <h5 style="color: #991b1c; margin-bottom: 1rem; font-size: 1.125rem;">JavaScript Required</h5>
+                <p style="color: #374151; line-height: 1.6; margin-bottom: 0.75rem;">
+                  This bond calculator is an interactive tool that requires JavaScript to function.
+                </p>
+                <p style="color: #374151; line-height: 1.6; font-size: 0.875rem;">
+                  Please enable JavaScript in your browser settings to:
+                </p>
+                <ul style="text-align: left; margin: 1rem auto; max-width: 20rem; color: #374151; font-size: 0.875rem; line-height: 1.6;">
+                  <li>Calculate bond prices and cash flows</li>
+                  <li>View interactive charts and tables</li>
+                  <li>Explore dynamic equations</li>
+                  <li>Adjust parameters in real-time</li>
+                </ul>
+              </div>
+            </noscript>
+          </div>
+        </div>
+      </section>
+
     </main>
   </div>
 

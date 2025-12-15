@@ -751,7 +751,8 @@ canvas[tabindex]:focus {
   visibility: visible;
 }
 
-/* Small blue indicator dot (separate element needed) */
+/* Blue dot indicator removed - was conflicting with tooltip arrow ::after */
+/*
 .data-table td[data-tooltip]::after {
   content: '';
   position: absolute;
@@ -772,6 +773,7 @@ canvas[tabindex]:focus {
 .data-table td[data-tooltip]:focus::after {
   opacity: 0.6;
 }
+*/
 
 /* Table cell tooltips - CSS-only implementation */
 .data-table td[data-tooltip] {
@@ -809,6 +811,21 @@ canvas[tabindex]:focus {
   transition: opacity 0.15s ease-in-out, visibility 0.15s ease-in-out;
 }
 
+/* Prevent tooltip from going off left edge */
+.data-table td:first-child[data-tooltip]::before,
+.data-table td:nth-child(2)[data-tooltip]::before {
+  left: 0;
+  transform: translateX(0);
+}
+
+/* Prevent tooltip from going off right edge */
+.data-table td:last-child[data-tooltip]::before,
+.data-table td:nth-last-child(2)[data-tooltip]::before {
+  left: auto;
+  right: 0;
+  transform: translateX(0);
+}
+
 .data-table td[data-tooltip]:hover::before,
 .data-table td[data-tooltip]:focus::before {
   opacity: 1;
@@ -828,6 +845,25 @@ canvas[tabindex]:focus {
   border-right: 6px solid transparent;
   border-top: 6px solid var(--color-gray-900);
   z-index: 1001;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease-in-out, visibility 0.15s ease-in-out;
+}
+
+/* Adjust arrow for left-aligned tooltips */
+.data-table td:first-child[data-tooltip]::after,
+.data-table td:nth-child(2)[data-tooltip]::after {
+  left: 1rem;
+  transform: translateX(0);
+}
+
+/* Adjust arrow for right-aligned tooltips */
+.data-table td:last-child[data-tooltip]::after,
+.data-table td:nth-last-child(2)[data-tooltip]::after {
+  left: auto;
+  right: 1rem;
+  transform: translateX(0);
+}
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
@@ -840,15 +876,7 @@ canvas[tabindex]:focus {
   visibility: visible;
 }
 
-/* Blue indicator dot */
-.data-table td[data-tooltip] {
-  box-shadow: inset -2px 2px 0 0 rgba(60, 106, 229, 0.3);
-}
-
-.data-table td[data-tooltip]:hover,
-.data-table td[data-tooltip]:focus {
-  box-shadow: inset -2px 2px 0 0 rgba(60, 106, 229, 0.6);
-}
+/* Blue indicator removed - tooltip arrow is sufficient */
 
 
 /* Responsive table improvements for narrow widths */

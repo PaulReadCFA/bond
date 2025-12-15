@@ -52,12 +52,12 @@ export function renderTable(cashFlows, bondPrice, periods, periodicCoupon, ytm) 
 
     html += `
       <tr>
-        <td class="text-left">${cf.period}</td>
-        <td class="text-left">${cf.yearLabel.toFixed(1)}</td>
-        <td class="text-right" style="color: #7a46ff;" data-tooltip="Annual yield-to-maturity rate" tabindex="0">${ytm.toFixed(2)}%</td>
-        <td class="text-right" style="color: #3c6ae5;" data-tooltip="Annual coupon payment = Face Value × (Coupon Rate / Payment Frequency)" tabindex="0">${formatCurrency(cf.couponPayment)}</td>
-        <td class="text-right" style="color: #0079a6;" tabindex="0" data-tooltip="${isInitial ? 'Initial bond purchase price (negative cash flow)' : (isFinal ? 'Face value returned at maturity = $100.00' : 'No principal payment until maturity')}">${formatCurrency(cf.principalPayment)}</td>
-        <td class="text-right" tabindex="0" data-tooltip="${isInitial ? 'Amount paid to purchase bond' : 'Coupon payment' + (isFinal ? ' + Face value' : '') + ' = ' + formatCurrency(cf.totalCashFlow)}"><strong>${formatCurrency(cf.totalCashFlow)}</strong></td>
+        <td class="text-left" data-label="${cf.period}">${cf.period}</td>
+        <td class="text-left" data-label="Year">${cf.yearLabel.toFixed(1)}</td>
+        <td class="text-right" style="color: #7a46ff;" data-label="Yield-to-maturity (r)" data-tooltip="Annual yield-to-maturity rate">${ytm.toFixed(2)}%</td>
+        <td class="text-right" style="color: #3c6ae5;" data-label="Coupon Payment (PMT)" data-tooltip="Annual coupon payment = Face Value × (Coupon Rate / Payment Frequency)">${formatCurrency(cf.couponPayment)}</td>
+        <td class="text-right" style="color: #0079a6;" data-label="Principal Repayment (FV)" data-tooltip="${isInitial ? 'Initial bond purchase price (negative cash flow)' : (isFinal ? 'Face value returned at maturity = $100.00' : 'No principal payment until maturity')}">${formatCurrency(cf.principalPayment)}</td>
+        <td class="text-right" data-label="Total Cash Flow" data-tooltip="${isInitial ? 'Amount paid to purchase bond' : 'Coupon payment' + (isFinal ? ' + Face value' : '') + ' = ' + formatCurrency(cf.totalCashFlow)}"><strong>${formatCurrency(cf.totalCashFlow)}</strong></td>
       </tr>`;
   });
 
@@ -72,7 +72,7 @@ export function renderTable(cashFlows, bondPrice, periods, periodicCoupon, ytm) 
         <td colspan="5" class="text-right" style="color: #b95b1d;">
           <strong>Bond Price <span style="color: #b95b1d;">(PV</span> of all cash flows):</strong>
         </td>
-        <td class="text-right" style="color: #b95b1d;" data-tooltip="Sum of present values of all future cash flows, discounted at the yield-to-maturity rate" tabindex="0"><strong>${formatCurrency(bondPrice)}</strong></td>
+        <td class="text-right" style="color: #b95b1d;" data-tooltip="Sum of present values of all future cash flows, discounted at the yield-to-maturity rate"><strong>${formatCurrency(bondPrice)}</strong></td>
       </tr>
     </tfoot>
   `;
@@ -85,16 +85,18 @@ export function renderTable(cashFlows, bondPrice, periods, periodicCoupon, ytm) 
   // --------------------------------------------------------------
   // 5. Add accessibility attributes **programmatically**
   // --------------------------------------------------------------
-  // The table itself should be focusable for keyboard users.
-  // We keep tabindex="0" (already on the <table> in index.html)
-  // and add a clear, concise aria-label.
-  table.setAttribute('aria-label', 'Bond cash flow table. Press Escape to exit table.');
+  // Note: The table itself is NOT focusable (no tabindex).
+  // Individual cells with tooltips are focusable (role="button").
+  // This provides better keyboard navigation and avoids ARIA conflicts.
+  table.setAttribute('aria-label', 'Bond cash flow table');
+  // Note: Don't add role="table" - native <table> semantics are better
+  // and avoid ARIA conflicts with <caption>, <thead>, etc.
 
   // Optional: announce the switch to screen-reader users
   announceToScreenReader('Table view loaded with bond cash flows.');
   
-  // Add keyboard navigation to escape the table
-  setupTableKeyboardEscape();
+  // Note: Escape key functionality removed since table cells are not focusable
+  // Tooltips work on hover only, maintaining table semantics
 }
 
 /**

@@ -5,6 +5,26 @@
    ========================================================================== */
 
 /* ==========================================================================
+   STIX Two Math Font (for mathematical consistency)
+   ========================================================================== */
+
+/* Try to load STIX Two Math from parent page if available */
+@font-face {
+  font-family: 'STIX Two Math';
+  src: local('STIX Two Math'), local('STIXTwoMath-Regular');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Fallback font stack for mathematical content */
+:root {
+  --font-math: 'STIX Two Math', 'Cambria Math', 'Latin Modern Math', 'XITS Math', 
+               'Asana Math', 'TeX Gyre Termes Math', 'DejaVu Math TeX Gyre', 
+               'Computer Modern', serif;
+}
+
+/* ==========================================================================
    1. BOND-SPECIFIC COLOR ASSIGNMENTS
    ========================================================================== */
 :root {
@@ -222,6 +242,7 @@
 
 /* MathML styling */
 math {
+  font-family: var(--font-math);
   font-size: 1.125rem;
   font-weight: 600;
   color: var(--color-gray-800);
@@ -230,6 +251,7 @@ math {
 
 /* Dynamic equation - slightly smaller */
 #dynamic-equation-container math {
+  font-family: var(--font-math);
   font-size: 1rem;
   color: var(--color-gray-700);
 }
@@ -348,6 +370,479 @@ math mo {
   }
 }
 
+
+/* ==========================================================================
+   9. VIEW CONTROLS - Button Position Fix
+   ========================================================================== */
+
+/* Override: Keep buttons in consistent position */
+.view-controls {
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.view-controls .button-group {
+  flex-shrink: 0;
+  margin-left: 0;
+}
+
+.view-controls .legend {
+  margin-right: auto;
+  /* When hidden, use visibility instead of display to maintain layout space */
+}
+
+.view-controls .legend[style*="display: none"] {
+  display: flex !important;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* On mobile, buttons take full width */
+@media (max-width: 640px) {
+  .view-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .view-controls .legend {
+    margin-bottom: 1rem;
+  }
+  
+  .view-controls .legend[style*="display: none"] {
+    display: none !important;
+    visibility: visible;
+  }
+  
+  .view-controls .button-group {
+    width: 100%;
+  }
+}
+
+
+
+/* Ensure all interactive elements meet 44x44px minimum (WCAG 2.5.5) */
+.input-field-inline {
+  min-height: 44px;
+}
+
+.toggle-btn,
+.model-btn {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Skip links already have 44px minimum in cfa-base.css */
+
+/* Chart and table are already properly sized */
+
+/* ==========================================================================
+   10. TABLE IMPROVEMENTS - Cleaner, Tidier Styling
+   ========================================================================== */
+
+/* Override base table styling for cleaner look */
+.data-table {
+  border: 1px solid var(--color-gray-200);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Cleaner header styling */
+.data-table th {
+  background: linear-gradient(to bottom, #f9fafb 0%, #f3f4f6 100%);
+  border-bottom: 2px solid var(--color-gray-300);
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  padding: 0.75rem 1rem;
+  font-weight: 700;
+  color: var(--color-gray-800);
+}
+
+/* Remove individual cell borders for cleaner look */
+.data-table th,
+.data-table td {
+  border-left: none;
+  border-right: none;
+}
+
+/* Keep only horizontal borders */
+.data-table tbody tr {
+  border-bottom: 1px solid var(--color-gray-200);
+}
+
+.data-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+/* Improved cell padding and sizing */
+.data-table td {
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+/* Better zebra striping */
+.data-table tbody tr:nth-child(even) {
+  background-color: #fafbfc;
+}
+
+.data-table tbody tr:nth-child(odd) {
+  background-color: #ffffff;
+}
+
+/* Smoother hover effect */
+.data-table tbody tr:hover {
+  background-color: #f0f4f8 !important;
+  transition: background-color 0.15s ease;
+}
+
+/* Footer styling - clean top border */
+.data-table tfoot tr {
+  border-top: 2px solid var(--color-gray-400);
+  background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+}
+
+.data-table tfoot td {
+  padding: 0.875rem 1rem;
+  font-weight: 600;
+}
+
+/* Tooltip indicator - subtle but visible */
+.data-table td[data-tooltip] {
+  position: relative;
+}
+
+.data-table td[data-tooltip]::after {
+  /* Don't use ::after for arrow, we need it for tooltip indicator */
+  content: none !important;
+}
+
+/* Small info icon indicator for tooltips */
+.data-table td[data-tooltip] {
+  padding-right: 1.5rem;
+}
+
+.data-table td[data-tooltip]::before {
+  /* This will be the tooltip bubble */
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-gray-900);
+  color: white;
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.5rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  white-space: normal;
+  width: max-content;
+  max-width: 20rem;
+  text-align: left;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out, transform 0.2s ease-in-out;
+  transform: translateX(-50%) translateY(-4px);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.data-table td[data-tooltip]:hover::before {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Prevent tooltips from going off-screen on the right */
+.data-table td[data-tooltip]:last-child::before,
+.data-table td[data-tooltip]:nth-last-child(2)::before {
+  left: auto;
+  right: 0;
+  transform: translateX(0) translateY(-4px);
+}
+
+.data-table td[data-tooltip]:last-child:hover::before,
+
+.data-table td[data-tooltip]:nth-last-child(2):hover::before,
+.data-table td[data-tooltip]:nth-last-child(2):focus::before {
+  transform: translateX(0) translateY(0);
+}
+
+/* Prevent tooltips from going off-screen on the left */
+.data-table td[data-tooltip]:first-child::before,
+.data-table td[data-tooltip]:nth-child(2)::before {
+  left: 0;
+  transform: translateX(0) translateY(-4px);
+}
+
+.data-table td[data-tooltip]:first-child:hover::before,
+
+.data-table td[data-tooltip]:nth-child(2):hover::before,
+.data-table td[data-tooltip]:nth-child(2):focus::before {
+  transform: translateX(0) translateY(0);
+}
+
+/* Visual indicator: small circle in top-right */
+.data-table td[data-tooltip] {
+  background-image: 
+    radial-gradient(circle, var(--color-blue-interactive) 40%, transparent 40%);
+  background-size: 5px 5px;
+  background-position: calc(100% - 6px) 6px;
+  background-repeat: no-repeat;
+}
+
+.data-table td[data-tooltip]:hover,
+.data-table td[data-tooltip]:focus {
+  background-image: 
+    radial-gradient(circle, var(--color-blue-interactive) 40%, transparent 40%);
+  background-size: 6px 6px;
+  background-position: calc(100% - 6px) 6px;
+}
+
+/* Period 0 row (initial purchase) - subtle highlight */
+.data-table tbody tr:first-child {
+  background-color: #fff7ed;
+}
+
+.data-table tbody tr:first-child:hover {
+  background-color: #ffedd5 !important;
+}
+
+/* Final period row - subtle highlight */
+.data-table tbody tr:last-child {
+  background-color: #f0fdf4;
+}
+
+.data-table tbody tr:last-child:hover {
+  background-color: #dcfce7 !important;
+}
+
+/* Focus states for accessibility */
+
+
+/* Table note styling */
+.table-note {
+  padding: 0.75rem 1rem;
+  background-color: var(--color-gray-50);
+  border-radius: 0 0 0.5rem 0.5rem;
+  margin-top: 0;
+  border: 1px solid var(--color-gray-200);
+  border-top: none;
+  font-style: normal;
+}
+
+
+
+
+/* Ensure card content doesn't restrict table scrolling */
+.card-content {
+  overflow: visible;
+}
+
+/* Visualizer card specifically */
+#visualizer .card-content {
+  overflow: visible;
+  padding: 0;
+}
+
+/* Add padding back to inner elements */
+#visualizer .view-controls,
+#visualizer .chart-wrapper {
+  padding: 0 1.25rem;
+}
+
+#visualizer .table-wrapper {
+  padding: 0;
+  margin: 0;
+}
+
+/* Table wrapper - NO scrolling needed */
+.table-wrapper {
+  overflow: visible;
+  max-width: 100%;
+  width: 100%;
+}
+
+/* Responsive card-style layout at narrow widths */
+@media (max-width: 768px) {
+  /* Hide the table header visually but keep for screen readers */
+  .data-table thead {
+    position: absolute !important;
+    clip: rect(0 0 0 0) !important;
+    height: 1px !important;
+    width: 1px !important;
+    margin: -1px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    border: 0 !important;
+  }
+  
+  /* Make each row a card */
+  .data-table tbody tr {
+    display: block !important;
+    margin-bottom: 1rem;
+    border: 1px solid var(--color-gray-200);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Reset all td to block first */
+  .data-table tbody td {
+    display: block;
+    border: none;
+  }
+  
+  /* First cell (Period) - Card Header */
+  .data-table tbody td:first-child {
+    display: block !important;
+    font-size: 1.125rem !important;
+    font-weight: 700 !important;
+    color: var(--color-primary-dark-blue) !important;
+    border-bottom: 2px solid var(--color-gray-300) !important;
+    margin-bottom: 0.75rem !important;
+    padding: 0 0 0.75rem 0 !important;
+    text-align: center !important;
+  }
+  
+  .data-table tbody td:first-child::before {
+    content: 'Period ' attr(data-label) !important;
+    display: block !important;
+  }
+  
+  /* All other cells - show as label: value rows */
+  .data-table tbody td:not(:first-child) {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 0.5rem 0 !important;
+    border: none !important;
+    border-bottom: 1px solid var(--color-gray-100) !important;
+    text-align: left !important;  /* Override inline text-align: right */
+  }
+  
+  .data-table tbody td:not(:first-child):last-child {
+    border-bottom: none !important;
+    padding-bottom: 0 !important;
+  }
+  
+  /* CRITICAL: Override tooltip ::before to show label instead on mobile */
+  .data-table tbody tr td:not(:first-child)::before,
+  .data-table tbody tr td[data-tooltip]:not(:first-child)::before {
+    /* Label content - overrides tooltip */
+    content: attr(data-label) ': ' !important;
+    
+    /* Reset ALL tooltip positioning */
+    position: static !important;
+    transform: none !important;
+    top: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    
+    /* Reset tooltip styling */
+    background: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+    width: auto !important;
+    white-space: normal !important;
+    
+    /* Label styling */
+    font-weight: 600 !important;
+    color: var(--color-gray-700) !important;
+    text-align: left !important;
+    flex: 0 0 auto !important;
+    margin-right: 0.5rem !important;
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    font-size: 0.875rem !important;
+    z-index: auto !important;
+    pointer-events: auto !important;
+  }
+  
+  /* Force show on mobile (not just on hover) */
+  .data-table tbody tr td[data-tooltip]:not(:first-child)::before {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+  
+  /* The value itself */
+  .data-table tbody td:not(:first-child) {
+    font-size: 0.875rem !important;
+  }
+  
+  /* Footer styling */
+  .data-table tfoot {
+    display: block;
+    margin-top: 1rem;
+    padding: 1rem;
+    background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+    border: 2px solid var(--color-gray-300);
+    border-radius: 0.5rem;
+  }
+  
+  .data-table tfoot tr {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .data-table tfoot td {
+    display: inline;
+    border: none;
+    padding: 0;
+  }
+  
+  .data-table tfoot td:first-child {
+    font-weight: 600;
+    flex: 1;
+  }
+  
+  /* Hide tooltip indicators and arrows in card view by default */
+  .data-table tbody td[data-tooltip] {
+    box-shadow: none !important;
+    cursor: default !important;  /* No help cursor on mobile */
+  }
+  
+  /* Hide tooltip arrow on mobile by default */
+  .data-table tbody tr td[data-tooltip]:not(:first-child)::after,
+  .data-table td[data-tooltip]::after {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+  }
+  
+  /* OPTIONAL: Show tooltip on tap/active (touch and hold) */
+  .data-table tbody tr td[data-tooltip]:active::before {
+    content: attr(data-tooltip) !important;  /* Switch to tooltip content */
+    position: absolute !important;
+    bottom: 100% !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    background: var(--color-gray-900) !important;
+    color: white !important;
+    padding: 0.5rem 0.75rem !important;
+    border-radius: 0.375rem !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+    white-space: normal !important;
+    max-width: 15rem !important;
+    width: max-content !important;
+    font-size: 0.75rem !important;
+    line-height: 1.4 !important;
+    z-index: 1000 !important;
+    margin-bottom: 0.5rem !important;
+  }
+}
+
 /* Alternative: Make YTM column abbreviate on very narrow screens */
 @media (max-width: 400px) {
   .data-table {
@@ -358,4 +853,165 @@ math mo {
   .data-table td {
     padding: 0.25rem 0.3rem;
   }
+}
+
+
+
+
+/* Use math font for all numeric displays for consistency */
+.result-value,
+.info-value,
+.data-table,
+.legend-item {
+  font-family: var(--font-math);
+}
+
+/* Input fields also use math font for consistency */
+.input-field-inline {
+  font-family: var(--font-math);
+}
+
+/* ==========================================================================
+   12. VALIDATION ERROR STATE
+   ========================================================================== */
+
+/* Make validation summary focusable and visible when focused */
+.validation-summary:focus {
+  outline: 3px solid var(--color-red-700);
+  outline-offset: 2px;
+}
+
+/* Dim the results when there are validation errors */
+.has-validation-errors .card-content {
+  opacity: 0.5;
+  pointer-events: none;
+  position: relative;
+}
+
+.has-validation-errors .card-content::before {
+  content: 'Waiting for valid inputs...';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--color-gray-900);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  z-index: 10;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+
+
+/* ==========================================================================
+   13. STICKY CALCULATOR LAYOUT
+   ========================================================================== */
+
+/* Sticky calculator wrapper */
+.sticky-calculator-wrapper {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--color-gray-50);
+  padding: 1rem 0;
+  margin: -1rem 0 1.5rem 0;
+}
+
+/* Add subtle shadow when stuck */
+.sticky-calculator-wrapper::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  right: 0;
+  height: 10px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.1), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+/* Show shadow when scrolled (JS can add .is-stuck class) */
+.sticky-calculator-wrapper.is-stuck::after {
+  opacity: 1;
+}
+
+/* Make calculator more compact when sticky */
+.sticky-calculator-wrapper #calculator {
+  margin-bottom: 0;
+}
+
+/* Remove grid layout - all cards now full width */
+.grid-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.grid-item-left,
+.grid-item-right {
+  width: 100%;
+  max-width: none;
+}
+
+/* Ensure visualizer is full width */
+#visualizer {
+  width: 100%;
+  max-width: none;
+}
+
+/* Results card after visualizer */
+#results-card {
+  width: 100%;
+  max-width: none;
+}
+
+/* At very narrow widths, reduce sticky padding */
+@media (max-width: 640px) {
+  .sticky-calculator-wrapper {
+    padding: 0.5rem 0;
+    margin: -0.5rem 0 1rem 0;
+  }
+}
+
+/* In iframes, ensure sticky works properly */
+@supports (position: sticky) {
+  .sticky-calculator-wrapper {
+    /* Sticky works in iframes in modern browsers */
+    position: sticky;
+  }
+}
+
+/* Fallback for browsers that don't support sticky */
+@supports not (position: sticky) {
+  .sticky-calculator-wrapper {
+    position: relative;
+  }
+}
+
+
+/* ==========================================================================
+   11. FINAL TWEAKS
+   ========================================================================== */
+
+/* Card 1: Left-align the intro text */
+.equation-intro {
+  text-align: left;
+}
+
+/* Chart legend: Remove borders and increase swatch size */
+.legend-color {
+  width: 1rem;
+  height: 1rem;
+  border: none;
+  border-left: none !important;
+  border-right: none !important;
+}
+
+/* Dashed line legend item - slightly wider */
+.legend-color.legend-dashed-line {
+  width: 2rem;
 }

@@ -59,6 +59,9 @@ function init() {
   // Run self-tests
   runSelfTests();
   
+  // Setup sticky observer
+  setupStickyObserver();
+  
   console.log('Bond Calculator ready');
 }
 
@@ -155,6 +158,12 @@ function updateCalculations() {
   // Don't calculate if there are validation errors
   if (hasErrors(errors)) {
     setState({ bondCalculations: null });
+    
+    // Announce to screen readers that calculations are paused
+    const errorCount = Object.keys(errors).length;
+    const errorWord = errorCount === 1 ? 'error' : 'errors';
+    announceToScreenReader(`Calculations paused. ${errorCount} input ${errorWord} detected.`);
+    
     return;
   }
   
@@ -257,7 +266,24 @@ function switchView(view) {
  * @param {Object} newState - Updated state
  */
 function handleStateChange(newState) {
-  const { bondCalculations, viewMode } = newState;
+  const { bondCalculations, viewMode, errors } = newState;
+  
+  // Update visual state based on validation errors
+  const resultsCard = $('#results-card');
+  const visualizerSection = $('#visualizer');
+  const equationCard = $('#equation-card');
+  
+  if (hasErrors(errors)) {
+    // Add dimmed state class
+    if (resultsCard) resultsCard.classList.add('has-validation-errors');
+    if (visualizerSection) visualizerSection.classList.add('has-validation-errors');
+    if (equationCard) equationCard.classList.add('has-validation-errors');
+  } else {
+    // Remove dimmed state class
+    if (resultsCard) resultsCard.classList.remove('has-validation-errors');
+    if (visualizerSection) visualizerSection.classList.remove('has-validation-errors');
+    if (equationCard) equationCard.classList.remove('has-validation-errors');
+  }
   
   if (!bondCalculations) {
     // Clear displays if no calculations
@@ -405,27 +431,64 @@ function runSelfTests() {
         if (diff <= test.expected.tolerance) {
           console.log(`✓ ${test.name} passed`);
         } else {
-          console.warn(`✗ ${test.name} failed: expected ${test.expected.price}, got ${result.bondPrice}`);
+          console.warn(`✗ ${test.name} failed: expected ${test.expected.price}, got ${result.bondPrice}`);
         }
       } else if (test.expected.priceShouldBe === 'greater than 100') {
         if (result.bondPrice > 100) {
           console.log(`✓ ${test.name} passed`);
         } else {
-          console.warn(`✗ ${test.name} failed: price should be > 100, got ${result.bondPrice}`);
+          console.warn(`✗ ${test.name} failed: price should be > 100, got ${result.bondPrice}`);
         }
       } else if (test.expected.priceShouldBe === 'less than 100') {
         if (result.bondPrice < 100) {
           console.log(`✓ ${test.name} passed`);
         } else {
-          console.warn(`✗ ${test.name} failed: price should be < 100, got ${result.bondPrice}`);
+          console.warn(`✗ ${test.name} failed: price should be < 100, got ${result.bondPrice}`);
         }
       }
     } catch (error) {
-      console.error(`✗ ${test.name} threw error:`, error);
+      console.error(`✗ ${test.name} threw error:`, error);
     }
   });
   
   console.log('Self-tests complete');
+}
+
+
+// =============================================================================
+// STICKY CALCULATOR OBSERVER
+// =============================================================================
+
+/**
+ * Detect when calculator becomes stuck and add visual feedback
+ */
+function setupStickyObserver() {
+  const wrapper = document.querySelector('.sticky-calculator-wrapper');
+  if (!wrapper) return;
+  
+  // Create a sentinel element at the top
+  const sentinel = document.createElement('div');
+  sentinel.style.position = 'absolute';
+  sentinel.style.top = '-1px';
+  sentinel.style.height = '1px';
+  sentinel.style.width = '100%';
+  sentinel.style.pointerEvents = 'none';
+  wrapper.insertBefore(sentinel, wrapper.firstChild);
+  
+  // Observe the sentinel
+  const observer = new IntersectionObserver(
+    ([entry]) => {
+      // When sentinel is not visible, calculator is stuck
+      if (entry.intersectionRatio < 1) {
+        wrapper.classList.add('is-stuck');
+      } else {
+        wrapper.classList.remove('is-stuck');
+      }
+    },
+    { threshold: [1], rootMargin: '0px' }
+  );
+  
+  observer.observe(sentinel);
 }
 
 // =============================================================================

@@ -103,10 +103,28 @@ export function updateValidationSummary(errors) {
   if (!summary || !list) return;
 
   if (hasErrors(errors)) {
+    const errorCount = Object.keys(errors).length;
+    
     list.innerHTML = Object.entries(errors)
       .map(([field, message]) => `<li>${message}</li>`)
       .join('');
+    
     summary.style.display = 'block';
+    
+    // Update the title with count for better context
+    const title = summary.querySelector('.validation-title');
+    if (title) {
+      const errorWord = errorCount === 1 ? 'error' : 'errors';
+      title.textContent = `Please correct the following ${errorCount} ${errorWord}:`;
+    }
+    
+    // Focus the validation summary so screen readers announce it
+    // and keyboard users can easily navigate to fix errors
+    setTimeout(() => {
+      summary.focus();
+      summary.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+    
   } else {
     summary.style.display = 'none';
   }

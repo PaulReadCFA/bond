@@ -178,7 +178,19 @@ onHover: (event, activeElements) => {
         x: {
           title: {
             display: true,
-            text: 'Years'
+            text: 'Years',
+            font: {
+              size: 13,
+              weight: 'bold'
+            },
+            color: '#374151'  // Darker gray-700
+          },
+          ticks: {
+            font: {
+              size: 12,
+              weight: 'bold'
+            },
+            color: '#374151'  // Darker gray-700
           },
           grid: {
             display: false
@@ -193,6 +205,11 @@ onHover: (event, activeElements) => {
             callback: function(value) {
               return formatCurrency(value);
             },
+            font: {
+              size: 12,
+              weight: 'bold'
+            },
+            color: '#374151',  // gray-700 - darker
             autoSkip: true,
             maxRotation: 0,
             minRotation: 0
@@ -212,6 +229,10 @@ onHover: (event, activeElements) => {
             callback: function(value) {
               return value.toFixed(1) + '%';
             },
+            font: {
+              size: 12,
+              weight: 'bold'
+            },
             color: '#7a46ff',
             autoSkip: true,
             maxRotation: 0,
@@ -227,7 +248,7 @@ onHover: (event, activeElements) => {
           left: 10,
           right: 10,
           top: showLabels ? 35 : 15,
-          bottom: 10
+          bottom: 80  // Increased to ensure note clears x-axis title
         }
       }
     },
@@ -239,15 +260,19 @@ onHover: (event, activeElements) => {
         const chartArea = chart.chartArea;
         
         ctx.save();
-        ctx.fillStyle = '#7a46ff';
+        ctx.fillStyle = '#5b21b6';  // Darker purple (purple-800) instead of #7a46ff
         // Use relative font size based on chart area for zoom compatibility
         const fontSize = Math.max(11, Math.min(14, chartArea.width / 50));
-        ctx.font = `bold ${fontSize}px sans-serif`;
+        ctx.font = `bold ${fontSize}px 'STIX Two Math', 'Cambria Math', serif`;
         ctx.textAlign = 'right';
         ctx.textBaseline = 'top';
         
+        // Calculate safe Y position - ensure it's visible
+        // Use padding.top as reference and ensure minimum distance from top
+        const safeY = Math.max(5, chartArea.top - 20);
+        
         // Draw title at top right
-        ctx.fillText('Yield to Maturity (%)', chartArea.right, chartArea.top - 25);
+        ctx.fillText('Yield to Maturity (%)', chartArea.right, safeY);
         
         ctx.restore();
       }
@@ -260,23 +285,31 @@ onHover: (event, activeElements) => {
         
         const ctx = chart.ctx;
         ctx.save();
-        ctx.font = 'bold 11px sans-serif';
-        ctx.fillStyle = COLORS.darkText;
+        ctx.font = "900 14px 'STIX Two Math', 'Cambria Math', serif";  // 900 weight (black) and 14px
+        ctx.fillStyle = '#000000';  // Pure black for maximum contrast
         ctx.textAlign = 'center';
         ctx.textBaseline = 'bottom';
         
-        // Find the highest positive bar to align negative labels
         const meta0 = chart.getDatasetMeta(0);
         const meta1 = chart.getDatasetMeta(1);
         
-        let maxPositiveY = chart.scales.y.top;
+        // Find the highest point (top of the tallest bar) to align ALL labels
+        let highestY = chart.scales.y.bottom; // Start at bottom
         chart.data.labels.forEach((label, index) => {
           const total = totalData[index];
-          if (total > 0 && meta0.data[index] && meta1.data[index]) {
+          if (Math.abs(total) < 0.01) return;
+          
+          if (!meta0.data[index] || !meta1.data[index]) return;
+          
+          // For positive bars, find the top
+          if (total > 0) {
             const topY = Math.min(meta0.data[index].y, meta1.data[index].y);
-            maxPositiveY = Math.max(maxPositiveY, topY);
+            highestY = Math.min(highestY, topY); // Lower Y value = higher on screen
           }
         });
+        
+        // Place all labels at the same height (slightly above the highest bar)
+        const labelY = highestY - 5;
         
         chart.data.labels.forEach((label, index) => {
           const total = totalData[index];
@@ -284,23 +317,49 @@ onHover: (event, activeElements) => {
           
           if (!meta0.data[index] || !meta1.data[index]) return;
           
-          const bar0 = meta0.data[index];
           const bar1 = meta1.data[index];
-          
           const x = bar1.x;
-          let y;
           
-          if (total < 0) {
-            // For negative bars, align with the positive labels
-            y = maxPositiveY - 5;
-          } else {
-            // For positive bars, place above the bar as before
-            y = Math.min(bar0.y, bar1.y) - 5;
-          }
-          
-          // Draw the label (use parentheses for negative values)
-          ctx.fillText(formatCurrency(total, false), x, y);
+          // All labels at the same Y position
+          ctx.fillText(formatCurrency(total, false), x, labelY);
         });
+        
+        ctx.restore();
+      }
+    },
+    {
+      // Chart note plugin - styled like table note, positioned below x-axis
+      id: 'chartNote',
+      afterDraw: (chart) => {
+        const ctx = chart.ctx;
+        const chartArea = chart.chartArea;
+        const canvas = chart.canvas;
+        
+        ctx.save();
+        
+        // Match table note styling
+        const noteText = 'Note: Values in parentheses indicate negative cash flows (outflows).';
+        const fontSize = 12;
+        ctx.font = `${fontSize}px 'STIX Two Math', 'Cambria Math', serif`;
+        
+        // Position below x-axis title (45px gap to clear "Years" label)
+        const noteHeight = 30;
+        const noteY = chartArea.bottom + 45;
+        const boxX = 0;
+        const boxWidth = canvas.width;
+        
+        // Only draw if there's enough space
+        if (noteY + noteHeight <= canvas.height) {
+          // Draw white background
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(boxX, noteY, boxWidth, noteHeight);
+          
+          // Draw text (gray-600)
+          ctx.fillStyle = '#4b5563';
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(noteText, 10, noteY + (noteHeight / 2));
+        }
         
         ctx.restore();
       }

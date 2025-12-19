@@ -5,26 +5,6 @@
    ========================================================================== */
 
 /* ==========================================================================
-   STIX Two Math Font (for mathematical consistency)
-   ========================================================================== */
-
-/* Try to load STIX Two Math from parent page if available */
-@font-face {
-  font-family: 'STIX Two Math';
-  src: local('STIX Two Math'), local('STIXTwoMath-Regular');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* Fallback font stack for mathematical content */
-:root {
-  --font-math: 'STIX Two Math', 'Cambria Math', 'Latin Modern Math', 'XITS Math', 
-               'Asana Math', 'TeX Gyre Termes Math', 'DejaVu Math TeX Gyre', 
-               'Computer Modern', serif;
-}
-
-/* ==========================================================================
    1. BOND-SPECIFIC COLOR ASSIGNMENTS
    ========================================================================== */
 :root {
@@ -45,8 +25,8 @@
 }
 
 .result-box.analysis {
-  background-color: var(--color-bg-purple);
-  border-color: var(--color-purple-200);
+  background-color: var(--color-bg-orange);
+  border-color: var(--color-bond-pv);
 }
 
 .result-title.price {
@@ -55,8 +35,23 @@
   color: var(--color-orange-darker);
 }
 
+/* Match mortgage typography conventions */
 .result-title.analysis {
-  color: var(--color-eggplant-deep);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #8b4513;  /* Orange theme - darker for contrast */
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+/* Main result value - large, bold, BLACK (matching mortgage) */
+.result-value.analysis-type {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-gray-900);  /* BLACK */
+  line-height: 1.2;
+  margin-bottom: 0.75rem;
 }
 
 .result-value {
@@ -73,9 +68,37 @@
   font-weight: 400;
 }
 
+/* Supporting details container */
+.result-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Detail lines - matching mortgage .result-detail */
+.result-detail {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-gray-700);
+  line-height: 1.6;
+}
+
+.result-detail strong {
+  color: var(--color-gray-900);
+  font-weight: 600;
+}
+
+/* PV breakdown line - slightly separated */
+.result-detail.pv-breakdown {
+  margin-top: 0.25rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(185, 91, 29, 0.2);
+}
+
+/* Legacy styles - kept for compatibility */
 .analysis-content {
   font-size: 1rem;
-  color: var(--color-eggplant-medium);
+  color: var(--color-gray-700);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -240,9 +263,9 @@
   }
 }
 
-/* MathML styling */
+/* MathML styling - use math fonts for proper bracket scaling */
 math {
-  font-family: var(--font-math);
+  font-family: 'STIX Two Math', 'Cambria Math', 'Latin Modern Math', serif;
   font-size: 1.125rem;
   font-weight: 600;
   color: var(--color-gray-800);
@@ -251,7 +274,7 @@ math {
 
 /* Dynamic equation - slightly smaller */
 #dynamic-equation-container math {
-  font-family: var(--font-math);
+  font-family: 'STIX Two Math', 'Cambria Math', 'Latin Modern Math', serif;
   font-size: 1rem;
   color: var(--color-gray-700);
 }
@@ -452,7 +475,6 @@ math mo {
   background: linear-gradient(to bottom, #f9fafb 0%, #f3f4f6 100%);
   border-bottom: 2px solid var(--color-gray-300);
   font-size: 0.8125rem;
-  text-transform: uppercase;
   letter-spacing: 0.025em;
   padding: 0.75rem 1rem;
   font-weight: 700;
@@ -500,7 +522,11 @@ math mo {
 /* Footer styling - clean top border */
 .data-table tfoot tr {
   border-top: 2px solid var(--color-gray-400);
-  background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+  background-color: #fff7ed; /* Orange for PV */
+}
+
+.data-table tfoot tr:hover {
+  background-color: #ffedd5;
 }
 
 .data-table tfoot td {
@@ -527,7 +553,7 @@ math mo {
   /* This will be the tooltip bubble */
   content: attr(data-tooltip);
   position: absolute;
-  bottom: calc(100% + 8px);
+  bottom: calc(100% + 12px); /* Increased from 8px to 12px for more clearance */
   left: 50%;
   transform: translateX(-50%);
   background: var(--color-gray-900);
@@ -587,24 +613,40 @@ math mo {
   transform: translateX(0) translateY(0);
 }
 
-/* Visual indicator: small circle in top-right */
+/* Visual indicator removed - cleaner design and better accessibility */
+/* Tooltips still work on hover, just without the blue dots */
+
+/* First row tooltips - show BELOW instead of above to avoid clipping with header */
+.data-table tbody tr:first-child td[data-tooltip]::before {
+  bottom: auto;
+  top: calc(100% + 12px); /* Position below the cell */
+  transform: translateX(-50%) translateY(4px);
+}
+
+.data-table tbody tr:first-child td[data-tooltip]:hover::before {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* First row, first column - align left to avoid clipping */
+.data-table tbody tr:first-child td[data-tooltip]:first-child::before {
+  left: 0;
+  transform: translateX(0) translateY(4px);
+}
+
+.data-table tbody tr:first-child td[data-tooltip]:first-child:hover::before {
+  transform: translateX(0) translateY(0);
+}
 .data-table td[data-tooltip] {
-  background-image: 
-    radial-gradient(circle, var(--color-blue-interactive) 40%, transparent 40%);
-  background-size: 5px 5px;
-  background-position: calc(100% - 6px) 6px;
-  background-repeat: no-repeat;
+  background-image: none;
 }
 
 .data-table td[data-tooltip]:hover,
 .data-table td[data-tooltip]:focus {
-  background-image: 
-    radial-gradient(circle, var(--color-blue-interactive) 40%, transparent 40%);
-  background-size: 6px 6px;
-  background-position: calc(100% - 6px) 6px;
+  background-image: none;
 }
 
 /* Period 0 row (initial purchase) - subtle highlight */
+/* First row - orange for PV/purchase */
 .data-table tbody tr:first-child {
   background-color: #fff7ed;
 }
@@ -613,13 +655,13 @@ math mo {
   background-color: #ffedd5 !important;
 }
 
-/* Final period row - subtle highlight */
+/* Final period row - neutral coloring */
 .data-table tbody tr:last-child {
-  background-color: #f0fdf4;
+  background-color: inherit;
 }
 
 .data-table tbody tr:last-child:hover {
-  background-color: #dcfce7 !important;
+  background-color: var(--color-gray-50) !important;
 }
 
 /* Focus states for accessibility */
@@ -628,11 +670,10 @@ math mo {
 /* Table note styling */
 .table-note {
   padding: 0.75rem 1rem;
-  background-color: var(--color-gray-50);
+  background-color: transparent; /* Transparent to match card */
   border-radius: 0 0 0.5rem 0.5rem;
   margin-top: 0;
-  border: 1px solid var(--color-gray-200);
-  border-top: none;
+  border: none; /* Remove border for cleaner look */
   font-style: normal;
 }
 
@@ -651,7 +692,10 @@ math mo {
 }
 
 /* Add padding back to inner elements */
-#visualizer .view-controls,
+#visualizer .view-controls {
+  /* No extra padding needed */
+}
+
 #visualizer .chart-wrapper {
   padding: 0 1.25rem;
 }
@@ -858,17 +902,13 @@ math mo {
 
 
 
-/* Use math font for all numeric displays for consistency */
+/* Use consistent system font for all content */
 .result-value,
 .info-value,
 .data-table,
-.legend-item {
-  font-family: var(--font-math);
-}
-
-/* Input fields also use math font for consistency */
+.legend-item,
 .input-field-inline {
-  font-family: var(--font-math);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 }
 
 /* ==========================================================================
@@ -916,8 +956,8 @@ math mo {
   top: 0;
   z-index: 100;
   background: var(--color-gray-50);
-  padding: 1rem 0;
-  margin: -1rem 0 1.5rem 0;
+  padding: 0;  /* Remove padding - gap is handled by .content */
+  margin: 0;   /* Remove margin - gap is handled by .content */
 }
 
 /* Add subtle shadow when stuck */
@@ -969,11 +1009,11 @@ math mo {
   max-width: none;
 }
 
-/* At very narrow widths, reduce sticky padding */
+/* At very narrow widths, keep same approach */
 @media (max-width: 640px) {
   .sticky-calculator-wrapper {
-    padding: 0.5rem 0;
-    margin: -0.5rem 0 1rem 0;
+    padding: 0;
+    margin: 0;
   }
 }
 

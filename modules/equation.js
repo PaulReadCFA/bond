@@ -48,7 +48,7 @@ export function renderDynamicEquation(calculations, params) {
         <mo fence="true" stretchy="true" symmetric="true">[</mo>
         <mrow>
           <mn>1</mn>
-          <mo>-</mo>
+          <mo>−</mo>
           <mfrac>
             <mn>1</mn>
             <msup>

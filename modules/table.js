@@ -3,6 +3,8 @@
  * Renders accessible data table for bond cash flows
  */
 
+console.log('ðŸ”µ TABLE.JS VERSION: 2024-12-18-11:30 - NO COLORS IN CELLS');
+
 import { $, formatCurrency, announceToScreenReader } from './utils.js';
 
 /**
@@ -26,18 +28,17 @@ export function renderTable(cashFlows, bondPrice, periods, periodicCoupon, ytm) 
   // --------------------------------------------------------------
   let html = `
     <caption class="sr-only">
-      Bond cash flow schedule showing period, year, yield to maturity, coupon payments,
+      Bond cash flow schedule showing year, yield to maturity, coupon payments,
       principal repayment, and total cash flows. Note: Values in parentheses indicate negative cash flows.
     </caption>
 
     <thead>
       <tr>
-        <th scope="col" class="text-left">Period</th>
         <th scope="col" class="text-left">Year</th>
-        <th scope="col" class="text-right">Yield-to-maturity <span style="color: #7a46ff;">(r)</span></th>
-        <th scope="col" class="text-right">Coupon payment <span style="color: #3c6ae5;">(PMT)</span></th>
-        <th scope="col" class="text-right">Principal repayment <span style="color: #0079a6;">(FV)</span></th>
-        <th scope="col" class="text-right">Total Cash Flow <span style="color: #3c6ae5;">(PMT)</span> + <span style="color: #0079a6;">(FV)</span></th>
+        <th scope="col" class="text-right">Yield-to-maturity (<span style="color: #7a46ff; font-style: italic;">r</span>)</th>
+        <th scope="col" class="text-right">Coupon payment (<span style="color: #3c6ae5;">PMT</span>)</th>
+        <th scope="col" class="text-right">Principal repayment (<span style="color: #0079a6;">FV</span>)</th>
+        <th scope="col" class="text-right">Total cash flow (<span style="color: #3c6ae5;">PMT</span>) + (<span style="color: #0079a6;">FV</span>)</th>
       </tr>
     </thead>
 
@@ -52,11 +53,10 @@ export function renderTable(cashFlows, bondPrice, periods, periodicCoupon, ytm) 
 
     html += `
       <tr>
-        <td class="text-left" data-label="${cf.period}">${cf.period}</td>
         <td class="text-left" data-label="Year">${cf.yearLabel.toFixed(1)}</td>
-        <td class="text-right" style="color: #7a46ff;" data-label="Yield-to-maturity (r)" data-tooltip="Annual yield-to-maturity rate">${ytm.toFixed(2)}%</td>
-        <td class="text-right" style="color: #3c6ae5;" data-label="Coupon Payment (PMT)" data-tooltip="Annual coupon payment = Face Value × (Coupon Rate / Payment Frequency)">${formatCurrency(cf.couponPayment)}</td>
-        <td class="text-right" style="color: #0079a6;" data-label="Principal Repayment (FV)" data-tooltip="${isInitial ? 'Initial bond purchase price (negative cash flow)' : (isFinal ? 'Face value returned at maturity = $100.00' : 'No principal payment until maturity')}">${formatCurrency(cf.principalPayment)}</td>
+        <td class="text-right" data-label="Yield-to-maturity (r)" data-tooltip="Annual yield to maturity rate">${ytm.toFixed(2)}%</td>
+        <td class="text-right" data-label="Coupon payment (PMT)" data-tooltip="Annual coupon payment = Face value × (Coupon rate / Payment frequency)">${formatCurrency(cf.couponPayment)}</td>
+        <td class="text-right" data-label="Principal repayment (FV)" data-tooltip="${isInitial ? 'Initial bond purchase price (negative cash flow)' : (isFinal ? 'Face value returned at maturity = $100.00' : 'No principal payment until maturity')}">${formatCurrency(cf.principalPayment)}</td>
         <td class="text-right" data-label="Total Cash Flow" data-tooltip="${isInitial ? 'Amount paid to purchase bond' : 'Coupon payment' + (isFinal ? ' + Face value' : '') + ' = ' + formatCurrency(cf.totalCashFlow)}"><strong>${formatCurrency(cf.totalCashFlow)}</strong></td>
       </tr>`;
   });
@@ -69,10 +69,10 @@ export function renderTable(cashFlows, bondPrice, periods, periodicCoupon, ytm) 
 
     <tfoot>
       <tr style="background-color: #ffffff;">
-        <td colspan="5" class="text-right" style="color: #b95b1d;">
-          <strong>Bond Price <span style="color: #b95b1d;">(PV</span> of all cash flows):</strong>
+        <td colspan="4" class="text-right">
+          <strong>Present value of bond (<span style="color: #b95b1d;">PV</span>):</strong>
         </td>
-        <td class="text-right" style="color: #b95b1d;" data-tooltip="Sum of present values of all future cash flows, discounted at the yield-to-maturity rate"><strong>${formatCurrency(bondPrice)}</strong></td>
+        <td class="text-right" data-tooltip="Sum of present values of all future cash flows, discounted at the yield to maturity rate"><strong style="color: #b95b1d;">${formatCurrency(bondPrice)}</strong></td>
       </tr>
     </tfoot>
   `;

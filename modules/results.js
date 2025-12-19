@@ -71,8 +71,9 @@ function createAnalysisBox(calculations, params) {
   
   const box = createElement('div', { className: 'result-box analysis' });
   
+  // Small uppercase title (matching mortgage .result-title)
   const title = createElement('h5', { className: 'result-title analysis' }, 
-    'Premium-Discount Analysis'
+    'Premium—Discount Analysis'
   );
   box.appendChild(title);
   
@@ -87,39 +88,35 @@ function createAnalysisBox(calculations, params) {
   // Add ID to title for aria-labelledby
   title.id = 'analysis-heading';
   
-  // Bond type (par, premium, or discount)
-  const typeDiv = createElement('div', { className: 'analysis-type' }, 
+  // Main result: Bond classification (large, bold, BLACK - matching mortgage .result-value)
+  const typeDiv = createElement('div', { className: 'result-value analysis-type' }, 
     bondType.description
   );
   content.appendChild(typeDiv);
   
-  // Analysis text
-  const analysisText = createElement('div');
+  // Supporting details container (matching mortgage .result-detail pattern)
+  const detailsContainer = createElement('div', { className: 'result-details' });
   
+  // Comparison line
+  const comparisonLine = createElement('div', { className: 'result-detail' });
   if (bondType.type === 'par') {
-    analysisText.textContent = `Trading at par. Coupon rate = YTM (${ytm.toFixed(2)}%)`;
+    comparisonLine.innerHTML = `Trading at par: <span style="font-style: italic;">c</span> = <span style="font-style: italic;">r</span> (${ytm.toFixed(2)}%)`;
   } else if (bondType.type === 'premium') {
-    analysisText.innerHTML = `Trading ${formatCurrency(bondType.difference)} above par. ` +
-      `Coupon (${couponRate.toFixed(2)}%) &gt; YTM (${ytm.toFixed(2)}%)`;
+    comparisonLine.innerHTML = `Trading ${formatCurrency(bondType.difference)} above par<br>` +
+      `<span style="font-style: italic;">c</span> (${couponRate.toFixed(2)}%) &gt; <span style="font-style: italic;">r</span> (${ytm.toFixed(2)}%)`;
   } else {
-    analysisText.innerHTML = `Trading ${formatCurrency(bondType.difference)} below par. ` +
-      `YTM (${ytm.toFixed(2)}%) &gt; coupon (${couponRate.toFixed(2)}%)`;
+    comparisonLine.innerHTML = `Trading ${formatCurrency(bondType.difference)} below par<br>` +
+      `<span style="font-style: italic;">r</span> (${ytm.toFixed(2)}%) &gt; <span style="font-style: italic;">c</span> (${couponRate.toFixed(2)}%)`;
   }
+  detailsContainer.appendChild(comparisonLine);
   
-  content.appendChild(analysisText);
+  // PV breakdown - separate lines (matching mortgage pattern)
+  const pvBreakdown = createElement('div', { className: 'result-detail pv-breakdown' });
+  pvBreakdown.innerHTML = 
+    `<span style="color: #8b4513;">PV</span> = coupon (${formatCurrency(pvCoupons)}) + face (${formatCurrency(pvFaceValue)})`;
+  detailsContainer.appendChild(pvBreakdown);
   
-  // Present value breakdown
-  const breakdownDiv = createElement('div', { className: 'analysis-details' });
-  
-  const pvCouponsDiv = createElement('div');
-  pvCouponsDiv.textContent = `PV coupons: ${formatCurrency(pvCoupons)}`;
-  breakdownDiv.appendChild(pvCouponsDiv);
-  
-  const pvFaceDiv = createElement('div');
-  pvFaceDiv.textContent = `PV face: ${formatCurrency(pvFaceValue)}`;
-  breakdownDiv.appendChild(pvFaceDiv);
-  
-  content.appendChild(breakdownDiv);
+  content.appendChild(detailsContainer);
   box.appendChild(content);
   
   return box;

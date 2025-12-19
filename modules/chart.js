@@ -1,5 +1,5 @@
 /**
- * Chart Module
+ * Chart Module - Bond Cash Flow Chart
  * Chart rendering using Chart.js with keyboard accessibility
  */
 
@@ -142,22 +142,22 @@ onHover: (event, activeElements) => {
               const index = context.dataIndex;
               const isInitialPeriod = index === 0;
               
-              // YTM line - add (r) with indication it's purple
+              // YTM line - use italic r
               if (context.dataset.label === 'Yield-to-maturity (r)') {
-                return `Yield-to-maturity (r): ${value.toFixed(2)}%`;
+                return `Yield-to-maturity (𝑟): ${value.toFixed(2)}%`;
               }
               
-              // For period 0, change "Principal repayment" to "Present value bond price"
+              // For period 0, use italic PV
               if (isInitialPeriod && context.dataset.label === 'Principal repayment') {
-                return `Present value bond price (PV): ${formatCurrency(value, true)}`;
+                return `Present value of bond (𝑃𝑉): ${formatCurrency(value, true)}`;
               }
               
-              // Regular labels with variables highlighted
+              // Regular labels with italic abbreviations
               if (context.dataset.label === 'Principal repayment') {
-                return `Principal repayment (FV): ${formatCurrency(value, true)}`;
+                return `Principal repayment (𝐹𝑉): ${formatCurrency(value, true)}`;
               }
               if (context.dataset.label === 'Coupon payment') {
-                return `Coupon payment (PMT): ${formatCurrency(value, true)}`;
+                return `Coupon payment (𝑃𝑀𝑇): ${formatCurrency(value, true)}`;
               }
               
               return `${context.dataset.label}: ${formatCurrency(value, true)}`;
@@ -178,19 +178,21 @@ onHover: (event, activeElements) => {
         x: {
           title: {
             display: true,
-            text: 'Years',
+            text: 'Time (years)',
             font: {
-              size: 13,
-              weight: 'bold'
+              size: 14,
+              weight: '600',
+              family: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif"
             },
-            color: '#374151'  // Darker gray-700
+            color: '#1f2937'  // gray-800 - darker for better readability
           },
           ticks: {
             font: {
-              size: 12,
-              weight: 'bold'
+              size: 13,
+              weight: '600',
+              family: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif"
             },
-            color: '#374151'  // Darker gray-700
+            color: '#1f2937'  // gray-800 - darker
           },
           grid: {
             display: false
@@ -206,10 +208,11 @@ onHover: (event, activeElements) => {
               return formatCurrency(value);
             },
             font: {
-              size: 12,
-              weight: 'bold'
+              size: 13,
+              weight: '600',
+              family: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif"
             },
-            color: '#374151',  // gray-700 - darker
+            color: '#1f2937',  // gray-800 - darker
             autoSkip: true,
             maxRotation: 0,
             minRotation: 0
@@ -220,20 +223,28 @@ onHover: (event, activeElements) => {
         },
         y2: {
           title: {
-            display: false  // We'll draw it manually
+            display: true,
+            text: 'Yield-to-maturity (%)',
+            color: '#7a46ff',
+            font: {
+              size: 13,
+              weight: '600',
+              family: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif"
+            }
           },
           position: 'right',
           min: 0,
           max: ytm ? Math.max(12, ytm * 1.2) : 12,
           ticks: {
             callback: function(value) {
-              return value.toFixed(1) + '%';
+              return value.toFixed(1);
             },
             font: {
-              size: 12,
-              weight: 'bold'
+              size: 13,
+              weight: '600',
+              family: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif"
             },
-            color: '#7a46ff',
+            color: '#7a46ff',  // Keep purple for YTM axis
             autoSkip: true,
             maxRotation: 0,
             minRotation: 0
@@ -248,36 +259,11 @@ onHover: (event, activeElements) => {
           left: 10,
           right: 10,
           top: showLabels ? 35 : 15,
-          bottom: 80  // Increased to ensure note clears x-axis title
+          bottom: 95  // Increased for note position
         }
       }
     },
     plugins: [{
-      // Custom plugin to draw horizontal Y2 axis title
-      id: 'horizontalY2Title',
-      afterDraw: (chart) => {
-        const ctx = chart.ctx;
-        const chartArea = chart.chartArea;
-        
-        ctx.save();
-        ctx.fillStyle = '#5b21b6';  // Darker purple (purple-800) instead of #7a46ff
-        // Use relative font size based on chart area for zoom compatibility
-        const fontSize = Math.max(11, Math.min(14, chartArea.width / 50));
-        ctx.font = `bold ${fontSize}px 'STIX Two Math', 'Cambria Math', serif`;
-        ctx.textAlign = 'right';
-        ctx.textBaseline = 'top';
-        
-        // Calculate safe Y position - ensure it's visible
-        // Use padding.top as reference and ensure minimum distance from top
-        const safeY = Math.max(5, chartArea.top - 20);
-        
-        // Draw title at top right
-        ctx.fillText('Yield to Maturity (%)', chartArea.right, safeY);
-        
-        ctx.restore();
-      }
-    },
-    {
       // Custom plugin to draw labels on top of stacked bars
       id: 'stackedBarLabels',
       afterDatasetsDraw: (chart) => {
@@ -285,8 +271,9 @@ onHover: (event, activeElements) => {
         
         const ctx = chart.ctx;
         ctx.save();
-        ctx.font = "900 14px 'STIX Two Math', 'Cambria Math', serif";  // 900 weight (black) and 14px
-        ctx.fillStyle = '#000000';  // Pure black for maximum contrast
+        // Use consistent font size and system font for better readability
+        ctx.font = "700 14px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif";
+        ctx.fillStyle = '#111827';  // gray-900 - very dark for maximum readability
         ctx.textAlign = 'center';
         ctx.textBaseline = 'bottom';
         
@@ -328,6 +315,57 @@ onHover: (event, activeElements) => {
       }
     },
     {
+      // Plugin to add variable labels (PV, PMT, FV) on bars for accessibility
+      id: 'variableLabels',
+      afterDatasetsDraw: (chart) => {
+        if (!showLabels) return;
+        
+        const ctx = chart.ctx;
+        const meta0 = chart.getDatasetMeta(0); // Principal
+        const meta1 = chart.getDatasetMeta(1); // Coupon
+        
+        ctx.save();
+        ctx.font = "600 11px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif";
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        chart.data.labels.forEach((label, index) => {
+          const cf = cashFlows[index];
+          if (!meta0.data[index] || !meta1.data[index]) return;
+          
+          const bar0 = meta0.data[index]; // Principal bar
+          const bar1 = meta1.data[index]; // Coupon bar
+          const x = bar1.x;
+          
+          // Label coupon section (PMT) if visible
+          if (Math.abs(cf.couponPayment) > 0.5) {
+            const couponHeight = Math.abs(bar1.y - bar1.base);
+            if (couponHeight > 20) { // Only show if bar is tall enough
+              const couponY = (bar1.y + bar1.base) / 2;
+              ctx.fillStyle = 'white';
+              ctx.fillText('PMT', x, couponY);
+            }
+          }
+          
+          // Label principal section (FV or PV)
+          if (Math.abs(cf.principalPayment) > 0.5) {
+            const principalHeight = Math.abs(bar0.y - bar0.base);
+            if (principalHeight > 20) { // Only show if bar is tall enough
+              const principalY = (bar0.y + bar0.base) / 2;
+              ctx.fillStyle = 'white';
+              if (index === 0) {
+                ctx.fillText('PV', x, principalY);
+              } else {
+                ctx.fillText('FV', x, principalY);
+              }
+            }
+          }
+        });
+        
+        ctx.restore();
+      }
+    },
+    {
       // Chart note plugin - styled like table note, positioned below x-axis
       id: 'chartNote',
       afterDraw: (chart) => {
@@ -337,25 +375,23 @@ onHover: (event, activeElements) => {
         
         ctx.save();
         
-        // Match table note styling
+        // Match table note styling with system font
         const noteText = 'Note: Values in parentheses indicate negative cash flows (outflows).';
         const fontSize = 12;
-        ctx.font = `${fontSize}px 'STIX Two Math', 'Cambria Math', serif`;
+        ctx.font = `${fontSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif`;
         
-        // Position below x-axis title (45px gap to clear "Years" label)
+        // Position below x-axis title (55px gap to clear "Time (years)" label)
         const noteHeight = 30;
-        const noteY = chartArea.bottom + 45;
+        const noteY = chartArea.bottom + 55;
         const boxX = 0;
         const boxWidth = canvas.width;
         
         // Only draw if there's enough space
         if (noteY + noteHeight <= canvas.height) {
-          // Draw white background
-          ctx.fillStyle = '#ffffff';
-          ctx.fillRect(boxX, noteY, boxWidth, noteHeight);
+          // No background - transparent to match card
           
-          // Draw text (gray-600)
-          ctx.fillStyle = '#4b5563';
+          // Draw text (darker gray-700 for better readability)
+          ctx.fillStyle = '#374151';
           ctx.textAlign = 'left';
           ctx.textBaseline = 'middle';
           ctx.fillText(noteText, 10, noteY + (noteHeight / 2));

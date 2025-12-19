@@ -7,8 +7,8 @@
   <meta name="description" content="Interactive bond valuation calculator demonstrating present value calculations for coupon bonds">
   
   <!-- Styles -->
-  <link rel="stylesheet" href="cfa-base.css">
-  <link rel="stylesheet" href="bond-specific.css">
+  <link rel="stylesheet" href="cfa-base.css?v=20251218">
+  <link rel="stylesheet" href="bond-specific.css?v=20251218">
   
   <!-- Chart.js for visualization -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -31,11 +31,19 @@
 <section id="equation-card" class="card">
   <h4 class="card-title">Bond Valuation Equation</h4>
   <p class="equation-intro">
-    This dynamic equation gives the price of a coupon bond based on your input.
+    This dynamic equation gives the price of a coupon bond based on your input in the Bond Cash Flow Calculator.
   </p>
   
+  <!-- Screen reader description of equation structure -->
+  <div class="sr-only" id="equation-description">
+    The bond valuation equation shows: Present value of coupon bond equals the sum of two components. 
+    First component: coupon payment divided by yield, multiplied by bracket 1 minus 1 over quantity 
+    1 plus yield raised to number of periods close bracket. Second component: face value divided by 
+    quantity 1 plus yield raised to number of periods. The equation updates dynamically with your input values.
+  </div>
+  
   <!-- Dynamic equation with actual values -->
-  <div class="equation-container" role="region" aria-label="Bond valuation with your values" aria-live="polite" id="dynamic-equation-container">
+  <div class="equation-container" role="region" aria-label="Bond valuation with your values" aria-describedby="equation-description" aria-live="polite" id="dynamic-equation-container">
     <div id="dynamic-mathml-equation">
       <!-- Populated by JavaScript -->
     </div>
@@ -68,7 +76,7 @@
               <div class="input-group-inline">
                 <div class="input-inline">
                   <label for="coupon-rate" class="input-label-inline">
-                    Coupon rate:
+                    Coupon rate (<span style="font-style: italic;">c</span>):
                   </label>
                   <div class="input-with-suffix-inline">
                     <input 
@@ -82,7 +90,7 @@
 
                 <div class="input-inline">
                   <label for="ytm" class="input-label-inline">
-                    Yield-to-maturity <span style="color: #7a46ff;">(r)</span>:
+                    Yield-to-maturity (<span style="color: #7a46ff; font-style: italic;">r</span>):
                   </label>
                   <div class="input-with-suffix-inline">
                     <input 
@@ -96,7 +104,7 @@
 
                 <div class="input-inline">
                   <label for="years" class="input-label-inline">
-                    Years-to-maturity <span style="color: #15803d;">(T)</span>:
+                    Years to maturity (<span style="color: #15803d; font-style: italic;">T</span>):
                   </label>
                   <div class="input-with-suffix-inline">
                     <input 
@@ -121,26 +129,26 @@
 
       <!-- Card 3: Visualizer (Full Width) -->
       <section class="card" id="visualizer" tabindex="-1">
-        <h4 class="card-title">Bond Cash Flows: Annual Payment Frequency</h4>
+        <h4 class="card-title">Bond Cash Flows</h4>
         <div class="card-content">
           <!-- View toggle buttons -->
           <div class="view-controls">
             <div class="legend" id="chart-legend" role="list" aria-label="Chart legend">
               <span class="legend-item" role="listitem">
                 <span class="legend-color" style="background-color: var(--color-bond-purchase);"></span>
-                Present value of bond <span style="color: #b95b1d;">(PV)</span>
+                Present value of bond <span style="font-style: normal; color: inherit;">(<span style="color: #b95b1d;">PV</span>)</span>
               </span>
               <span class="legend-item" role="listitem">
                 <span class="legend-color" style="background-color: var(--color-bond-coupon);"></span>
-                Coupon payment <span style="color: #3c6ae5;">(PMT)</span>
+                Coupon payment <span style="font-style: normal; color: inherit;">(<span style="color: #3c6ae5;">PMT</span>)</span>
               </span>
               <span class="legend-item" role="listitem">
                 <span class="legend-color" style="background-color: var(--color-bond-face);"></span>
-                Principal repayment <span style="color: #0079a6;">(FV)</span>
+                Principal repayment <span style="font-style: normal; color: inherit;">(<span style="color: #0079a6;">FV</span>)</span>
               </span>
               <span class="legend-item" role="listitem">
                 <span class="legend-color legend-dashed-line" style="border-bottom: 2px dashed var(--color-purple-bold); background: none; width: 2rem; height: 0; border-left: none; border-right: none; border-top: none;"></span>
-                Yield-to-maturity <span style="color: #7a46ff;">(r)</span>
+                Yield-to-maturity <span style="font-style: normal; color: inherit;">(<span style="color: #7a46ff; font-style: italic;">r</span>)</span>
               </span>
             </div>
             
@@ -230,7 +238,7 @@
   </div>
 
   <!-- JavaScript Modules -->
-  <script type="module" src="calculator.js"></script>
+  <script type="module" src="calculator.js?v=20251218"></script>
   <script>
   // Simple MathML support check
   const supportsMathML = CSS.supports('math-style: normal');

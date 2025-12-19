@@ -208,7 +208,7 @@ canvas[tabindex]:focus {
 .content {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;  /* Consistent 1rem gap between all cards */
 }
 
 /* Middle Row - Side-by-side on desktop */
@@ -273,11 +273,12 @@ canvas[tabindex]:focus {
 .model-controls,
 .view-controls {
   display: flex;
+  justify-content: flex-end; /* Keep legend and buttons together on right */
   flex-wrap: wrap;
   align-items: center;
   gap: 1rem;
   margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
+  padding-bottom: 1rem;  /* Moderate spacing */
   border-bottom: 1px solid var(--color-gray-200);
 }
 
@@ -320,7 +321,9 @@ canvas[tabindex]:focus {
   background-color: var(--color-blue-interactive);
   color: white;
   font-weight: 600;
-  border-color: var(--color-blue-interactive);
+  border-color: transparent;  /* Make border invisible for cleaner look */
+  border-width: 2px;  /* Keep border width to maintain button size */
+  box-shadow: 0 1px 3px rgba(60, 106, 229, 0.3);  /* Subtle shadow instead */
 }
 
 .toggle-btn:disabled {
@@ -519,9 +522,9 @@ canvas[tabindex]:focus {
 }
 
 .result-value {
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   font-size: 1.875rem;
-  font-weight: 400;
+  font-weight: 700;  /* Changed from 400 to 700 for better visibility */
   line-height: 1.2;
   word-break: break-word;
 }
@@ -581,7 +584,9 @@ canvas[tabindex]:focus {
   align-items: center;
   gap: 1rem;
   font-size: 0.875rem;
-  color: var(--color-gray-700);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  font-weight: 400;
+  color: var(--color-gray-800);  /* Darker for consistency */
 }
 
 .legend-item {

@@ -71,9 +71,9 @@ function createAnalysisBox(calculations, params) {
   
   const box = createElement('div', { className: 'result-box analysis' });
   
-  // Small uppercase title (matching mortgage .result-title)
+  // Small uppercase title with dynamic bond type (matching mortgage .result-title)
   const title = createElement('h5', { className: 'result-title analysis' }, 
-    'Premium—Discount Analysis'
+    bondType.description  // Dynamic: "Premium bond", "Par bond", or "Discount bond"
   );
   box.appendChild(title);
   
@@ -87,12 +87,6 @@ function createAnalysisBox(calculations, params) {
   
   // Add ID to title for aria-labelledby
   title.id = 'analysis-heading';
-  
-  // Main result: Bond classification (large, bold, BLACK - matching mortgage .result-value)
-  const typeDiv = createElement('div', { className: 'result-value analysis-type' }, 
-    bondType.description
-  );
-  content.appendChild(typeDiv);
   
   // Supporting details container (matching mortgage .result-detail pattern)
   const detailsContainer = createElement('div', { className: 'result-details' });

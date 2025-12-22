@@ -266,6 +266,18 @@ canvas[tabindex]:focus {
   color: rgba(0, 0, 0, 0.8);
 }
 
+/* Card header with controls (e.g., toggle buttons) */
+.card-header-with-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.card-header-with-controls .card-title {
+  margin-bottom: 0;
+}
+
 /* ==========================================================================
    6. BUTTONS & CONTROLS
    ========================================================================== */

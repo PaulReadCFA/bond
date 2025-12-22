@@ -50,7 +50,7 @@ function createPriceBox(bondPrice) {
   
   // Per $100 par text
   const parText = createElement('span', { className: 'result-value-small' }, 
-    ' per $100 par'
+    ' per USD 100 par'
   );
   valueContainer.appendChild(parText);
   
@@ -71,9 +71,9 @@ function createAnalysisBox(calculations, params) {
   
   const box = createElement('div', { className: 'result-box analysis' });
   
-  // Small uppercase title with dynamic bond type (matching mortgage .result-title)
+  // Small uppercase title (matching mortgage .result-title)
   const title = createElement('h5', { className: 'result-title analysis' }, 
-    bondType.description  // Dynamic: "Premium bond", "Par bond", or "Discount bond"
+    'Premium—Discount Analysis'
   );
   box.appendChild(title);
   
@@ -87,6 +87,12 @@ function createAnalysisBox(calculations, params) {
   
   // Add ID to title for aria-labelledby
   title.id = 'analysis-heading';
+  
+  // Main result: Bond classification (large, bold, BLACK - matching mortgage .result-value)
+  const typeDiv = createElement('div', { className: 'result-value analysis-type' }, 
+    bondType.description
+  );
+  content.appendChild(typeDiv);
   
   // Supporting details container (matching mortgage .result-detail pattern)
   const detailsContainer = createElement('div', { className: 'result-details' });

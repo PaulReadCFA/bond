@@ -59,8 +59,8 @@ function init() {
   // Run self-tests
   runSelfTests();
   
-  // Setup sticky observer
-  setupStickyObserver();
+  // Setup collapsible results section
+  setupResultsToggle();
   
   console.log('Bond Calculator ready');
 }
@@ -429,66 +429,68 @@ function runSelfTests() {
       if (test.expected.price !== undefined) {
         const diff = Math.abs(result.bondPrice - test.expected.price);
         if (diff <= test.expected.tolerance) {
-          console.log(`✓ ${test.name} passed`);
+          console.log(`âœ“ ${test.name} passed`);
         } else {
-          console.warn(`✗ ${test.name} failed: expected ${test.expected.price}, got ${result.bondPrice}`);
+          console.warn(`âœ— ${test.name} failed: expected ${test.expected.price}, got ${result.bondPrice}`);
         }
       } else if (test.expected.priceShouldBe === 'greater than 100') {
         if (result.bondPrice > 100) {
-          console.log(`✓ ${test.name} passed`);
+          console.log(`âœ“ ${test.name} passed`);
         } else {
-          console.warn(`✗ ${test.name} failed: price should be > 100, got ${result.bondPrice}`);
+          console.warn(`âœ— ${test.name} failed: price should be > 100, got ${result.bondPrice}`);
         }
       } else if (test.expected.priceShouldBe === 'less than 100') {
         if (result.bondPrice < 100) {
-          console.log(`✓ ${test.name} passed`);
+          console.log(`âœ“ ${test.name} passed`);
         } else {
-          console.warn(`✗ ${test.name} failed: price should be < 100, got ${result.bondPrice}`);
+          console.warn(`âœ— ${test.name} failed: price should be < 100, got ${result.bondPrice}`);
         }
       }
     } catch (error) {
-      console.error(`✗ ${test.name} threw error:`, error);
+      console.error(`âœ— ${test.name} threw error:`, error);
     }
   });
   
   console.log('Self-tests complete');
 }
 
-
 // =============================================================================
-// STICKY CALCULATOR OBSERVER
+// COLLAPSIBLE RESULTS SECTION
 // =============================================================================
 
 /**
- * Detect when calculator becomes stuck and add visual feedback
+ * Setup toggle button for collapsible results section
  */
-function setupStickyObserver() {
-  const wrapper = document.querySelector('.sticky-calculator-wrapper');
-  if (!wrapper) return;
+function setupResultsToggle() {
+  const toggleBtn = document.getElementById('toggle-results-btn');
+  const resultsContent = document.getElementById('results-content');
   
-  // Create a sentinel element at the top
-  const sentinel = document.createElement('div');
-  sentinel.style.position = 'absolute';
-  sentinel.style.top = '-1px';
-  sentinel.style.height = '1px';
-  sentinel.style.width = '100%';
-  sentinel.style.pointerEvents = 'none';
-  wrapper.insertBefore(sentinel, wrapper.firstChild);
+  if (!toggleBtn || !resultsContent) {
+    console.warn('Results toggle elements not found');
+    return;
+  }
   
-  // Observe the sentinel
-  const observer = new IntersectionObserver(
-    ([entry]) => {
-      // When sentinel is not visible, calculator is stuck
-      if (entry.intersectionRatio < 1) {
-        wrapper.classList.add('is-stuck');
-      } else {
-        wrapper.classList.remove('is-stuck');
-      }
-    },
-    { threshold: [1], rootMargin: '0px' }
-  );
-  
-  observer.observe(sentinel);
+  listen(toggleBtn, 'click', () => {
+    const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+    const newState = !isExpanded;
+    
+    // Update ARIA state
+    toggleBtn.setAttribute('aria-expanded', newState.toString());
+    
+    // Update button label
+    toggleBtn.setAttribute('aria-label', 
+      newState ? 'Collapse results and analysis section' : 'Expand results and analysis section'
+    );
+    
+    // Show/hide content
+    if (newState) {
+      resultsContent.style.display = 'block';
+      announceToScreenReader('Results and analysis section expanded');
+    } else {
+      resultsContent.style.display = 'none';
+      announceToScreenReader('Results and analysis section collapsed');
+    }
+  });
 }
 
 // =============================================================================

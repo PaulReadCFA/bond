@@ -947,94 +947,45 @@ math mo {
 
 
 /* ==========================================================================
-   13. STICKY CALCULATOR LAYOUT
+   13. COLLAPSIBLE SECTION TOGGLE
    ========================================================================== */
 
-/* Sticky calculator wrapper */
-.sticky-calculator-wrapper {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: var(--color-gray-50);
-  padding: 0;  /* Remove padding - gap is handled by .content */
-  margin: 0;   /* Remove margin - gap is handled by .content */
+/* Section toggle button (for collapsible cards) */
+.toggle-section-btn {
+  background: none;
+  border: none;
+  color: var(--color-gray-600);
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  transition: color 0.2s ease, transform 0.2s ease;
+  min-width: 44px;
+  min-height: 44px;
 }
 
-/* Add subtle shadow when stuck */
-.sticky-calculator-wrapper::after {
-  content: '';
-  position: absolute;
-  bottom: -10px;
-  left: 0;
-  right: 0;
-  height: 10px;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.1), transparent);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
+.toggle-section-btn:hover {
+  color: var(--color-gray-800);
 }
 
-/* Show shadow when scrolled (JS can add .is-stuck class) */
-.sticky-calculator-wrapper.is-stuck::after {
-  opacity: 1;
+.toggle-section-btn:focus {
+  outline: 2px solid var(--color-blue-interactive);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
-/* Make calculator more compact when sticky */
-.sticky-calculator-wrapper #calculator {
-  margin-bottom: 0;
+.toggle-section-btn .toggle-icon {
+  display: inline-block;
+  transition: transform 0.2s ease;
 }
 
-/* Remove grid layout - all cards now full width */
-.grid-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+.toggle-section-btn[aria-expanded="false"] .toggle-icon {
+  transform: rotate(-90deg);
 }
-
-.grid-item-left,
-.grid-item-right {
-  width: 100%;
-  max-width: none;
-}
-
-/* Ensure visualizer is full width */
-#visualizer {
-  width: 100%;
-  max-width: none;
-}
-
-/* Results card after visualizer */
-#results-card {
-  width: 100%;
-  max-width: none;
-}
-
-/* At very narrow widths, keep same approach */
-@media (max-width: 640px) {
-  .sticky-calculator-wrapper {
-    padding: 0;
-    margin: 0;
-  }
-}
-
-/* In iframes, ensure sticky works properly */
-@supports (position: sticky) {
-  .sticky-calculator-wrapper {
-    /* Sticky works in iframes in modern browsers */
-    position: sticky;
-  }
-}
-
-/* Fallback for browsers that don't support sticky */
-@supports not (position: sticky) {
-  .sticky-calculator-wrapper {
-    position: relative;
-  }
-}
-
 
 /* ==========================================================================
-   11. FINAL TWEAKS
+   14. FINAL TWEAKS
    ========================================================================== */
 
 /* Card 1: Left-align the intro text */

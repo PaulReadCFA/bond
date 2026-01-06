@@ -50,7 +50,7 @@ function createPriceBox(bondPrice) {
   
   // Per $100 par text
   const parText = createElement('span', { className: 'result-value-small' }, 
-    ' per USD 100 par'
+    ' per $100 par'
   );
   valueContainer.appendChild(parText);
   
@@ -71,7 +71,6 @@ function createAnalysisBox(calculations, params) {
   
   const box = createElement('div', { className: 'result-box analysis' });
   
-  // Small uppercase title (matching mortgage .result-title)
   const title = createElement('h5', { className: 'result-title analysis' }, 
     'Premium—Discount Analysis'
   );
@@ -88,35 +87,40 @@ function createAnalysisBox(calculations, params) {
   // Add ID to title for aria-labelledby
   title.id = 'analysis-heading';
   
-  // Main result: Bond classification (large, bold, BLACK - matching mortgage .result-value)
-  const typeDiv = createElement('div', { className: 'result-value analysis-type' }, 
+  // Bond type (par, premium, or discount)
+  const typeDiv = createElement('div', { className: 'analysis-type' }, 
     bondType.description
   );
   content.appendChild(typeDiv);
   
-  // Supporting details container (matching mortgage .result-detail pattern)
-  const detailsContainer = createElement('div', { className: 'result-details' });
+  // Analysis text
+  const analysisText = createElement('div');
   
-  // Comparison line
-  const comparisonLine = createElement('div', { className: 'result-detail' });
   if (bondType.type === 'par') {
-    comparisonLine.innerHTML = `Trading at par: <span style="font-style: italic;">c</span> = <span style="font-style: italic;">r</span> (${ytm.toFixed(2)}%)`;
+    analysisText.innerHTML = `Trading at par.<br>Coupon rate (<span style="font-style: italic;">c</span>) at ${couponRate.toFixed(2)}% = yield-to-maturity (<span style="font-style: italic;">r</span>) at ${ytm.toFixed(2)}%`;
   } else if (bondType.type === 'premium') {
-    comparisonLine.innerHTML = `Trading ${formatCurrency(bondType.difference)} above par<br>` +
-      `<span style="font-style: italic;">c</span> (${couponRate.toFixed(2)}%) &gt; <span style="font-style: italic;">r</span> (${ytm.toFixed(2)}%)`;
+    analysisText.innerHTML = `Trading ${formatCurrency(bondType.difference)} above par.<br>` +
+      `Coupon rate (<span style="font-style: italic;">c</span>) at ${couponRate.toFixed(2)}% &gt; yield-to-maturity (<span style="font-style: italic;">r</span>) at ${ytm.toFixed(2)}%`;
   } else {
-    comparisonLine.innerHTML = `Trading ${formatCurrency(bondType.difference)} below par<br>` +
-      `<span style="font-style: italic;">r</span> (${ytm.toFixed(2)}%) &gt; <span style="font-style: italic;">c</span> (${couponRate.toFixed(2)}%)`;
+    analysisText.innerHTML = `Trading ${formatCurrency(bondType.difference)} below par.<br>` +
+      `Yield-to-maturity (<span style="font-style: italic;">r</span>) at ${ytm.toFixed(2)}% &gt; coupon rate (<span style="font-style: italic;">c</span>) at ${couponRate.toFixed(2)}%`;
   }
-  detailsContainer.appendChild(comparisonLine);
   
-  // PV breakdown - separate lines (matching mortgage pattern)
-  const pvBreakdown = createElement('div', { className: 'result-detail pv-breakdown' });
-  pvBreakdown.innerHTML = 
-    `<span style="color: #8b4513;">PV</span> = coupon (${formatCurrency(pvCoupons)}) + face (${formatCurrency(pvFaceValue)})`;
-  detailsContainer.appendChild(pvBreakdown);
+  content.appendChild(analysisText);
   
-  content.appendChild(detailsContainer);
+  // Present value breakdown - showing PV = bond price = coupon + face format
+  const breakdownDiv = createElement('div', { className: 'analysis-details' });
+  
+  const pvEquation = createElement('div');
+  pvEquation.innerHTML = `<span style="color: #b95b1d;">PV</span> = <span style="color: #b95b1d;">PV of bond price</span> (${formatCurrency(bondPrice)}) = coupon (${formatCurrency(pvCoupons)}) + face (${formatCurrency(pvFaceValue)})`;
+  breakdownDiv.appendChild(pvEquation);
+  
+  // Add explanatory sentence
+  const explanation = createElement('div', { className: 'result-detail' });
+  explanation.innerHTML = `The present value price of the bond (<span style="color: #b95b1d;">PV</span>) is equal to the present value of all coupon payments plus the present value of the bond face value.`;
+  breakdownDiv.appendChild(explanation);
+  
+  content.appendChild(breakdownDiv);
   box.appendChild(content);
   
   return box;

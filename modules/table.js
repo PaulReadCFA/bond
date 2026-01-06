@@ -54,10 +54,10 @@ export function renderTable(cashFlows, bondPrice, periods, periodicCoupon, ytm) 
     html += `
       <tr>
         <td class="text-left" data-label="Year">${cf.yearLabel.toFixed(1)}</td>
-        <td class="text-right" data-label="Yield-to-maturity (r)" data-tooltip="Annual yield to maturity rate">${ytm.toFixed(2)}%</td>
-        <td class="text-right" data-label="Coupon payment (PMT)" data-tooltip="Annual coupon payment = Face value × (Coupon rate / Payment frequency)">${formatCurrency(cf.couponPayment)}</td>
-        <td class="text-right" data-label="Principal repayment (FV)" data-tooltip="${isInitial ? 'Initial bond purchase price (negative cash flow)' : (isFinal ? 'Face value returned at maturity = $100.00' : 'No principal payment until maturity')}">${formatCurrency(cf.principalPayment)}</td>
-        <td class="text-right" data-label="Total Cash Flow" data-tooltip="${isInitial ? 'Amount paid to purchase bond' : 'Coupon payment' + (isFinal ? ' + Face value' : '') + ' = ' + formatCurrency(cf.totalCashFlow)}"><strong>${formatCurrency(cf.totalCashFlow)}</strong></td>
+        <td class="text-right" data-label="Yield-to-maturity (r)" data-tooltip="Annual yield to maturity rate" title="Annual yield to maturity rate">${ytm.toFixed(2)}%</td>
+        <td class="text-right" data-label="Coupon payment (PMT)" data-tooltip="Annual coupon payment = Face value × (Coupon rate ÷ Payment frequency)" title="Annual coupon payment = Face value × (Coupon rate ÷ Payment frequency)">${formatCurrency(cf.couponPayment)}</td>
+        <td class="text-right" data-label="Principal repayment (FV)" data-tooltip="${isInitial ? 'Initial bond purchase price (negative cash flow)' : (isFinal ? 'Face value returned at maturity = USD 100.00' : 'No principal payment until maturity')}" title="${isInitial ? 'Initial bond purchase price (negative cash flow)' : (isFinal ? 'Face value returned at maturity = USD 100.00' : 'No principal payment until maturity')}">${formatCurrency(cf.principalPayment)}</td>
+        <td class="text-right" data-label="Total Cash Flow" data-tooltip="${isInitial ? 'Amount paid to purchase bond' : 'Coupon payment' + (isFinal ? ' + Face value' : '') + ' = ' + formatCurrency(cf.totalCashFlow)}" title="${isInitial ? 'Amount paid to purchase bond' : 'Coupon payment' + (isFinal ? ' + Face value' : '') + ' = ' + formatCurrency(cf.totalCashFlow)}"><strong>${formatCurrency(cf.totalCashFlow)}</strong></td>
       </tr>`;
   });
 
@@ -72,7 +72,7 @@ export function renderTable(cashFlows, bondPrice, periods, periodicCoupon, ytm) 
         <td colspan="4" class="text-right">
           <strong>Present value of bond (<span style="color: #b95b1d;">PV</span>):</strong>
         </td>
-        <td class="text-right" data-tooltip="Sum of present values of all future cash flows, discounted at the yield to maturity rate"><strong style="color: #b95b1d;">${formatCurrency(bondPrice)}</strong></td>
+        <td class="text-right" data-tooltip="Sum of present values of all future cash flows, discounted at the yield to maturity rate" title="Sum of present values of all future cash flows, discounted at the yield to maturity rate"><strong style="color: #b95b1d;">${formatCurrency(bondPrice)}</strong></td>
       </tr>
     </tfoot>
   `;

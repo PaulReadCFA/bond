@@ -50,15 +50,16 @@
   </div>
 </section>
 
-      <!-- Card 4: Calculator -->
-      <section class="card" id="calculator" tabindex="-1">
-        <h4 class="card-title">Bond Cash Flow Calculator</h4>
-        <div class="card-content">
+      <!-- Card 4: Calculator (Sticky) -->
+      <div class="sticky-calculator-wrapper" role="region" aria-label="Input calculator - stays visible when scrolling">
+        <section class="card" id="calculator" tabindex="-1">
+          <h4 class="card-title">Bond Cash Flow Calculator</h4>
+          <div class="card-content">
             <!-- Static info row -->
             <div class="info-box">
               <div class="info-item">
                 <span class="info-label">Face value:</span>
-                <span class="info-value">USD 100.00</span>
+                <span class="info-value">$100.00</span>
               </div>
               <div class="info-item">
                 <span class="info-label">Payment frequency:</span>
@@ -124,6 +125,7 @@
             </div>
           </div>
         </section>
+      </div>
 
       <!-- Card 3: Visualizer (Full Width) -->
       <section class="card" id="visualizer" tabindex="-1">
@@ -151,7 +153,7 @@
             </div>
             
             <div class="button-group" role="toolbar" aria-label="View mode - switch between chart and table">
-              <button id="chart-view-btn" class="toggle-btn active" aria-pressed="true" aria-label="Chart view">
+              <button id="chart-view-btn" class="toggle-btn active" aria-pressed="true" aria-label="Chart view" title="If Chart is unavailable, zoom out in your browser window.">
                 Chart
               </button>
               <button id="table-view-btn" class="toggle-btn" aria-pressed="false" aria-label="Table view">
@@ -206,17 +208,10 @@
       </section>
 
       <!-- Card 2: Results & Analysis -->
-      <section class="card" id="results-card" tabindex="-1" aria-labelledby="results-title">
-        <div class="card-header-with-controls">
-          <h4 class="card-title" id="results-title">Results and Analysis</h4>
-          <button id="toggle-results-btn" class="toggle-section-btn" 
-                  aria-expanded="true" 
-                  aria-controls="results-content"
-                  aria-label="Collapse results and analysis section">
-            <span class="toggle-icon" aria-hidden="true">▼</span>
-          </button>
-        </div>
-        <div id="results-content" aria-live="polite">
+      <section class="card" id="results-card">
+        <h4 class="card-title">Results and Analysis</h4>
+        <div class="card-content">
+          <div id="results-content">
             <!-- Populated by JavaScript -->
             <noscript>
               <div style="padding: 2rem; text-align: center; background: #fef2f2; border: 2px solid #b91c1c; border-radius: 0.5rem;">
@@ -236,7 +231,7 @@
               </div>
             </noscript>
           </div>
-        <div id="result-announcement" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+        </div>
       </section>
 
     </main>

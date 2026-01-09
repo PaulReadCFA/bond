@@ -59,8 +59,8 @@ function init() {
   // Run self-tests
   runSelfTests();
   
-  // Setup collapsible results section
-  setupResultsToggle();
+  // Setup sticky observer
+  setupStickyObserver();
   
   console.log('Bond Calculator ready');
 }
@@ -193,17 +193,124 @@ function updateCalculations() {
 /**
  * Set up chart/table view toggle
  */
+/**
+ * Set up chart/table view toggle
+ */
 function setupViewToggle() {
   const chartBtn = $('#chart-view-btn');
   const tableBtn = $('#table-view-btn');
+
+  updateButtonStates();
+
+  // Chart button - use addEventListener directly with capture phase
+  if (chartBtn) {
+    chartBtn.addEventListener('click', (e) => {
+      // FIRST: Check if narrow screen before anything else
+      const isForced = document.body.classList.contains('force-table');
+      
+      if (isForced || chartBtn.disabled) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        
+        console.log('Chart button blocked - narrow screen detected');
+        
+        // Visual feedback: briefly highlight table button
+        if (tableBtn) {
+          tableBtn.style.transition = 'transform 0.2s ease';
+          tableBtn.style.transform = 'scale(1.05)';
+          setTimeout(() => {
+            tableBtn.style.transform = 'scale(1)';
+          }, 200);
+        }
+        
+        // Force table view
+        setState({ viewMode: 'table' });
+        updateButtonStates();
+        
+        return false;
+      }
+      
+      // Normal behavior - allow chart view
+      setState({ viewMode: 'chart' });
+      updateButtonStates();
+    }, true); // Use capture phase
+  }
+
+  listen(tableBtn, 'click', () => {
+    setState({ viewMode: 'table' });
+    updateButtonStates();
+  });
+
+  // Keyboard navigation between toggle buttons
+  [chartBtn, tableBtn].forEach(btn => {
+    if (!btn) return;
+    btn.tabIndex = 0;
+    
+    btn.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+        e.preventDefault();
+        const next = btn === chartBtn ? tableBtn : chartBtn;
+        next.focus();
+        setState({ viewMode: next.id === 'chart-view-btn' ? 'chart' : 'table' });
+        updateButtonStates();
+      }
+    });
+  });
+}
+
+/**
+ * Update button states based on current view and screen width
+ */
+function updateButtonStates() {
+  const chartBtn = $('#chart-view-btn');
+  const tableBtn = $('#table-view-btn');
+  const chartContainer = $('#chart-container');
+  const tableContainer = $('#table-container');
+  const legend = $('#chart-legend');
+  const isForced = document.body.classList.contains('force-table');
+  const currentView = isForced ? 'table' : state.viewMode;
+
+  if (!chartBtn || !tableBtn) return;
+
+  console.log(`updateButtonStates: isForced=${isForced}, chartBtn.disabled=${chartBtn.disabled}`);
+
+  // Update active states
+  chartBtn.classList.toggle('active', currentView === 'chart');
+  tableBtn.classList.toggle('active', currentView === 'table');
   
-  if (!chartBtn || !tableBtn) {
-    console.error('Toggle buttons not found');
-    return;
+  // Update aria-pressed
+  chartBtn.setAttribute('aria-pressed', currentView === 'chart');
+  tableBtn.setAttribute('aria-pressed', currentView === 'table');
+  
+  // Disable chart button when forced to table
+  chartBtn.disabled = isForced;
+  
+  // Show/hide containers based on view
+  if (currentView === 'chart') {
+    if (chartContainer) chartContainer.style.display = 'block';
+    if (tableContainer) tableContainer.style.display = 'none';
+    if (legend) legend.style.display = 'flex';
+    
+    // Announce change
+    announceToScreenReader('Chart view active');
+    
+    // Focus chart container
+    focusElement(chartContainer, 100);
+    
+  } else {
+    if (tableContainer) tableContainer.style.display = 'block';
+    if (chartContainer) chartContainer.style.display = 'none';
+    if (legend) legend.style.display = 'none';
+    
+    // Announce change
+    announceToScreenReader('Table view active');
+    
+    // Focus table
+    focusElement($('#cash-flow-table'), 100);
   }
   
-  listen(chartBtn, 'click', () => switchView('chart'));
-  listen(tableBtn, 'click', () => switchView('table'));
+  console.log(`After update: chartBtn.disabled=${chartBtn.disabled}`);
 }
 
 /**
@@ -341,7 +448,7 @@ function setupResizeListener() {
     // Debounce resize events
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
-      handleResponsiveView();
+      detectNarrowScreen();
       
       if (state.viewMode === 'chart' && state.bondCalculations) {
         const showLabels = shouldShowLabels();
@@ -356,42 +463,30 @@ function setupResizeListener() {
   });
   
   // Initial check
-  handleResponsiveView();
+  detectNarrowScreen();
 }
 
 /**
  * Handle responsive view switching based on viewport width
  */
-function handleResponsiveView() {
-  const chartBtn = $('#chart-view-btn');
-  const tableBtn = $('#table-view-btn');
-  const viewportWidth = window.innerWidth;
+/**
+ * Detect narrow screen and force table view
+ */
+function detectNarrowScreen() {
+  const narrow = window.innerWidth <= 600;
   
-  // At very narrow widths (< 600px), force table view and disable chart button
-  if (viewportWidth < 600) {
-    if (state.viewMode === 'chart') {
-      switchView('table');
-    }
-    
-    // Disable chart button
-    if (chartBtn) {
-      chartBtn.disabled = true;
-      chartBtn.setAttribute('aria-disabled', 'true');
-      chartBtn.title = 'Chart view not available at this screen size';
-    }
-    if (tableBtn) {
-      tableBtn.disabled = false;
-      tableBtn.removeAttribute('aria-disabled');
-      tableBtn.title = '';
+  console.log(`detectNarrowScreen: width=${window.innerWidth}, narrow=${narrow}`);
+  
+  if (narrow) {
+    document.body.classList.add('force-table');
+    if (state.viewMode !== 'table') {
+      setState({ viewMode: 'table' });
     }
   } else {
-    // Re-enable chart button at wider widths
-    if (chartBtn) {
-      chartBtn.disabled = false;
-      chartBtn.removeAttribute('aria-disabled');
-      chartBtn.title = '';
-    }
+    document.body.classList.remove('force-table');
   }
+  
+  updateButtonStates();
 }
 
 // =============================================================================
@@ -454,43 +549,41 @@ function runSelfTests() {
   console.log('Self-tests complete');
 }
 
+
 // =============================================================================
-// COLLAPSIBLE RESULTS SECTION
+// STICKY CALCULATOR OBSERVER
 // =============================================================================
 
 /**
- * Setup toggle button for collapsible results section
+ * Detect when calculator becomes stuck and add visual feedback
  */
-function setupResultsToggle() {
-  const toggleBtn = document.getElementById('toggle-results-btn');
-  const resultsContent = document.getElementById('results-content');
+function setupStickyObserver() {
+  const wrapper = document.querySelector('.sticky-calculator-wrapper');
+  if (!wrapper) return;
   
-  if (!toggleBtn || !resultsContent) {
-    console.warn('Results toggle elements not found');
-    return;
-  }
+  // Create a sentinel element at the top
+  const sentinel = document.createElement('div');
+  sentinel.style.position = 'absolute';
+  sentinel.style.top = '-1px';
+  sentinel.style.height = '1px';
+  sentinel.style.width = '100%';
+  sentinel.style.pointerEvents = 'none';
+  wrapper.insertBefore(sentinel, wrapper.firstChild);
   
-  listen(toggleBtn, 'click', () => {
-    const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
-    const newState = !isExpanded;
-    
-    // Update ARIA state
-    toggleBtn.setAttribute('aria-expanded', newState.toString());
-    
-    // Update button label
-    toggleBtn.setAttribute('aria-label', 
-      newState ? 'Collapse results and analysis section' : 'Expand results and analysis section'
-    );
-    
-    // Show/hide content
-    if (newState) {
-      resultsContent.style.display = 'block';
-      announceToScreenReader('Results and analysis section expanded');
-    } else {
-      resultsContent.style.display = 'none';
-      announceToScreenReader('Results and analysis section collapsed');
-    }
-  });
+  // Observe the sentinel
+  const observer = new IntersectionObserver(
+    ([entry]) => {
+      // When sentinel is not visible, calculator is stuck
+      if (entry.intersectionRatio < 1) {
+        wrapper.classList.add('is-stuck');
+      } else {
+        wrapper.classList.remove('is-stuck');
+      }
+    },
+    { threshold: [1], rootMargin: '0px' }
+  );
+  
+  observer.observe(sentinel);
 }
 
 // =============================================================================

@@ -12,6 +12,23 @@
   
   <!-- Chart.js for visualization -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  
+  <!-- MathJax configuration for accessibility -->
+  <script>
+  MathJax = {
+    options: {
+      menuOptions: {
+        settings: {
+          assistiveMml: true,
+          explorer: true
+        }
+      }
+    }
+  };
+  </script>
+  
+  <!-- MathJax for accessible, cross-browser math rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/mml-chtml.js"></script>
 </head>
 <body>
   <noscript>
@@ -34,26 +51,17 @@
     This dynamic equation gives the price of a coupon bond based on your input in the Bond Cash Flow Calculator.
   </p>
   
-  <!-- Screen reader description of equation structure -->
-  <div class="sr-only" id="equation-description">
-    The bond valuation equation shows: Present value of coupon bond equals the sum of two components. 
-    First component: coupon payment divided by yield, multiplied by bracket 1 minus 1 over quantity 
-    1 plus yield raised to number of periods close bracket. Second component: face value divided by 
-    quantity 1 plus yield raised to number of periods. The equation updates dynamically with your input values.
-  </div>
-  
   <!-- Dynamic equation with actual values -->
-  <div class="equation-container" role="region" aria-label="Bond valuation with your values" aria-describedby="equation-description" aria-live="polite" id="dynamic-equation-container">
+  <div class="equation-container" role="region" aria-label="Bond valuation with your values" id="dynamic-equation-container">
     <div id="dynamic-mathml-equation">
       <!-- Populated by JavaScript -->
     </div>
   </div>
 </section>
 
-      <!-- Card 4: Calculator (Sticky) -->
-      <div class="sticky-calculator-wrapper" role="region" aria-label="Input calculator - stays visible when scrolling">
-        <section class="card" id="calculator" tabindex="-1">
-          <h4 class="card-title">Bond Cash Flow Calculator</h4>
+      <!-- Card 2: Calculator -->
+      <section class="card" id="calculator" tabindex="-1">
+        <h4 class="card-title">Bond Cash Flow Calculator</h4>
           <div class="card-content">
             <!-- Static info row -->
             <div class="info-box">
@@ -84,7 +92,7 @@
                       id="coupon-rate" 
                       class="input-field-inline"
                       min="0" max="10" step="0.1" value="8.6">
-                    <span class="input-suffix-inline">%</span>
+                    <span class="input-suffix-inline" id="coupon-rate-suffix" aria-hidden="true">%</span>
                   </div>
                 </div>
 
@@ -98,7 +106,7 @@
                       id="ytm" 
                       class="input-field-inline"
                       min="0" max="10" step="0.1" value="6.5">
-                    <span class="input-suffix-inline">%</span>
+                    <span class="input-suffix-inline" id="ytm-suffix" aria-hidden="true">%</span>
                   </div>
                 </div>
 
@@ -112,7 +120,7 @@
                       id="years" 
                       class="input-field-inline"
                       min="1" max="5" step="1" value="5">
-                    <span class="input-suffix-inline">&nbsp;</span>
+                    <span class="input-suffix-inline" id="years-suffix" aria-hidden="true">&nbsp;</span>
                   </div>
                 </div>
               </div>
@@ -125,7 +133,6 @@
             </div>
           </div>
         </section>
-      </div>
 
       <!-- Card 3: Visualizer (Full Width) -->
       <section class="card" id="visualizer" tabindex="-1">
@@ -153,13 +160,16 @@
             </div>
             
             <div class="button-group" role="toolbar" aria-label="View mode - switch between chart and table">
-              <button id="chart-view-btn" class="toggle-btn active" aria-pressed="true" aria-label="Chart view" title="If Chart is unavailable, zoom out in your browser window.">
+              <button id="chart-view-btn" class="toggle-btn active" aria-pressed="true" aria-label="Chart view">
                 Chart
               </button>
               <button id="table-view-btn" class="toggle-btn" aria-pressed="false" aria-label="Table view">
                 Table
               </button>
             </div>
+            <p id="chart-helper-text" class="text-xs text-gray-500" style="display: none; margin-top: 0.5rem;">
+              Chart view is not available at narrow screen widths. Showing table view.
+            </p>
           </div>
 
           <!-- Screen reader announcement for view changes -->
@@ -201,7 +211,7 @@
               <!-- Populated by JavaScript -->
             </table>
             <p id="table-note" class="table-note">
-              Note: Values in parentheses indicate negative cash flows (outflows). Hover over colored values to see calculation details.
+              Note: Values in parentheses indicate negative cash flows (outflows).
             </p>
           </div>
         </div>

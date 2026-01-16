@@ -59,9 +59,6 @@ function init() {
   // Run self-tests
   runSelfTests();
   
-  // Setup sticky observer
-  setupStickyObserver();
-  
   console.log('Bond Calculator ready');
 }
 
@@ -72,26 +69,33 @@ function setupSkipLinks() {
   const skipToVisualizer = document.querySelector('a[href="#visualizer"]');
   
   if (skipToVisualizer) {
-    listen(skipToVisualizer, 'click', (e) => {
+    const handler = (e) => {
       // Prevent default to handle it ourselves
       e.preventDefault();
       
-      // Switch to table view
-      switchView('table');
+      // Switch to table view using state management
+      setState({ viewMode: 'table' });
+      updateButtonStates();
       
-      // Scroll the section into view
-      const section = $('#visualizer');
-      if (section) {
-        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Focus the table immediately (no delay for keyboard users)
+      const table = $('#cash-flow-table');
+      if (table) {
+        // Scroll section into view first
+        table.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Focus the table (this moves both keyboard and SR focus)
+        table.focus();
+        // Announce to screen readers
+        announceToScreenReader('Jumped to data table');
       }
-      
-      // Focus the table after switching
-      setTimeout(() => {
-        const table = $('#cash-flow-table');
-        if (table) {
-          table.focus();
-        }
-      }, 400);
+    };
+    
+    // Handle both click and keyboard activation
+    listen(skipToVisualizer, 'click', handler);
+    skipToVisualizer.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handler(e);
+      }
     });
   }
 }
@@ -268,6 +272,7 @@ function updateButtonStates() {
   const chartContainer = $('#chart-container');
   const tableContainer = $('#table-container');
   const legend = $('#chart-legend');
+  const helperText = $('#chart-helper-text');
   const isForced = document.body.classList.contains('force-table');
   const currentView = isForced ? 'table' : state.viewMode;
 
@@ -286,6 +291,11 @@ function updateButtonStates() {
   // Disable chart button when forced to table
   chartBtn.disabled = isForced;
   
+  // Show/hide helper text when chart is disabled
+  if (helperText) {
+    helperText.style.display = isForced ? 'block' : 'none';
+  }
+  
   // Show/hide containers based on view
   if (currentView === 'chart') {
     if (chartContainer) chartContainer.style.display = 'block';
@@ -295,8 +305,7 @@ function updateButtonStates() {
     // Announce change
     announceToScreenReader('Chart view active');
     
-    // Focus chart container
-    focusElement(chartContainer, 100);
+    // DON'T move focus - let user stay on button to use arrow keys
     
   } else {
     if (tableContainer) tableContainer.style.display = 'block';
@@ -306,8 +315,7 @@ function updateButtonStates() {
     // Announce change
     announceToScreenReader('Table view active');
     
-    // Focus table
-    focusElement($('#cash-flow-table'), 100);
+    // DON'T move focus - let user stay on button to use arrow keys
   }
   
   console.log(`After update: chartBtn.disabled=${chartBtn.disabled}`);
@@ -524,67 +532,31 @@ function runSelfTests() {
       if (test.expected.price !== undefined) {
         const diff = Math.abs(result.bondPrice - test.expected.price);
         if (diff <= test.expected.tolerance) {
-          console.log(`âœ“ ${test.name} passed`);
+          console.log(`✓  ${test.name} passed`);
         } else {
-          console.warn(`âœ— ${test.name} failed: expected ${test.expected.price}, got ${result.bondPrice}`);
+          console.warn(`✗ ${test.name} failed: expected ${test.expected.price}, got ${result.bondPrice}`);
         }
       } else if (test.expected.priceShouldBe === 'greater than 100') {
         if (result.bondPrice > 100) {
-          console.log(`âœ“ ${test.name} passed`);
+          console.log(`✓  ${test.name} passed`);
         } else {
-          console.warn(`âœ— ${test.name} failed: price should be > 100, got ${result.bondPrice}`);
+          console.warn(`✗ ${test.name} failed: price should be > 100, got ${result.bondPrice}`);
         }
       } else if (test.expected.priceShouldBe === 'less than 100') {
         if (result.bondPrice < 100) {
-          console.log(`âœ“ ${test.name} passed`);
+          console.log(`✓  ${test.name} passed`);
         } else {
-          console.warn(`âœ— ${test.name} failed: price should be < 100, got ${result.bondPrice}`);
+          console.warn(`✗ ${test.name} failed: price should be < 100, got ${result.bondPrice}`);
         }
       }
     } catch (error) {
-      console.error(`âœ— ${test.name} threw error:`, error);
+      console.error(`✗ ${test.name} threw error:`, error);
     }
   });
   
   console.log('Self-tests complete');
 }
 
-
-// =============================================================================
-// STICKY CALCULATOR OBSERVER
-// =============================================================================
-
-/**
- * Detect when calculator becomes stuck and add visual feedback
- */
-function setupStickyObserver() {
-  const wrapper = document.querySelector('.sticky-calculator-wrapper');
-  if (!wrapper) return;
-  
-  // Create a sentinel element at the top
-  const sentinel = document.createElement('div');
-  sentinel.style.position = 'absolute';
-  sentinel.style.top = '-1px';
-  sentinel.style.height = '1px';
-  sentinel.style.width = '100%';
-  sentinel.style.pointerEvents = 'none';
-  wrapper.insertBefore(sentinel, wrapper.firstChild);
-  
-  // Observe the sentinel
-  const observer = new IntersectionObserver(
-    ([entry]) => {
-      // When sentinel is not visible, calculator is stuck
-      if (entry.intersectionRatio < 1) {
-        wrapper.classList.add('is-stuck');
-      } else {
-        wrapper.classList.remove('is-stuck');
-      }
-    },
-    { threshold: [1], rootMargin: '0px' }
-  );
-  
-  observer.observe(sentinel);
-}
 
 // =============================================================================
 // CLEANUP

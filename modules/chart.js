@@ -111,18 +111,16 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
         mode: 'index',
         intersect: false
       },
-onHover: (event, activeElements) => {
-  // Skip if keyboard focus already active
-  if (isKeyboardMode && document.activeElement === canvas) return;
+      onHover: (event, activeElements) => {
+        // Skip if keyboard focus already active
+        if (isKeyboardMode && document.activeElement === canvas) return;
 
-  // Announce hovered data point
-  if (activeElements.length > 0) {
-    const index = activeElements[0].index;
-    announceDataPoint(cashFlows[index], totalData[index], ytm);
-  }
-}
-
-,
+        // Announce hovered data point
+        if (activeElements.length > 0) {
+          const index = activeElements[0].index;
+          announceDataPoint(cashFlows[index], totalData[index], ytm);
+        }
+      },
       plugins: {
         title: {
           display: false
@@ -144,20 +142,20 @@ onHover: (event, activeElements) => {
               
               // YTM line - use italic r
               if (context.dataset.label === 'Yield-to-maturity (r)') {
-                return `Yield-to-maturity (𝑟): ${value.toFixed(2)}%`;
+                return `Yield-to-maturity (r): ${value.toFixed(2)}%`;
               }
               
               // For period 0, use italic PV
               if (isInitialPeriod && context.dataset.label === 'Principal repayment') {
-                return `Present value of bond (𝑃𝑉): ${formatCurrency(value, true)}`;
+                return `Present value of bond (PV): ${formatCurrency(value, true)}`;
               }
               
               // Regular labels with italic abbreviations
               if (context.dataset.label === 'Principal repayment') {
-                return `Principal repayment (𝐹𝑉): ${formatCurrency(value, true)}`;
+                return `Principal repayment (FV): ${formatCurrency(value, true)}`;
               }
               if (context.dataset.label === 'Coupon payment') {
-                return `Coupon payment (𝑃𝑀𝑇): ${formatCurrency(value, true)}`;
+                return `Coupon payment (PMT): ${formatCurrency(value, true)}`;
               }
               
               return `${context.dataset.label}: ${formatCurrency(value, true)}`;
@@ -224,7 +222,7 @@ onHover: (event, activeElements) => {
         y2: {
           title: {
             display: true,
-            text: 'Yield-to-maturity (%)',
+            text: 'Yield-to-maturity (r) %',
             color: '#7a46ff',
             font: {
               size: 13,
@@ -439,7 +437,7 @@ onHover: (event, activeElements) => {
   });
   
   // Add keyboard navigation
-  setupKeyboardNavigation(canvas, cashFlows, totalData);
+  setupKeyboardNavigation(canvas, cashFlows, totalData, ytm);
 }
 
 /**
@@ -447,8 +445,9 @@ onHover: (event, activeElements) => {
  * @param {HTMLCanvasElement} canvas - The chart canvas
  * @param {Array} cashFlows - Array of cash flow objects
  * @param {Array} totalData - Array of total values
+ * @param {number} ytm - Yield to maturity
  */
-function setupKeyboardNavigation(canvas, cashFlows, totalData) {
+function setupKeyboardNavigation(canvas, cashFlows, totalData, ytm) {
   // Remove existing listeners to avoid duplicates
   const oldListener = canvas._keydownListener;
   if (oldListener) {
@@ -554,6 +553,7 @@ function showTooltipAtIndex(index) {
  * Announce data point for screen readers
  * @param {Object} cashFlow - Cash flow object
  * @param {number} total - Total cash flow
+ * @param {number} ytm - Yield to maturity
  */
 function announceDataPoint(cashFlow, total, ytm) {
   // Create or update live region for screen reader announcements

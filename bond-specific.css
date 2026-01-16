@@ -17,7 +17,7 @@
 }
 
 /* ==========================================================================
-   2. RESULT BOXES — Bond-Specific
+   2. RESULT BOXES â€” Bond-Specific
    ========================================================================== */
 .result-box.price {
   background-color: var(--color-bg-orange);
@@ -117,7 +117,7 @@
 }
 
 /* ==========================================================================
-   4. INPUT LAYOUT — Inline with Labels
+   4. INPUT LAYOUT â€” Inline with Labels
    ========================================================================== */
 .input-group-inline {
   display: flex;
@@ -189,7 +189,7 @@
 }
 
 /* ==========================================================================
-   5. EQUATION DISPLAY — Bond-specific
+   5. EQUATION DISPLAY â€” Bond-specific
    ========================================================================== */
 .equation-container {
   padding: 1rem;
@@ -504,117 +504,6 @@ math mo {
   font-weight: 600;
 }
 
-/* Tooltip indicator - subtle but visible */
-.data-table td[data-tooltip] {
-  position: relative;
-}
-
-.data-table td[data-tooltip]::after {
-  /* Don't use ::after for arrow, we need it for tooltip indicator */
-  content: none !important;
-}
-
-/* Small info icon indicator for tooltips */
-.data-table td[data-tooltip] {
-  padding-right: 1.5rem;
-}
-
-.data-table td[data-tooltip]::before {
-  /* This will be the tooltip bubble */
-  content: attr(data-tooltip);
-  position: absolute;
-  bottom: calc(100% + 12px); /* Increased from 8px to 12px for more clearance */
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--color-gray-900);
-  color: white;
-  padding: 0.625rem 0.875rem;
-  border-radius: 0.5rem;
-  font-size: 0.8125rem;
-  line-height: 1.5;
-  white-space: normal;
-  width: max-content;
-  max-width: 20rem;
-  text-align: left;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-  z-index: 1000;
-  pointer-events: none;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out, transform 0.2s ease-in-out;
-  transform: translateX(-50%) translateY(-4px);
-  font-weight: 400;
-  text-transform: none;
-  letter-spacing: normal;
-}
-
-.data-table td[data-tooltip]:hover::before {
-  opacity: 1;
-  visibility: visible;
-  transform: translateX(-50%) translateY(0);
-}
-
-/* Prevent tooltips from going off-screen on the right */
-.data-table td[data-tooltip]:last-child::before,
-.data-table td[data-tooltip]:nth-last-child(2)::before {
-  left: auto;
-  right: 0;
-  transform: translateX(0) translateY(-4px);
-}
-
-.data-table td[data-tooltip]:last-child:hover::before,
-
-.data-table td[data-tooltip]:nth-last-child(2):hover::before,
-.data-table td[data-tooltip]:nth-last-child(2):focus::before {
-  transform: translateX(0) translateY(0);
-}
-
-/* Prevent tooltips from going off-screen on the left */
-.data-table td[data-tooltip]:first-child::before,
-.data-table td[data-tooltip]:nth-child(2)::before {
-  left: 0;
-  transform: translateX(0) translateY(-4px);
-}
-
-.data-table td[data-tooltip]:first-child:hover::before,
-
-.data-table td[data-tooltip]:nth-child(2):hover::before,
-.data-table td[data-tooltip]:nth-child(2):focus::before {
-  transform: translateX(0) translateY(0);
-}
-
-/* Visual indicator removed - cleaner design and better accessibility */
-/* Tooltips still work on hover, just without the blue dots */
-
-/* First row tooltips - show BELOW instead of above to avoid clipping with header */
-.data-table tbody tr:first-child td[data-tooltip]::before {
-  bottom: auto;
-  top: calc(100% + 12px); /* Position below the cell */
-  transform: translateX(-50%) translateY(4px);
-}
-
-.data-table tbody tr:first-child td[data-tooltip]:hover::before {
-  transform: translateX(-50%) translateY(0);
-}
-
-/* First row, first column - align left to avoid clipping */
-.data-table tbody tr:first-child td[data-tooltip]:first-child::before {
-  left: 0;
-  transform: translateX(0) translateY(4px);
-}
-
-.data-table tbody tr:first-child td[data-tooltip]:first-child:hover::before {
-  transform: translateX(0) translateY(0);
-}
-.data-table td[data-tooltip] {
-  background-image: none;
-}
-
-.data-table td[data-tooltip]:hover,
-.data-table td[data-tooltip]:focus {
-  background-image: none;
-}
-
 /* Period 0 row (initial purchase) - subtle highlight */
 /* First row - orange for PV/purchase */
 .data-table tbody tr:first-child {
@@ -633,9 +522,6 @@ math mo {
 .data-table tbody tr:last-child:hover {
   background-color: var(--color-gray-50) !important;
 }
-
-/* Focus states for accessibility */
-
 
 /* Table note styling */
 .table-note {
@@ -726,7 +612,7 @@ math mo {
   }
   
   .data-table tbody td:first-child::before {
-    content: 'Period ' attr(data-label) !important;
+    content: attr(data-label) !important;
     display: block !important;
   }
   
@@ -746,28 +632,10 @@ math mo {
     padding-bottom: 0 !important;
   }
   
-  /* CRITICAL: Override tooltip ::before to show label instead on mobile */
-  .data-table tbody tr td:not(:first-child)::before,
-  .data-table tbody tr td[data-tooltip]:not(:first-child)::before {
-    /* Label content - overrides tooltip */
+  /* CRITICAL: Use data-label for mobile labels */
+  .data-table tbody tr td:not(:first-child)::before {
+    /* Label content from data-label attribute */
     content: attr(data-label) ': ' !important;
-    
-    /* Reset ALL tooltip positioning */
-    position: static !important;
-    transform: none !important;
-    top: auto !important;
-    bottom: auto !important;
-    left: auto !important;
-    right: auto !important;
-    
-    /* Reset tooltip styling */
-    background: none !important;
-    box-shadow: none !important;
-    border-radius: 0 !important;
-    padding: 0 !important;
-    max-width: none !important;
-    width: auto !important;
-    white-space: normal !important;
     
     /* Label styling */
     font-weight: 600 !important;
@@ -776,17 +644,7 @@ math mo {
     flex: 0 0 auto !important;
     margin-right: 0.5rem !important;
     display: inline-block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
     font-size: 0.875rem !important;
-    z-index: auto !important;
-    pointer-events: auto !important;
-  }
-  
-  /* Force show on mobile (not just on hover) */
-  .data-table tbody tr td[data-tooltip]:not(:first-child)::before {
-    opacity: 1 !important;
-    visibility: visible !important;
   }
   
   /* The value itself */
@@ -821,43 +679,7 @@ math mo {
     flex: 1;
   }
   
-  /* Hide tooltip indicators and arrows in card view by default */
-  .data-table tbody td[data-tooltip] {
-    box-shadow: none !important;
-    cursor: default !important;  /* No help cursor on mobile */
-  }
-  
-  /* Hide tooltip arrow on mobile by default */
-  .data-table tbody tr td[data-tooltip]:not(:first-child)::after,
-  .data-table td[data-tooltip]::after {
-    display: none !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-  }
-  
-  /* OPTIONAL: Show tooltip on tap/active (touch and hold) */
-  .data-table tbody tr td[data-tooltip]:active::before {
-    content: attr(data-tooltip) !important;  /* Switch to tooltip content */
-    position: absolute !important;
-    bottom: 100% !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    background: var(--color-gray-900) !important;
-    color: white !important;
-    padding: 0.5rem 0.75rem !important;
-    border-radius: 0.375rem !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
-    white-space: normal !important;
-    max-width: 15rem !important;
-    width: max-content !important;
-    font-size: 0.75rem !important;
-    line-height: 1.4 !important;
-    z-index: 1000 !important;
-    margin-bottom: 0.5rem !important;
-  }
-}
-
-/* Alternative: Make YTM column abbreviate on very narrow screens */
+  /* Footer styling */
 @media (max-width: 400px) {
   .data-table {
     font-size: 0.625rem;
@@ -914,93 +736,6 @@ math mo {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-
-
-/* ==========================================================================
-   13. STICKY CALCULATOR LAYOUT
-   ========================================================================== */
-
-/* Sticky calculator wrapper */
-.sticky-calculator-wrapper {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: var(--color-gray-50);
-  padding: 0;  /* Remove padding - gap is handled by .content */
-  margin: 0;   /* Remove margin - gap is handled by .content */
-}
-
-/* Add subtle shadow when stuck */
-.sticky-calculator-wrapper::after {
-  content: '';
-  position: absolute;
-  bottom: -10px;
-  left: 0;
-  right: 0;
-  height: 10px;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.1), transparent);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
-}
-
-/* Show shadow when scrolled (JS can add .is-stuck class) */
-.sticky-calculator-wrapper.is-stuck::after {
-  opacity: 1;
-}
-
-/* Make calculator more compact when sticky */
-.sticky-calculator-wrapper #calculator {
-  margin-bottom: 0;
-}
-
-/* Remove grid layout - all cards now full width */
-.grid-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.grid-item-left,
-.grid-item-right {
-  width: 100%;
-  max-width: none;
-}
-
-/* Ensure visualizer is full width */
-#visualizer {
-  width: 100%;
-  max-width: none;
-}
-
-/* Results card after visualizer */
-#results-card {
-  width: 100%;
-  max-width: none;
-}
-
-/* At very narrow widths, keep same approach */
-@media (max-width: 640px) {
-  .sticky-calculator-wrapper {
-    padding: 0;
-    margin: 0;
-  }
-}
-
-/* In iframes, ensure sticky works properly */
-@supports (position: sticky) {
-  .sticky-calculator-wrapper {
-    /* Sticky works in iframes in modern browsers */
-    position: sticky;
-  }
-}
-
-/* Fallback for browsers that don't support sticky */
-@supports not (position: sticky) {
-  .sticky-calculator-wrapper {
-    position: relative;
-  }
-}
 
 
 /* ==========================================================================

@@ -3,7 +3,7 @@
  * Renders accessible data table for bond cash flows
  */
 
-console.log('ðŸ”µ TABLE.JS VERSION: 2024-12-18-11:30 - NO COLORS IN CELLS');
+console.log('TABLE.JS VERSION: 2024-12-18-11:30 - NO COLORS IN CELLS');
 
 import { $, formatCurrency, announceToScreenReader } from './utils.js';
 
@@ -54,10 +54,10 @@ export function renderTable(cashFlows, bondPrice, periods, periodicCoupon, ytm) 
     html += `
       <tr>
         <td class="text-left" data-label="Year">${cf.yearLabel.toFixed(1)}</td>
-        <td class="text-right" data-label="Yield-to-maturity (r)" data-tooltip="Annual yield to maturity rate" title="Annual yield to maturity rate">${ytm.toFixed(2)}%</td>
-        <td class="text-right" data-label="Coupon payment (PMT)" data-tooltip="Annual coupon payment = Face value × (Coupon rate ÷ Payment frequency)" title="Annual coupon payment = Face value × (Coupon rate ÷ Payment frequency)">${formatCurrency(cf.couponPayment)}</td>
-        <td class="text-right" data-label="Principal repayment (FV)" data-tooltip="${isInitial ? 'Initial bond purchase price (negative cash flow)' : (isFinal ? 'Face value returned at maturity = USD 100.00' : 'No principal payment until maturity')}" title="${isInitial ? 'Initial bond purchase price (negative cash flow)' : (isFinal ? 'Face value returned at maturity = USD 100.00' : 'No principal payment until maturity')}">${formatCurrency(cf.principalPayment)}</td>
-        <td class="text-right" data-label="Total Cash Flow" data-tooltip="${isInitial ? 'Amount paid to purchase bond' : 'Coupon payment' + (isFinal ? ' + Face value' : '') + ' = ' + formatCurrency(cf.totalCashFlow)}" title="${isInitial ? 'Amount paid to purchase bond' : 'Coupon payment' + (isFinal ? ' + Face value' : '') + ' = ' + formatCurrency(cf.totalCashFlow)}"><strong>${formatCurrency(cf.totalCashFlow)}</strong></td>
+        <td class="text-right" data-label="Yield-to-maturity (r)">${ytm.toFixed(2)}%</td>
+        <td class="text-right" data-label="Coupon payment (PMT)">${formatCurrency(cf.couponPayment)}</td>
+        <td class="text-right" data-label="Principal repayment (FV)">${formatCurrency(cf.principalPayment)}</td>
+        <td class="text-right" data-label="Total Cash Flow"><strong>${formatCurrency(cf.totalCashFlow)}</strong></td>
       </tr>`;
   });
 
@@ -72,7 +72,7 @@ export function renderTable(cashFlows, bondPrice, periods, periodicCoupon, ytm) 
         <td colspan="4" class="text-right">
           <strong>Present value of bond (<span style="color: #b95b1d;">PV</span>):</strong>
         </td>
-        <td class="text-right" data-tooltip="Sum of present values of all future cash flows, discounted at the yield to maturity rate" title="Sum of present values of all future cash flows, discounted at the yield to maturity rate"><strong style="color: #b95b1d;">${formatCurrency(bondPrice)}</strong></td>
+        <td class="text-right"><strong style="color: #b95b1d;">${formatCurrency(bondPrice)}</strong></td>
       </tr>
     </tfoot>
   `;
@@ -85,45 +85,118 @@ export function renderTable(cashFlows, bondPrice, periods, periodicCoupon, ytm) 
   // --------------------------------------------------------------
   // 5. Add accessibility attributes **programmatically**
   // --------------------------------------------------------------
-  // Note: The table itself is NOT focusable (no tabindex).
-  // Individual cells with tooltips are focusable (role="button").
-  // This provides better keyboard navigation and avoids ARIA conflicts.
+  // Make table focusable for skip links
+  table.setAttribute('tabindex', '-1');
   table.setAttribute('aria-label', 'Bond cash flow table');
-  // Note: Don't add role="table" - native <table> semantics are better
-  // and avoid ARIA conflicts with <caption>, <thead>, etc.
+
+  // For mobile: Restore table semantics when using display:block
+  // CSS display:block breaks native table semantics, so we add ARIA roles
+  updateTableSemantics(table);
+  
+  // Update ARIA roles on window resize
+  // Store the listener so we can remove it if table is re-rendered
+  if (table._resizeListener) {
+    window.removeEventListener('resize', table._resizeListener);
+  }
+  
+  const resizeListener = debounce(() => {
+    updateTableSemantics(table);
+  }, 250);
+  
+  table._resizeListener = resizeListener;
+  window.addEventListener('resize', resizeListener);
 
   // Optional: announce the switch to screen-reader users
   announceToScreenReader('Table view loaded with bond cash flows.');
-  
-  // Note: Escape key functionality removed since table cells are not focusable
-  // Tooltips work on hover only, maintaining table semantics
 }
 
 /**
- * Set up Escape key to exit table and move to next section
+ * Simple debounce helper
  */
-function setupTableKeyboardEscape() {
-  const table = document.getElementById('cash-flow-table');
+function debounce(fn, wait) {
+  let timeout;
+  return function(...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => fn.apply(this, args), wait);
+  };
+}
+
+/**
+ * Update table semantics based on viewport width
+ * @param {HTMLTableElement} table - The table element
+ */
+function updateTableSemantics(table) {
+  const isMobile = window.innerWidth <= 768;
   
-  if (!table) return;
+  if (isMobile) {
+    // Add ARIA roles to restore table semantics
+    restoreTableSemantics(table);
+  } else {
+    // Remove ARIA roles on desktop - native semantics work fine
+    removeTableSemantics(table);
+  }
+}
+
+/**
+ * Restore table semantics on mobile when CSS uses display:block
+ * @param {HTMLTableElement} table - The table element
+ */
+function restoreTableSemantics(table) {
+  // Main table role
+  table.setAttribute('role', 'table');
   
-  // Remove old listener if exists
-  if (table._escapeListener) {
-    table.removeEventListener('keydown', table._escapeListener);
+  // Header section
+  const thead = table.querySelector('thead');
+  if (thead) {
+    thead.setAttribute('role', 'rowgroup');
+    thead.querySelectorAll('tr').forEach(tr => {
+      tr.setAttribute('role', 'row');
+      tr.querySelectorAll('th').forEach(th => {
+        th.setAttribute('role', 'columnheader');
+      });
+    });
   }
   
-  const escapeListener = (e) => {
-    // Press Escape to jump out of table to calculator section
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      const calculator = document.getElementById('calculator');
-      if (calculator) {
-        calculator.focus();
-        announceToScreenReader('Exited table, moved to calculator section');
-      }
-    }
-  };
+  // Body section
+  const tbody = table.querySelector('tbody');
+  if (tbody) {
+    tbody.setAttribute('role', 'rowgroup');
+    tbody.querySelectorAll('tr').forEach(tr => {
+      tr.setAttribute('role', 'row');
+      tr.querySelectorAll('td').forEach(td => {
+        td.setAttribute('role', 'cell');
+      });
+    });
+  }
   
-  table._escapeListener = escapeListener;
-  table.addEventListener('keydown', escapeListener);
+  // Footer section
+  const tfoot = table.querySelector('tfoot');
+  if (tfoot) {
+    tfoot.setAttribute('role', 'rowgroup');
+    tfoot.querySelectorAll('tr').forEach(tr => {
+      tr.setAttribute('role', 'row');
+      tr.querySelectorAll('td').forEach(td => {
+        td.setAttribute('role', 'cell');
+      });
+    });
+  }
+}
+
+/**
+ * Remove ARIA table roles on desktop (native semantics work better)
+ * @param {HTMLTableElement} table - The table element
+ */
+function removeTableSemantics(table) {
+  // Remove main table role
+  table.removeAttribute('role');
+  
+  // Remove all ARIA roles from table elements
+  const elements = table.querySelectorAll('[role]');
+  elements.forEach(el => {
+    // Only remove table-related roles, keep aria-label on table
+    const role = el.getAttribute('role');
+    if (['table', 'rowgroup', 'row', 'columnheader', 'cell'].includes(role)) {
+      el.removeAttribute('role');
+    }
+  });
 }

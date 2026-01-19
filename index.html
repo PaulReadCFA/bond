@@ -28,8 +28,30 @@
       scale: 1.0,  // Start at 100% - ResizeObserver will scale down if needed
       minScale: 0.5,  // Allow scaling down to 50% on narrow screens
       matchFontHeight: false  // Use our CSS font sizes
+    },
+    startup: {
+      // After MathJax loads and typesets all equations
+      ready: () => {
+        MathJax.startup.defaultReady();
+        MathJax.startup.promise.then(() => {
+          // Fix aria-hidden focusability for all equations on page
+          fixAllAriaHiddenElements();
+        });
+      }
     }
   };
+  
+  // Fix WCAG issue: aria-hidden elements should not be focusable
+  function fixAllAriaHiddenElements() {
+    const ariaHiddenElements = document.querySelectorAll('mjx-assistive-mml[aria-hidden="true"]');
+    ariaHiddenElements.forEach(element => {
+      element.setAttribute('tabindex', '-1');
+      const mathElements = element.querySelectorAll('math, math *');
+      mathElements.forEach(mathEl => {
+        mathEl.setAttribute('tabindex', '-1');
+      });
+    });
+  }
   </script>
   
   <!-- MathJax for accessible, cross-browser math rendering -->
@@ -52,7 +74,7 @@
       <!-- Card 0: Static Formula (variables only) -->
       <section class="card" id="static-equation-card">
         <div class="equation-container" role="region" aria-label="General bond pricing formula">
-          <math xmlns="http://www.w3.org/1998/Math/MathML" display="block" role="math" tabindex="0" aria-label="Coupon bond present value equation">
+          <math xmlns="http://www.w3.org/1998/Math/MathML" display="block" role="math" aria-label="Coupon bond present value equation">
             <mrow>
               <msub>
                 <mi mathcolor="#b95b1d">PV</mi>
@@ -261,7 +283,7 @@
               <!-- Populated by JavaScript -->
             </table>
             <p id="table-note" class="table-note">
-              Note: Values in parentheses indicate negative cash flows (outflows).
+              Note: Negative values indicate cash outflows (money paid out).
             </p>
           </div>
         </div>

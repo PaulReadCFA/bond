@@ -374,7 +374,7 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
         ctx.save();
         
         // Match table note styling with system font
-        const noteText = 'Note: Values in parentheses indicate negative cash flows (outflows).';
+        const noteText = 'Note: Negative values indicate cash outflows (money paid out).';
         const fontSize = 12;
         ctx.font = `${fontSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif`;
         

@@ -40,10 +40,10 @@ export function debounce(fn, wait = 300) {
 /**
  * Format number as currency
  * @param {number} value - Numeric value
- * @param {boolean} signed - Include sign for negative values
+ * @param {boolean} signed - Include sign for negative values (deprecated, always true now)
  * @returns {string} Formatted currency string
  */
-export function formatCurrency(value, signed = false) {
+export function formatCurrency(value, signed = true) {
   const absValue = Math.abs(value);
   const formatted = absValue.toLocaleString('en-US', {
     minimumFractionDigits: 2,
@@ -51,7 +51,8 @@ export function formatCurrency(value, signed = false) {
   });
   
   if (value < 0) {
-    return signed ? `-USD ${formatted}` : `(USD ${formatted})`;
+    // Use Unicode minus sign (U+2212) for accessibility
+    return `−USD ${formatted}`;
   }
   return `USD ${formatted}`;
 }

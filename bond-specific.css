@@ -17,6 +17,29 @@
 }
 
 /* ==========================================================================
+   MATHJAX ACCESSIBILITY FIX
+   ========================================================================== */
+/* Ensure MathJax assistive MML (aria-hidden) is not focusable - WCAG 4.1.2 */
+mjx-assistive-mml[aria-hidden="true"] {
+  /* Use sr-only pattern to ensure it's truly hidden and non-focusable */
+  position: absolute !important;
+  clip: rect(0 0 0 0) !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Ensure no child elements are focusable either */
+mjx-assistive-mml[aria-hidden="true"] * {
+  pointer-events: none !important;
+}
+
+/* ==========================================================================
    2. RESULT BOXES â€” Bond-Specific
    ========================================================================== */
 .result-box.price {
@@ -191,8 +214,20 @@
 /* ==========================================================================
    5. EQUATION DISPLAY â€” Bond-specific
    ========================================================================== */
+
+/* Ensure MathJax assistive elements are not focusable (WCAG compliance) */
+mjx-assistive-mml,
+mjx-assistive-mml *,
+mjx-math[aria-hidden="true"],
+mjx-container[aria-hidden="true"],
+[aria-hidden="true"] mjx-math,
+[aria-hidden="true"] mjx-container {
+  pointer-events: none !important;
+  user-select: none !important;
+}
+
 .equation-container {
-  padding: 1rem;
+  padding: 0.5rem;  /* Reduced from 1rem to give equation more space */
   margin: 0.75rem 0;
   background: white;
   border: 1px solid var(--color-gray-200);
@@ -242,47 +277,90 @@ math {
   margin: 0.5rem 0;
 }
 
-/* Dynamic equation - slightly smaller */
+/* Dynamic equation - base size for MathJax */
 #dynamic-equation-container math {
   font-family: 'STIX Two Math', 'Cambria Math', 'Latin Modern Math', serif;
-  font-size: 1rem;
+  font-size: 1rem;  /* Start at normal size - ResizeObserver scales if needed */
   color: var(--color-gray-700);
+  max-width: 100%;
 }
 
-/* Dynamic equation responsive scaling - very aggressive to prevent scrollbars */
+/* MathJax wrapper - ensure it doesn't add extra size and stays contained */
+#dynamic-equation-container mjx-container {
+  font-size: 100% !important;  /* Use parent font size */
+  margin: 0 !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  display: block !important;
+  box-sizing: border-box !important;
+  
+  /* Initial scale to prevent layout shift - JS will adjust if needed */
+  transform: scale(0.85);
+  transform-origin: left center;
+  
+  /* Smooth transitions for scale changes */
+  transition: transform 0.2s ease-out;
+}
+
+/* Print: always show equation at full size */
+@media print {
+  #dynamic-equation-container mjx-container {
+    transform: none !important;
+  }
+}
+
+/* High zoom/DPI: disable scaling to let equation grow naturally */
+@media (min-resolution: 1.5dppx), (-webkit-min-device-pixel-ratio: 1.5) {
+  #dynamic-equation-container mjx-container {
+    transform: none !important;
+    /* Allow horizontal scroll at high zoom - this is expected and accessible */
+  }
+}
+
+/* Ensure equation container allows horizontal scroll if needed */
+#dynamic-equation-container {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Dynamic equation responsive scaling - moderate adjustments */
 @media (max-width: 900px) {
   #dynamic-equation-container math {
-    font-size: 0.9em;
+    font-size: 0.95rem;
   }
 }
 
 @media (max-width: 768px) {
   #dynamic-equation-container math {
-    font-size: 0.8em;
+    font-size: 0.8rem;
   }
 }
 
 @media (max-width: 640px) {
   #dynamic-equation-container math {
-    font-size: 0.7em;
+    font-size: 0.7rem;
   }
 }
 
 @media (max-width: 480px) {
   #dynamic-equation-container math {
-    font-size: 0.6em;
+    font-size: 0.6rem;
   }
 }
 
 @media (max-width: 400px) {
   #dynamic-equation-container math {
-    font-size: 0.55em;
+    font-size: 0.55rem;
   }
 }
 
 @media (max-width: 360px) {
   #dynamic-equation-container math {
-    font-size: 0.5em;
+    font-size: 0.5rem;
   }
 }
 
@@ -332,6 +410,22 @@ math mo {
 
 .denominator-r {
   padding-top: 0.25em;
+}
+
+/* Prevent MathJax assistive MathML (aria-hidden) from being focusable */
+mjx-assistive-mml[aria-hidden="true"],
+mjx-assistive-mml[aria-hidden="true"] * {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Ensure assistive MathML cannot receive focus */
+mjx-assistive-mml[aria-hidden="true"] math,
+mjx-assistive-mml[aria-hidden="true"] math * {
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* ==========================================================================

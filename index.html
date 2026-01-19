@@ -23,6 +23,11 @@
           explorer: true
         }
       }
+    },
+    chtml: {
+      scale: 1.0,  // Start at 100% - ResizeObserver will scale down if needed
+      minScale: 0.5,  // Allow scaling down to 50% on narrow screens
+      matchFontHeight: false  // Use our CSS font sizes
     }
   };
   </script>
@@ -44,7 +49,69 @@
       <a href="#visualizer" class="skip-link">Skip to data table</a>
     </nav>
     <main class="content">
-      <!-- Card 1: Equation -->
+      <!-- Card 0: Static Formula (variables only) -->
+      <section class="card" id="static-equation-card">
+        <div class="equation-container" role="region" aria-label="General bond pricing formula">
+          <math xmlns="http://www.w3.org/1998/Math/MathML" display="block" role="math" tabindex="0" aria-label="Coupon bond present value equation">
+            <mrow>
+              <msub>
+                <mi mathcolor="#b95b1d">PV</mi>
+                <mtext mathcolor="#b95b1d">Coupon bond</mtext>
+              </msub>
+              <mo>=</mo>
+
+              <mfrac linethickness="1.2px">
+                <mi mathvariant="bold" mathcolor="#3c6ae5">PMT</mi>
+                <mrow class="denominator-r">
+                  <mi mathcolor="#7a46ff">r</mi>
+                </mrow>
+              </mfrac>
+
+              <mo>×</mo>
+
+              <mrow>
+                <mo fence="true" stretchy="true" symmetric="true">[</mo>
+                <mrow>
+                  <mn>1</mn>
+                  <mo>−</mo>
+                  <mfrac>
+                    <mn>1</mn>
+                    <msup>
+                      <mrow>
+                        <mo>(</mo>
+                        <mn>1</mn>
+                        <mo>+</mo>
+                        <mi mathcolor="#7a46ff">r</mi>
+                        <mo>)</mo>
+                      </mrow>
+                      <mi mathcolor="#15803d">T</mi>
+                    </msup>
+                  </mfrac>
+                </mrow>
+                <mo fence="true" stretchy="true" symmetric="true">]</mo>
+              </mrow>
+
+              <mo>+</mo>
+
+              <mfrac>
+                <mi mathcolor="#0079a6" mathvariant="bold">FV</mi>
+                <msup>
+                  <mrow>
+                    <mo>(</mo>
+                    <mn>1</mn>
+                    <mo>+</mo>
+                    <mi mathcolor="#7a46ff">r</mi>
+                    <mo>)</mo>
+                  </mrow>
+                  <mi mathcolor="#15803d">T</mi>
+                </msup>
+              </mfrac>
+            </mrow>
+          </math>
+        </div>
+      </section>
+      
+      <!-- Card 1: Dynamic Equation -->
 <section id="equation-card" class="card">
   <h4 class="card-title">Bond Valuation Equation</h4>
   <p class="equation-intro">
@@ -52,7 +119,7 @@
   </p>
   
   <!-- Dynamic equation with actual values -->
-  <div class="equation-container" role="region" aria-label="Bond valuation with your values" id="dynamic-equation-container">
+  <div class="equation-container" role="region" aria-label="Bond valuation equation" id="dynamic-equation-container">
     <div id="dynamic-mathml-equation">
       <!-- Populated by JavaScript -->
     </div>
@@ -140,7 +207,7 @@
         <div class="card-content">
           <!-- View toggle buttons -->
           <div class="view-controls">
-            <div class="legend" id="chart-legend" role="list" aria-label="Chart legend">
+            <div class="legend" id="chart-legend" role="list">
               <span class="legend-item" role="listitem">
                 <span class="legend-color" style="background-color: var(--color-bond-purchase);"></span>
                 Present value of bond <span style="font-style: normal; color: inherit;">(<span style="color: #b95b1d;">PV</span>)</span>
@@ -159,11 +226,11 @@
               </span>
             </div>
             
-            <div class="button-group" role="toolbar" aria-label="View mode - switch between chart and table">
-              <button id="chart-view-btn" class="toggle-btn active" aria-pressed="true" aria-label="Chart view">
+            <div class="button-group" role="toolbar">
+              <button id="chart-view-btn" class="toggle-btn active" aria-pressed="true">
                 Chart
               </button>
-              <button id="table-view-btn" class="toggle-btn" aria-pressed="false" aria-label="Table view">
+              <button id="table-view-btn" class="toggle-btn" aria-pressed="false">
                 Table
               </button>
             </div>
@@ -175,37 +242,20 @@
           <!-- Screen reader announcement for view changes -->
           <div class="sr-only" aria-live="polite" aria-atomic="true" id="view-announcement"></div>
 
-          <!-- Hidden chart description -->
-          <div class="sr-only" id="bond-chart-desc">
-            <h4 id="bond-chart-title">Bond cash flows over time</h4>
-            <p>
-              This chart displays the complete cash flow timeline for a bond investment. 
-              At period 0, the present value bond price (PV) is shown as a negative cash flow (money paid out). 
-              Then, at each annual period, the bond pays a coupon payment (PMT) shown in blue. 
-              At the final maturity date, both the last coupon payment and the principal repayment 
-              (FV, shown in teal) are received. The stacked bars show how coupon and principal payments 
-              combine at each period. A dashed purple line shows the yield-to-maturity rate (r) on the right axis.
-            </p>
-            <p>
-              Keyboard navigation: Tab to focus the chart. Use Left and Right arrow keys to move between periods. 
-              Press Home to jump to the first period, or End to jump to the last period. 
-              Each period will announce its year, yield to maturity, coupon payment, principal repayment, and total cash flow.
-            </p>
-          </div>
+          <!-- Chart title for aria-labelledby -->
+          <h4 id="bond-chart-title" class="sr-only">Bond cash flows over time</h4>
 
           <!-- Chart container -->
           <div id="chart-container" class="chart-wrapper" 
                role="region" 
-               aria-labelledby="bond-chart-title" 
-               aria-describedby="bond-chart-desc"
+               aria-labelledby="bond-chart-title"
                tabindex="-1">
             <canvas id="bond-chart"></canvas>
           </div>
 
           <!-- Table container -->
           <div id="table-container" class="table-wrapper" style="display: none;"
-               role="region"  
-               aria-label="Bond cash flow table"  
+               role="region"
                tabindex="-1">
             <table id="cash-flow-table" class="data-table" aria-describedby="table-note">
               <!-- Populated by JavaScript -->

@@ -74,5 +74,113 @@ export function renderDynamicEquation(calculations, params) {
   
   container.innerHTML = mathML;
   
+  // Tell MathJax to re-render the updated equation
+  if (window.MathJax && window.MathJax.typesetPromise) {
+    window.MathJax.typesetPromise([container]).then(() => {
+      // After MathJax renders, set up responsive scaling
+      setupResponsiveScaling(container);
+      
+      // Fix accessibility: ensure aria-hidden assistive MathML is not focusable
+      fixAriaHiddenFocusability(container);
+    }).catch((err) => {
+      console.error('MathJax typesetting failed:', err);
+    });
+  }
+  
   // Note: MathML is already accessible to screen readers, no need for aria-live announcement
+}
+
+/**
+ * Set up responsive scaling for equation to fit container
+ * @param {HTMLElement} container - Equation container element
+ */
+function setupResponsiveScaling(container) {
+  const mjxContainer = container.querySelector('mjx-container');
+  if (!mjxContainer) return;
+  
+  let resizeTimeout;
+  
+  /**
+   * Calculate and apply scale to fit equation in container
+   */
+  function adjustScale() {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+      // Detect browser zoom level
+      // When zoomed in significantly, disable scaling to let equation grow naturally
+      const baseWidth = window.innerWidth;
+      const zoomLevel = Math.round((window.outerWidth / baseWidth) * 100) / 100;
+      
+      // At 150% zoom or higher, disable auto-scaling
+      // This respects user's preference to make text larger
+      if (zoomLevel >= 1.5 || window.devicePixelRatio >= 1.5) {
+        mjxContainer.style.transform = 'none';
+        mjxContainer.style.transformOrigin = 'left center';
+        return;
+      }
+      
+      // Get dimensions
+      const containerWidth = container.clientWidth;
+      const equationWidth = mjxContainer.scrollWidth;
+      
+      // If equation is wider than container, scale it down
+      if (equationWidth > containerWidth) {
+        // Calculate scale needed (with 2% margin for safety)
+        const scale = (containerWidth / equationWidth) * 0.98;
+        
+        // Apply transform
+        mjxContainer.style.transform = `scale(${scale})`;
+        mjxContainer.style.transformOrigin = 'left center';
+      } else {
+        // Equation fits naturally, no scaling needed
+        mjxContainer.style.transform = 'none';
+      }
+    }, 100); // Debounce: wait 100ms after last resize
+  }
+  
+  // Clean up any existing observer
+  if (container._resizeObserver) {
+    container._resizeObserver.disconnect();
+  }
+  
+  // Set up ResizeObserver to watch for container size changes
+  const resizeObserver = new ResizeObserver(adjustScale);
+  resizeObserver.observe(container);
+  
+  // Store observer reference for cleanup
+  container._resizeObserver = resizeObserver;
+  
+  // Also listen for window resize (catches zoom changes)
+  window.addEventListener('resize', adjustScale);
+  
+  // Listen for zoom changes via matchMedia
+  const zoomQuery = window.matchMedia('screen and (min-resolution: 1.5dppx)');
+  if (zoomQuery.addEventListener) {
+    zoomQuery.addEventListener('change', adjustScale);
+  }
+  
+  // Initial adjustment
+  adjustScale();
+}
+
+/**
+ * Fix WCAG issue: aria-hidden elements should not be focusable
+ * MathJax creates mjx-assistive-mml elements with aria-hidden="true"
+ * that contain focusable MathML - we need to prevent focus
+ * @param {HTMLElement} container - Equation container element
+ */
+function fixAriaHiddenFocusability(container) {
+  // Find ALL elements with aria-hidden="true" that have tabindex or are focusable
+  const ariaHiddenElements = container.querySelectorAll('[aria-hidden="true"]');
+  
+  ariaHiddenElements.forEach(element => {
+    // Remove from tab order
+    element.setAttribute('tabindex', '-1');
+    
+    // Also fix any focusable children
+    const focusableChildren = element.querySelectorAll('[tabindex="0"], [tabindex], a, button, input, select, textarea');
+    focusableChildren.forEach(child => {
+      child.setAttribute('tabindex', '-1');
+    });
+  });
 }

@@ -59,6 +59,9 @@ function init() {
   // Run self-tests
   runSelfTests();
   
+  // Fix static equation aria-hidden focusability after MathJax loads
+  fixStaticEquationAccessibility();
+  
   console.log('Bond Calculator ready');
 }
 
@@ -555,6 +558,56 @@ function runSelfTests() {
   });
   
   console.log('Self-tests complete');
+}
+
+// =============================================================================
+// STATIC EQUATION ACCESSIBILITY FIX
+// =============================================================================
+
+/**
+ * Fix aria-hidden focusability for static equation
+ * Ensures MathJax assistive MathML elements are not focusable
+ */
+function fixStaticEquationAccessibility() {
+  // Wait for MathJax to finish rendering
+  if (typeof MathJax !== 'undefined' && MathJax.startup && MathJax.startup.promise) {
+    MathJax.startup.promise.then(() => {
+      const staticCard = document.getElementById('static-equation-card');
+      if (staticCard) {
+        fixAriaHiddenFocusability(staticCard);
+      }
+    }).catch(err => {
+      console.error('MathJax initialization failed:', err);
+    });
+  } else {
+    // Fallback: try after a short delay
+    setTimeout(() => {
+      const staticCard = document.getElementById('static-equation-card');
+      if (staticCard) {
+        fixAriaHiddenFocusability(staticCard);
+      }
+    }, 1000);
+  }
+}
+
+/**
+ * Fix aria-hidden focusability for a container's MathJax elements
+ * @param {HTMLElement} container - Container with MathJax content
+ */
+function fixAriaHiddenFocusability(container) {
+  // Find ALL elements with aria-hidden="true" that have tabindex or are focusable
+  const ariaHiddenElements = container.querySelectorAll('[aria-hidden="true"]');
+  
+  ariaHiddenElements.forEach(element => {
+    // Remove from tab order
+    element.setAttribute('tabindex', '-1');
+    
+    // Also fix any focusable children
+    const focusableChildren = element.querySelectorAll('[tabindex="0"], [tabindex], a, button, input, select, textarea');
+    focusableChildren.forEach(child => {
+      child.setAttribute('tabindex', '-1');
+    });
+  });
 }
 
 

@@ -74,17 +74,18 @@ export function renderDynamicEquation(calculations, params) {
   
   container.innerHTML = mathML;
   
-  // Tell MathJax to re-render the updated equation
-  if (window.MathJax && window.MathJax.typesetPromise) {
-    window.MathJax.typesetPromise([container]).then(() => {
-      // After MathJax renders, set up responsive scaling
-      setupResponsiveScaling(container);
-      
-      // Fix accessibility: ensure aria-hidden assistive MathML is not focusable
-      fixAriaHiddenFocusability(container);
-    }).catch((err) => {
-      console.error('MathJax typesetting failed:', err);
-    });
+  // Tell MathJax 2.7.7 to re-render the updated equation
+  if (window.MathJax && window.MathJax.Hub) {
+    window.MathJax.Hub.Queue(
+      ["Typeset", window.MathJax.Hub, container],
+      function() {
+        // After MathJax renders, set up responsive scaling
+        setupResponsiveScaling(container);
+        
+        // Fix accessibility: ensure aria-hidden assistive MathML is not focusable
+        fixAriaHiddenFocusability(container);
+      }
+    );
   }
   
   // Note: MathML is already accessible to screen readers, no need for aria-live announcement
@@ -95,7 +96,8 @@ export function renderDynamicEquation(calculations, params) {
  * @param {HTMLElement} container - Equation container element
  */
 function setupResponsiveScaling(container) {
-  const mjxContainer = container.querySelector('mjx-container');
+  // MathJax 2.7.7 uses .MathJax_Display or .MathJax for rendered output
+  const mjxContainer = container.querySelector('.MathJax_Display, .MathJax, .MathJax_CHTML');
   if (!mjxContainer) return;
   
   let resizeTimeout;
@@ -165,20 +167,35 @@ function setupResponsiveScaling(container) {
 
 /**
  * Fix WCAG issue: aria-hidden elements should not be focusable
- * MathJax creates mjx-assistive-mml elements with aria-hidden="true"
- * that contain focusable MathML - we need to prevent focus
+ * MathJax 2.7.7 creates elements with aria-hidden="true" that need fixing
+ * Also handles role="presentation" spans that are focusable
  * @param {HTMLElement} container - Equation container element
  */
 function fixAriaHiddenFocusability(container) {
-  // Find ALL elements with aria-hidden="true" that have tabindex or are focusable
-  const ariaHiddenElements = container.querySelectorAll('[aria-hidden="true"]');
+  // Fix 1: MathJax visual spans with role="presentation" need proper role for focusability
+  const presentationSpans = container.querySelectorAll('span.mjx-chtml[role="presentation"][tabindex="0"]');
+  presentationSpans.forEach(span => {
+    // Add role="application" for Math Explorer functionality
+    span.setAttribute('role', 'application');
+    span.setAttribute('aria-label', 'Interactive math equation. Press Enter to explore.');
+  });
   
+  // Fix 2: Remove aria-label from aria-hidden elements (not allowed by WCAG)
+  const ariaHiddenWithLabel = container.querySelectorAll('[aria-hidden="true"][aria-label]');
+  ariaHiddenWithLabel.forEach(element => {
+    element.removeAttribute('aria-label');
+  });
+  
+  // Fix 3: All aria-hidden elements should not be focusable
+  const ariaHiddenElements = container.querySelectorAll('[aria-hidden="true"]');
   ariaHiddenElements.forEach(element => {
-    // Remove from tab order
-    element.setAttribute('tabindex', '-1');
+    // Only set tabindex if not already set to -1
+    if (element.getAttribute('tabindex') !== '-1') {
+      element.setAttribute('tabindex', '-1');
+    }
     
     // Also fix any focusable children
-    const focusableChildren = element.querySelectorAll('[tabindex="0"], [tabindex], a, button, input, select, textarea');
+    const focusableChildren = element.querySelectorAll('[tabindex="0"], a, button, input, select, textarea');
     focusableChildren.forEach(child => {
       child.setAttribute('tabindex', '-1');
     });

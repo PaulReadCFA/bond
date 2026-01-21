@@ -69,8 +69,29 @@ function init() {
  * Set up skip link handlers for accessibility
  */
 function setupSkipLinks() {
-  const skipToVisualizer = document.querySelector('a[href="#visualizer"]');
+  // Skip to data entry (first input field)
+  const skipToDataEntry = document.querySelector('a[href="#coupon-rate"]');
+  if (skipToDataEntry) {
+    const handler = (e) => {
+      e.preventDefault();
+      const firstInput = $('#coupon-rate');
+      if (firstInput) {
+        firstInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstInput.focus();
+        announceToScreenReader('Jumped to data entry fields');
+      }
+    };
+    listen(skipToDataEntry, 'click', handler);
+    skipToDataEntry.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handler(e);
+      }
+    });
+  }
   
+  // Skip to data table
+  const skipToVisualizer = document.querySelector('a[href="#visualizer"]');
   if (skipToVisualizer) {
     const handler = (e) => {
       // Prevent default to handle it ourselves
@@ -569,15 +590,13 @@ function runSelfTests() {
  * Ensures MathJax assistive MathML elements are not focusable
  */
 function fixStaticEquationAccessibility() {
-  // Wait for MathJax to finish rendering
-  if (typeof MathJax !== 'undefined' && MathJax.startup && MathJax.startup.promise) {
-    MathJax.startup.promise.then(() => {
+  // Wait for MathJax 2.7.7 to finish rendering
+  if (typeof MathJax !== 'undefined' && MathJax.Hub) {
+    MathJax.Hub.Queue(function() {
       const staticCard = document.getElementById('static-equation-card');
       if (staticCard) {
         fixAriaHiddenFocusability(staticCard);
       }
-    }).catch(err => {
-      console.error('MathJax initialization failed:', err);
     });
   } else {
     // Fallback: try after a short delay
@@ -595,15 +614,30 @@ function fixStaticEquationAccessibility() {
  * @param {HTMLElement} container - Container with MathJax content
  */
 function fixAriaHiddenFocusability(container) {
-  // Find ALL elements with aria-hidden="true" that have tabindex or are focusable
-  const ariaHiddenElements = container.querySelectorAll('[aria-hidden="true"]');
+  // Fix 1: MathJax visual spans with role="presentation" need proper role for focusability
+  const presentationSpans = container.querySelectorAll('span.mjx-chtml[role="presentation"][tabindex="0"]');
+  presentationSpans.forEach(span => {
+    // Add role="application" for Math Explorer functionality
+    span.setAttribute('role', 'application');
+    span.setAttribute('aria-label', 'Interactive math equation. Press Enter to explore.');
+  });
   
+  // Fix 2: Remove aria-label from aria-hidden elements (not allowed by WCAG)
+  const ariaHiddenWithLabel = container.querySelectorAll('[aria-hidden="true"][aria-label]');
+  ariaHiddenWithLabel.forEach(element => {
+    element.removeAttribute('aria-label');
+  });
+  
+  // Fix 3: All aria-hidden elements should not be focusable
+  const ariaHiddenElements = container.querySelectorAll('[aria-hidden="true"]');
   ariaHiddenElements.forEach(element => {
-    // Remove from tab order
-    element.setAttribute('tabindex', '-1');
+    // Only set tabindex if not already set to -1
+    if (element.getAttribute('tabindex') !== '-1') {
+      element.setAttribute('tabindex', '-1');
+    }
     
     // Also fix any focusable children
-    const focusableChildren = element.querySelectorAll('[tabindex="0"], [tabindex], a, button, input, select, textarea');
+    const focusableChildren = element.querySelectorAll('[tabindex="0"], a, button, input, select, textarea');
     focusableChildren.forEach(child => {
       child.setAttribute('tabindex', '-1');
     });

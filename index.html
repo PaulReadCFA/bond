@@ -13,49 +13,84 @@
   <!-- Chart.js for visualization -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   
-  <!-- MathJax configuration for accessibility -->
-  <script>
-  MathJax = {
-    options: {
-      menuOptions: {
-        settings: {
-          assistiveMml: true,
-          explorer: true
+  <!-- MathJax 2.7.7 configuration for Canvas LMS compatibility -->
+  <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    jax: ["input/MathML", "output/CommonHTML"],
+    extensions: ["mml2jax.js", "MathMenu.js", "MathZoom.js", "AssistiveMML.js"],
+    MathML: {
+      extensions: ["content-mathml.js", "mml3.js"]
+    },
+    CommonHTML: {
+      scale: 100,  // 100% scale - ResizeObserver will handle scaling
+      minScaleAdjust: 50,  // Allow down to 50%
+      matchFontHeight: false,
+      mtextFontInherit: false
+    },
+    menuSettings: {
+      assistiveMML: true,
+      explorer: true,
+      collapsible: false
+    },
+    showMathMenu: true,
+    showMathMenuMSIE: true,
+    "AssistiveMML": {
+      disabled: false,
+      styles: {
+        ".MJX_Assistive_MathML": {
+          position: "absolute!important",
+          clip: "rect(1px, 1px, 1px, 1px)",
+          padding: "1px 0 0 0!important",
+          border: "0!important",
+          height: "1px!important",
+          width: "1px!important",
+          overflow: "hidden!important",
+          display: "block!important"
         }
       }
-    },
-    chtml: {
-      scale: 1.0,  // Start at 100% - ResizeObserver will scale down if needed
-      minScale: 0.5,  // Allow scaling down to 50% on narrow screens
-      matchFontHeight: false  // Use our CSS font sizes
-    },
-    startup: {
-      // After MathJax loads and typesets all equations
-      ready: () => {
-        MathJax.startup.defaultReady();
-        MathJax.startup.promise.then(() => {
-          // Fix aria-hidden focusability for all equations on page
-          fixAllAriaHiddenElements();
-        });
-      }
     }
-  };
+  });
   
   // Fix WCAG issue: aria-hidden elements should not be focusable
+  // Run after MathJax finishes rendering
+  MathJax.Hub.Queue(function () {
+    fixAllAriaHiddenElements();
+  });
+  
   function fixAllAriaHiddenElements() {
-    const ariaHiddenElements = document.querySelectorAll('mjx-assistive-mml[aria-hidden="true"]');
+    // Fix 1: MathJax visual spans with role="presentation" need proper role for focusability
+    const presentationSpans = document.querySelectorAll('span.mjx-chtml[role="presentation"][tabindex="0"]');
+    presentationSpans.forEach(span => {
+      // Add role="application" for Math Explorer functionality
+      span.setAttribute('role', 'application');
+      span.setAttribute('aria-label', 'Interactive math equation. Press Enter to explore.');
+    });
+    
+    // Fix 2: Remove aria-label from aria-hidden elements (not allowed)
+    const ariaHiddenWithLabel = document.querySelectorAll('[aria-hidden="true"][aria-label]');
+    ariaHiddenWithLabel.forEach(element => {
+      element.removeAttribute('aria-label');
+    });
+    
+    // Fix 3: All other aria-hidden elements should not be focusable
+    const ariaHiddenElements = document.querySelectorAll('[aria-hidden="true"]');
     ariaHiddenElements.forEach(element => {
-      element.setAttribute('tabindex', '-1');
-      const mathElements = element.querySelectorAll('math, math *');
-      mathElements.forEach(mathEl => {
-        mathEl.setAttribute('tabindex', '-1');
+      // Only set tabindex if not already set to -1
+      if (element.getAttribute('tabindex') !== '-1') {
+        element.setAttribute('tabindex', '-1');
+      }
+      
+      // Also fix any focusable children
+      const focusableChildren = element.querySelectorAll('[tabindex="0"], a, button, input, select, textarea');
+      focusableChildren.forEach(child => {
+        child.setAttribute('tabindex', '-1');
       });
     });
   }
   </script>
   
-  <!-- MathJax for accessible, cross-browser math rendering -->
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/mml-chtml.js"></script>
+  <!-- MathJax 2.7.7 for Canvas LMS compatibility -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </head>
 <body>
   <noscript>
@@ -67,14 +102,14 @@
   <div class="container">
     <!-- Skip Links for Accessibility -->
     <nav role="navigation" aria-label="Skip links">
-      <a href="#calculator" class="skip-link">Skip to calculator</a>
+      <a href="#coupon-rate" class="skip-link">Skip to data entry</a>
       <a href="#visualizer" class="skip-link">Skip to data table</a>
     </nav>
     <main class="content">
       <!-- Card 0: Static Formula (variables only) -->
       <section class="card" id="static-equation-card">
         <div class="equation-container" role="region" aria-label="General bond pricing formula">
-          <math xmlns="http://www.w3.org/1998/Math/MathML" display="block" role="math" aria-label="Coupon bond present value equation">
+          <math xmlns="http://www.w3.org/1998/Math/MathML" display="block" role="math">
             <mrow>
               <msub>
                 <mi mathcolor="#b95b1d">PV</mi>
@@ -152,6 +187,11 @@
       <section class="card" id="calculator" tabindex="-1">
         <h4 class="card-title">Bond Cash Flow Calculator</h4>
           <div class="card-content">
+            <!-- Instructional note -->
+            <p class="input-instructions" style="font-size: 0.875rem; color: var(--color-gray-600); margin-bottom: 1rem;">
+              Enter your bond details below. The calculations and visualizations will update automatically as you change the values.
+            </p>
+            
             <!-- Static info row -->
             <div class="info-box">
               <div class="info-item">

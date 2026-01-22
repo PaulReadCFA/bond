@@ -11,9 +11,9 @@ import { formatCurrency } from './utils.js';
  * @param {Object} params - Input parameters
  */
 export function renderDynamicEquation(calculations, params) {
-  const container = document.getElementById('dynamic-mathml-equation');
+  const innerContainer = document.getElementById('dynamic-mathml-equation');
   
-  if (!container) {
+  if (!innerContainer) {
     console.error('Dynamic equation container not found');
     return;
   }
@@ -72,18 +72,66 @@ export function renderDynamicEquation(calculations, params) {
     </math>
   `;
   
-  container.innerHTML = mathML;
+  // MATHJAX JUMP FIX: Lock heights BEFORE replacing content
+  // Lock the OUTER equation-container div (not just the inner one)
+  const outerContainer = document.getElementById('dynamic-equation-container');
+  const parentCard = innerContainer.closest('.card');
+  
+  // Lock outer container (this is key - it prevents the equation box from resizing)
+  if (outerContainer) {
+    const outerHeight = outerContainer.getBoundingClientRect().height;
+    if (outerHeight > 0) {
+      outerContainer.style.height = `${outerHeight}px`;
+      outerContainer.style.minHeight = `${outerHeight}px`;
+      outerContainer.style.maxHeight = `${outerHeight}px`;
+      outerContainer.style.overflow = 'hidden';
+    }
+  }
+  
+  // Also lock parent card to prevent card from resizing
+  if (parentCard) {
+    const cardHeight = parentCard.getBoundingClientRect().height;
+    if (cardHeight > 0) {
+      parentCard.style.height = `${cardHeight}px`;
+      parentCard.style.minHeight = `${cardHeight}px`;
+      parentCard.style.maxHeight = `${cardHeight}px`;
+      parentCard.style.overflow = 'hidden';
+    }
+  }
+  
+  // NOW replace content (containers are locked at correct size)
+  innerContainer.innerHTML = mathML;
   
   // Tell MathJax 2.7.7 to re-render the updated equation
   if (window.MathJax && window.MathJax.Hub) {
     window.MathJax.Hub.Queue(
-      ["Typeset", window.MathJax.Hub, container],
+      ["Typeset", window.MathJax.Hub, innerContainer],
       function() {
         // After MathJax renders, set up responsive scaling
-        setupResponsiveScaling(container);
+        setupResponsiveScaling(innerContainer);
         
         // Fix accessibility: ensure aria-hidden assistive MathML is not focusable
-        fixAriaHiddenFocusability(container);
+        fixAriaHiddenFocusability(innerContainer);
+        
+        // MATHJAX JUMP FIX: Unlock heights AFTER MathJax completes
+        // Wait 200ms to ensure MathJax is fully done
+        setTimeout(function() {
+          // Clear outer container locks
+          if (outerContainer) {
+            outerContainer.style.height = '';
+            outerContainer.style.minHeight = '';
+            outerContainer.style.maxHeight = '';
+            outerContainer.style.overflow = '';
+          }
+          
+          // Clear parent card locks
+          if (parentCard) {
+            parentCard.style.height = '';
+            parentCard.style.minHeight = '';
+            parentCard.style.maxHeight = '';
+            parentCard.style.overflow = '';
+          }
+        }, 200);
       }
     );
   }

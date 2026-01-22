@@ -32,6 +32,12 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
     return;
   }
   
+  // Update YTM value display in legend
+  const ytmDisplay = document.getElementById('ytm-value-display');
+  if (ytmDisplay && ytm !== null) {
+    ytmDisplay.textContent = `${ytm.toFixed(2)}%`;
+  }
+  
   // Make canvas focusable and add keyboard navigation
   canvas.setAttribute('tabindex', '0');
   canvas.setAttribute('role', 'img');
@@ -221,7 +227,7 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
         },
         y2: {
           title: {
-            display: true,
+            display: false,  // Disable default title - we'll draw it with custom plugin
             text: 'Yield-to-maturity (r) %',
             color: '#7a46ff',
             font: {
@@ -262,6 +268,128 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
       }
     },
     plugins: [{
+      // Custom plugin to draw y2 axis title with italic r
+      id: 'y2AxisTitle',
+      afterDraw: (chart) => {
+        const ctx = chart.ctx;
+        const chartArea = chart.chartArea;
+        const yScale = chart.scales.y2;
+        
+        if (!yScale) return;
+        
+        ctx.save();
+        
+        // Position: right side of chart, vertically centered, rotated 90 degrees
+        const x = chartArea.right + 45; // Offset from right edge
+        const y = (chartArea.top + chartArea.bottom) / 2;
+        
+        // Text parts
+        const beforeR = 'Yield-to-maturity (';
+        const rText = 'r';
+        const afterR = ') %';
+        
+        // Set up for vertical text (rotate 90 degrees for top-to-bottom)
+        ctx.translate(x, y);
+        ctx.rotate(Math.PI / 2);
+        
+        // Calculate widths for positioning
+        ctx.font = "600 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif";
+        const beforeWidth = ctx.measureText(beforeR).width;
+        const afterWidth = ctx.measureText(afterR).width;
+        
+        ctx.font = "italic 600 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif";
+        const rWidth = ctx.measureText(rText).width;
+        
+        const totalWidth = beforeWidth + rWidth + afterWidth;
+        const startX = -totalWidth / 2;
+        
+        // Draw text parts
+        ctx.fillStyle = '#7a46ff';
+        ctx.textBaseline = 'middle';
+        
+        // Before r
+        ctx.font = "600 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif";
+        ctx.fillText(beforeR, startX, 0);
+        
+        // Italic r
+        ctx.font = "italic 600 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif";
+        ctx.fillText(rText, startX + beforeWidth, 0);
+        
+        // After r
+        ctx.font = "600 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif";
+        ctx.fillText(afterR, startX + beforeWidth + rWidth, 0);
+        
+        ctx.restore();
+      }
+    },
+    {
+      // Custom plugin to draw r value annotation on chart
+      id: 'rValueAnnotation',
+      afterDatasetsDraw: (chart) => {
+        if (ytm === null) return;
+        
+        const ctx = chart.ctx;
+        const chartArea = chart.chartArea;
+        const yScale = chart.scales.y2;
+        
+        // Position: middle of chart, slightly above the r line
+        const x = (chartArea.left + chartArea.right) / 2;
+        const yLineValue = ytm;
+        const yPixel = yScale.getPixelForValue(yLineValue);
+        const y = yPixel - 15; // 15px above the line
+        
+        ctx.save();
+        
+        // Draw background box for better readability
+        ctx.font = "700 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif";
+        const text = `r = ${ytm.toFixed(2)}%`;
+        const metrics = ctx.measureText(text);
+        const padding = 6;
+        const boxWidth = metrics.width + (padding * 2);
+        const boxHeight = 20;
+        
+        ctx.fillStyle = 'white'; // White background
+        ctx.strokeStyle = '#7a46ff'; // Purple border
+        ctx.lineWidth = 1.5;
+        
+        const boxX = x - (boxWidth / 2);
+        const boxY = y - (boxHeight / 2);
+        
+        ctx.beginPath();
+        ctx.roundRect(boxX, boxY, boxWidth, boxHeight, 4);
+        ctx.fill();
+        ctx.stroke();
+        
+        // Draw text with italic r
+        ctx.fillStyle = '#7a46ff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        // Measure to position properly
+        const rText = 'r';
+        const restText = ` = ${ytm.toFixed(2)}%`;
+        
+        ctx.font = "italic 700 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif";
+        const rWidth = ctx.measureText(rText).width;
+        
+        ctx.font = "700 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif";
+        const restWidth = ctx.measureText(restText).width;
+        
+        const totalWidth = rWidth + restWidth;
+        const startX = x - (totalWidth / 2);
+        
+        // Draw italic r
+        ctx.font = "italic 700 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif";
+        ctx.fillText(rText, startX + rWidth / 2, y);
+        
+        // Draw rest of text
+        ctx.font = "700 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif";
+        ctx.fillText(restText, startX + rWidth + restWidth / 2, y);
+        
+        ctx.restore();
+      }
+    },
+    {
       // Custom plugin to draw labels on top of stacked bars
       id: 'stackedBarLabels',
       afterDatasetsDraw: (chart) => {

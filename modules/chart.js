@@ -400,6 +400,59 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
       }
     },
     {
+      // YTM line label plugin - shows "r = XX%" with purple border
+      id: 'ytmLabel',
+      afterDatasetsDraw: (chart) => {
+        if (!ytm) return;
+        
+        const ctx = chart.ctx;
+        const chartArea = chart.chartArea;
+        const y2Scale = chart.scales.y2;
+        
+        if (!y2Scale) return;
+        
+        ctx.save();
+        
+        // Get the y-position of the YTM line
+        const ytmY = y2Scale.getPixelForValue(ytm);
+        
+        // Label text with italic r
+        const labelText = `r = ${ytm.toFixed(2)}%`;
+        
+        // Set font for measuring
+        ctx.font = "600 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif";
+        const textMetrics = ctx.measureText(labelText);
+        const textWidth = textMetrics.width;
+        
+        // Box dimensions with padding
+        const paddingX = 8;
+        const paddingY = 5;
+        const boxWidth = textWidth + (paddingX * 2);
+        const boxHeight = 24;
+        
+        // Position: Center of chart, aligned with YTM line
+        const boxX = chartArea.left + (chartArea.width / 2) - (boxWidth / 2);
+        const boxY = ytmY - (boxHeight / 2);
+        
+        // Draw white background
+        ctx.fillStyle = 'white';
+        ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
+        
+        // Draw purple border
+        ctx.strokeStyle = '#7a46ff';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
+        
+        // Draw text
+        ctx.fillStyle = '#7a46ff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(labelText, boxX + (boxWidth / 2), boxY + (boxHeight / 2));
+        
+        ctx.restore();
+      }
+    },
+    {
       // Chart note plugin - styled like table note, positioned below x-axis
       id: 'chartNote',
       afterDraw: (chart) => {

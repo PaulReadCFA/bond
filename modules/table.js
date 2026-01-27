@@ -142,8 +142,9 @@ function updateTableSemantics(table) {
  * @param {HTMLTableElement} table - The table element
  */
 function restoreTableSemantics(table) {
-  // Main table role
-  table.setAttribute('role', 'table');
+  // Don't add role="table" to the <table> element itself
+  // Native <table> already has implicit role="table" and supports <caption>
+  // Adding explicit role="table" breaks caption element support
   
   // Header section
   const thead = table.querySelector('thead');
@@ -187,15 +188,14 @@ function restoreTableSemantics(table) {
  * @param {HTMLTableElement} table - The table element
  */
 function removeTableSemantics(table) {
-  // Remove main table role
-  table.removeAttribute('role');
+  // Note: We don't add role="table" to <table> element, so nothing to remove there
   
-  // Remove all ARIA roles from table elements
+  // Remove all ARIA roles from table child elements
   const elements = table.querySelectorAll('[role]');
   elements.forEach(el => {
-    // Only remove table-related roles, keep aria-label on table
+    // Only remove table-related roles
     const role = el.getAttribute('role');
-    if (['table', 'rowgroup', 'row', 'columnheader', 'cell'].includes(role)) {
+    if (['rowgroup', 'row', 'columnheader', 'cell'].includes(role)) {
       el.removeAttribute('role');
     }
   });

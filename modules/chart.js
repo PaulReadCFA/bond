@@ -245,14 +245,7 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
         },
         y2: {
           title: {
-            display: true,
-            text: 'Yield-to-maturity (r) %',
-            color: '#7a46ff',
-            font: {
-              size: 13,
-              weight: '600',
-              family: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif"
-            }
+            display: false  // We'll draw this manually with italic 'r'
           },
           position: 'right',
           min: 0,
@@ -284,7 +277,7 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
       layout: {
         padding: {
           left: 10,
-          right: 10,
+          right: 80,  // Increased for y2 axis title with italic 'r'
           top: showLabels ? 35 : 15,
           bottom: 95  // Increased for note position
         }
@@ -416,18 +409,25 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
         // Get the y-position of the YTM line
         const ytmY = y2Scale.getPixelForValue(ytm);
         
-        // Label text with italic r
-        const labelText = `r = ${ytm.toFixed(2)}%`;
+        // Prepare text parts: "r" (italic) + " = " + "6.50%" (regular)
+        const rText = 'r';
+        const equalsText = ' = ';
+        const valueText = `${ytm.toFixed(2)}%`;
         
-        // Set font for measuring
+        // Measure text with different fonts
+        ctx.font = "italic 600 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif";
+        const rWidth = ctx.measureText(rText).width;
+        
         ctx.font = "600 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif";
-        const textMetrics = ctx.measureText(labelText);
-        const textWidth = textMetrics.width;
+        const equalsWidth = ctx.measureText(equalsText).width;
+        const valueWidth = ctx.measureText(valueText).width;
+        
+        const totalWidth = rWidth + equalsWidth + valueWidth;
         
         // Box dimensions with padding
         const paddingX = 8;
         const paddingY = 5;
-        const boxWidth = textWidth + (paddingX * 2);
+        const boxWidth = totalWidth + (paddingX * 2);
         const boxHeight = 24;
         
         // Position: Center of chart, aligned with YTM line
@@ -443,11 +443,79 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
         ctx.lineWidth = 2;
         ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
         
-        // Draw text
+        // Draw text in parts
+        const textY = boxY + (boxHeight / 2);
+        let currentX = boxX + paddingX;
+        
+        // Draw italic "r"
         ctx.fillStyle = '#7a46ff';
-        ctx.textAlign = 'center';
+        ctx.font = "italic 600 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif";
+        ctx.textAlign = 'left';
         ctx.textBaseline = 'middle';
-        ctx.fillText(labelText, boxX + (boxWidth / 2), boxY + (boxHeight / 2));
+        ctx.fillText(rText, currentX, textY);
+        currentX += rWidth;
+        
+        // Draw regular " = XX%"
+        ctx.font = "600 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif";
+        ctx.fillText(equalsText + valueText, currentX, textY);
+        
+        ctx.restore();
+      }
+    },
+    {
+      // Custom y2 axis title with italic 'r'
+      id: 'y2AxisTitle',
+      afterDraw: (chart) => {
+        const ctx = chart.ctx;
+        const chartArea = chart.chartArea;
+        const y2Scale = chart.scales.y2;
+        
+        if (!y2Scale) return;
+        
+        ctx.save();
+        
+        // Text parts: "Yield-to-maturity (" + "r" (italic) + ") %"
+        const beforeR = 'Yield-to-maturity (';
+        const rText = 'r';
+        const afterR = ') %';
+        
+        // Measure text with different fonts
+        ctx.font = "600 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif";
+        const beforeRWidth = ctx.measureText(beforeR).width;
+        const afterRWidth = ctx.measureText(afterR).width;
+        
+        ctx.font = "italic 600 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif";
+        const rWidth = ctx.measureText(rText).width;
+        
+        const totalWidth = beforeRWidth + rWidth + afterRWidth;
+        
+        // Position: Right side, vertically centered, more space from axis
+        const titleX = chartArea.right + 50;  // Increased from 35 to 50 for more space
+        const titleY = chartArea.top + (chartArea.height / 2);
+        
+        // Rotate context for vertical text (clockwise for right side)
+        ctx.translate(titleX, titleY);
+        ctx.rotate(Math.PI / 2);  // Changed from -Math.PI / 2 to Math.PI / 2
+        
+        // Draw text in parts (now drawing horizontally in rotated context)
+        let currentX = -totalWidth / 2;
+        
+        // Draw "Yield-to-maturity ("
+        ctx.fillStyle = '#7a46ff';
+        ctx.font = "600 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif";
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(beforeR, currentX, 0);
+        currentX += beforeRWidth;
+        
+        // Draw italic "r"
+        ctx.font = "italic 600 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif";
+        ctx.fillText(rText, currentX, 0);
+        currentX += rWidth;
+        
+        // Draw ") %"
+        ctx.font = "600 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif";
+        ctx.fillText(afterR, currentX, 0);
         
         ctx.restore();
       }

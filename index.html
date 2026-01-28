@@ -13,84 +13,46 @@
   <!-- Chart.js for visualization -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   
-  <!-- MathJax 2.7.7 configuration for Canvas LMS compatibility -->
+  <!-- MathJax 2.7.7 for MathML rendering - EXACT copy of dividend config -->
   <script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    jax: ["input/MathML", "output/CommonHTML"],
-    extensions: ["mml2jax.js", "MathMenu.js", "MathZoom.js", "AssistiveMML.js"],
-    MathML: {
-      extensions: ["content-mathml.js", "mml3.js"]
-    },
-    CommonHTML: {
-      scale: 100,  // 100% scale - ResizeObserver will handle scaling
-      minScaleAdjust: 50,  // Allow down to 50%
-      matchFontHeight: false,
-      mtextFontInherit: false
-    },
-    menuSettings: {
-      assistiveMML: true,
-      explorer: true,
-      collapsible: false
-    },
-    showMathMenu: true,
-    showMathMenuMSIE: true,
-    "AssistiveMML": {
-      disabled: false,
-      styles: {
-        ".MJX_Assistive_MathML": {
-          position: "absolute!important",
-          clip: "rect(1px, 1px, 1px, 1px)",
-          padding: "1px 0 0 0!important",
-          border: "0!important",
-          height: "1px!important",
-          width: "1px!important",
-          overflow: "hidden!important",
-          display: "block!important"
-        }
-      }
+    MathJax.Hub.Config({
+      MathML: {
+        extensions: ["content-mathml.js"]
+      },
+      "HTML-CSS": { 
+        scale: 95,
+        linebreaks: { automatic: true }
+      },
+      menuSettings: {
+        explorer: false  // Disable MathJax accessibility explorer (prevents tabindex)
+      },
+      MathEvents: {
+        removeElement: null  // Don't make equations focusable
+      },
+      skipStartupTypeset: false
+    });
+    
+    // Aggressive tabindex removal - run multiple times to catch all MathJax elements
+    function removeAllMathJaxTabindex() {
+      var mathJaxElements = document.querySelectorAll('.MathJax[tabindex], .MathJax_Display[tabindex], span[id^="MathJax-Element"][tabindex]');
+      mathJaxElements.forEach(function(el) {
+        el.removeAttribute('tabindex');
+        el.setAttribute('aria-hidden', 'true');
+      });
     }
-  });
-  
-  // Fix WCAG issue: aria-hidden elements should not be focusable
-  // Run after MathJax finishes rendering
-  MathJax.Hub.Queue(function () {
-    fixAllAriaHiddenElements();
-  });
-  
-  function fixAllAriaHiddenElements() {
-    // Fix 1: MathJax visual spans with role="presentation" need proper role for focusability
-    const presentationSpans = document.querySelectorAll('span.mjx-chtml[role="presentation"][tabindex="0"]');
-    presentationSpans.forEach(span => {
-      // Add role="application" for Math Explorer functionality
-      span.setAttribute('role', 'application');
-      span.setAttribute('aria-label', 'Interactive math equation. Press Enter to explore.');
-    });
     
-    // Fix 2: Remove aria-label from aria-hidden elements (not allowed)
-    const ariaHiddenWithLabel = document.querySelectorAll('[aria-hidden="true"][aria-label]');
-    ariaHiddenWithLabel.forEach(element => {
-      element.removeAttribute('aria-label');
-    });
-    
-    // Fix 3: All other aria-hidden elements should not be focusable
-    const ariaHiddenElements = document.querySelectorAll('[aria-hidden="true"]');
-    ariaHiddenElements.forEach(element => {
-      // Only set tabindex if not already set to -1
-      if (element.getAttribute('tabindex') !== '-1') {
-        element.setAttribute('tabindex', '-1');
-      }
-      
-      // Also fix any focusable children
-      const focusableChildren = element.querySelectorAll('[tabindex="0"], a, button, input, select, textarea');
-      focusableChildren.forEach(child => {
-        child.setAttribute('tabindex', '-1');
+    // Remove tabindex after MathJax finishes initial rendering
+    MathJax.Hub.Register.StartupHook("End", function () {
+      MathJax.Hub.Queue(function () {
+        removeAllMathJaxTabindex();
+        // Run again after a delay to catch stragglers
+        setTimeout(removeAllMathJaxTabindex, 100);
+        setTimeout(removeAllMathJaxTabindex, 500);
+        setTimeout(removeAllMathJaxTabindex, 1000);
       });
     });
-  }
   </script>
-  
-  <!-- MathJax 2.7.7 for Canvas LMS compatibility -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=MML_HTMLorMML"></script>
 </head>
 <body>
   <noscript>

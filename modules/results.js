@@ -72,7 +72,7 @@ function createAnalysisBox(calculations, params) {
   const box = createElement('div', { className: 'result-box analysis' });
   
   const title = createElement('h5', { className: 'result-title analysis' }, 
-    'Premium–Discount Analysis'
+    'Premium—Discount Analysis'
   );
   box.appendChild(title);
   

@@ -540,25 +540,25 @@ function runSelfTests() {
       if (test.expected.price !== undefined) {
         const diff = Math.abs(result.bondPrice - test.expected.price);
         if (diff <= test.expected.tolerance) {
-          console.log(`Ã¢Å“â€œ ${test.name} passed`);
+          console.log(`✓ ${test.name} passed`);
         } else {
-          console.warn(`Ã¢Å“â€” ${test.name} failed: expected ${test.expected.price}, got ${result.bondPrice}`);
+          console.warn(`✗ ${test.name} failed: expected ${test.expected.price}, got ${result.bondPrice}`);
         }
       } else if (test.expected.priceShouldBe === 'greater than 100') {
         if (result.bondPrice > 100) {
-          console.log(`Ã¢Å“â€œ ${test.name} passed`);
+          console.log(`✓ ${test.name} passed`);
         } else {
-          console.warn(`Ã¢Å“â€” ${test.name} failed: price should be > 100, got ${result.bondPrice}`);
+          console.warn(`✗ ${test.name} failed: price should be > 100, got ${result.bondPrice}`);
         }
       } else if (test.expected.priceShouldBe === 'less than 100') {
         if (result.bondPrice < 100) {
-          console.log(`Ã¢Å“â€œ ${test.name} passed`);
+          console.log(`✓ ${test.name} passed`);
         } else {
-          console.warn(`Ã¢Å“â€” ${test.name} failed: price should be < 100, got ${result.bondPrice}`);
+          console.warn(`✗ ${test.name} failed: price should be < 100, got ${result.bondPrice}`);
         }
       }
     } catch (error) {
-      console.error(`Ã¢Å“â€” ${test.name} threw error:`, error);
+      console.error(`✗ ${test.name} threw error:`, error);
     }
   });
   

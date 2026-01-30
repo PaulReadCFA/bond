@@ -94,7 +94,6 @@ export function renderTable(cashFlows, bondPrice, periods, periodicCoupon, ytm) 
   // --------------------------------------------------------------
   // Make table focusable for skip links
   table.setAttribute('tabindex', '-1');
-  table.setAttribute('aria-label', 'Bond cash flow table');
 
   // For mobile: Restore table semantics when using display:block
   // CSS display:block breaks native table semantics, so we add ARIA roles
@@ -149,9 +148,9 @@ function updateTableSemantics(table) {
  * @param {HTMLTableElement} table - The table element
  */
 function restoreTableSemantics(table) {
-  // Don't add role="table" to the <table> element itself
-  // Native <table> already has implicit role="table" and supports <caption>
-  // Adding explicit role="table" breaks caption element support
+  // When CSS uses display:block, native table semantics are lost
+  // We must explicitly restore them with ARIA roles
+  table.setAttribute('role', 'table');
   
   // Header section
   const thead = table.querySelector('thead');
@@ -195,7 +194,8 @@ function restoreTableSemantics(table) {
  * @param {HTMLTableElement} table - The table element
  */
 function removeTableSemantics(table) {
-  // Note: We don't add role="table" to <table> element, so nothing to remove there
+  // Remove role="table" from the table element itself
+  table.removeAttribute('role');
   
   // Remove all ARIA roles from table child elements
   const elements = table.querySelectorAll('[role]');

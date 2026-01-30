@@ -40,7 +40,7 @@ mjx-assistive-mml[aria-hidden="true"] * {
 }
 
 /* ==========================================================================
-   2. RESULT BOXES â€” Bond-Specific
+   2. RESULT BOXES — Bond-Specific
    ========================================================================== */
 .result-box.price {
   background-color: var(--color-bg-orange);
@@ -140,7 +140,7 @@ mjx-assistive-mml[aria-hidden="true"] * {
 }
 
 /* ==========================================================================
-   4. INPUT LAYOUT â€” Inline with Labels
+   4. INPUT LAYOUT — Inline with Labels
    ========================================================================== */
 .input-group-inline {
   display: flex;
@@ -212,7 +212,7 @@ mjx-assistive-mml[aria-hidden="true"] * {
 }
 
 /* ==========================================================================
-   5. EQUATION DISPLAY â€” Bond-specific
+   5. EQUATION DISPLAY — Bond-specific
    ========================================================================== */
 
 /* Ensure MathJax assistive elements are not focusable (WCAG compliance) */

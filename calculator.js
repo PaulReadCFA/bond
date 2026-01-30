@@ -72,28 +72,28 @@ function setupSkipLinks() {
   const skipToVisualizer = document.querySelector('a[href="#visualizer"]');
   const skipToCalculator = document.querySelector('a[href="#calculator"]');
   
-  // Skip to data table
+// Skip to data table
   if (skipToVisualizer) {
     listen(skipToVisualizer, 'click', (e) => {
       e.preventDefault();
       
-      // Switch to table view first (without auto-focus to avoid conflicts)
+      // Switch to table view first
       setState({ viewMode: 'table' });
       updateButtonStates(false);
       
-      // Scroll the visualizer section into view
-      const section = $('#visualizer');
-      if (section) {
-        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Scroll the table into view
+      const tableContainer = $('#table-container');
+      if (tableContainer) {
+        tableContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
       
-           // Scroll to table and announce to SR without moving focus
-      // This allows users to continue tabbing through and exit the iframe
+      // Focus the table view toggle button (last interactive element before table)
+      // This way, next Tab exits the iframe
       setTimeout(() => {
-        const tableContainer = $('#table-container');
-        if (tableContainer) {
-          tableContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          announceToScreenReader('Jumped to cash flow data table');
+        const tableBtn = $('#table-view-btn');
+        if (tableBtn) {
+          tableBtn.focus();
+          announceToScreenReader('Jumped to data table. Press Tab to continue to next section.');
         }
       }, 100);
     });

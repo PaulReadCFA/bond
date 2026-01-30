@@ -81,21 +81,14 @@ function setupSkipLinks() {
       setState({ viewMode: 'table' });
       updateButtonStates(false);
       
-      // Scroll the table into view
-      const tableContainer = $('#table-container');
-      if (tableContainer) {
-        tableContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-      
-      // Focus the table view toggle button (last interactive element before table)
-      // This way, next Tab exits the iframe
-      setTimeout(() => {
-        const tableBtn = $('#table-view-btn');
-        if (tableBtn) {
-          tableBtn.focus();
-          announceToScreenReader('Jumped to data table. Press Tab to continue to next section.');
+      // Scroll and focus the table
+    setTimeout(() => {
+        const table = $('#cash-flow-table');
+        if (table) {
+          table.focus();
+          announceToScreenReader('Jumped to data table');
         }
-      }, 100);
+      }, 600);
     });
   }
   

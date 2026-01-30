@@ -77,15 +77,25 @@ function setupSkipLinks() {
     listen(skipToVisualizer, 'click', (e) => {
       e.preventDefault();
       
-      // Switch to table view (updateButtonStates will handle focus)
+      // Switch to table view first (without auto-focus to avoid conflicts)
       setState({ viewMode: 'table' });
-      updateButtonStates();
+      updateButtonStates(false);
       
       // Scroll the visualizer section into view
       const section = $('#visualizer');
       if (section) {
         section.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
+      
+      // Focus the table after smooth scroll completes (~500ms)
+      // Using explicit focus here ensures proper screen reader announcement
+      setTimeout(() => {
+        const table = $('#cash-flow-table');
+        if (table) {
+          table.focus();
+          announceToScreenReader('Jumped to data table');
+        }
+      }, 600);
     });
   }
   
@@ -197,7 +207,8 @@ function setupViewToggle() {
   const chartBtn = $('#chart-view-btn');
   const tableBtn = $('#table-view-btn');
 
-  updateButtonStates();
+  // Initialize button states without auto-focusing (page load)
+  updateButtonStates(false);
 
   // Chart button - use addEventListener directly with capture phase
   if (chartBtn) {

@@ -59,8 +59,8 @@ function init() {
   // Run self-tests
   runSelfTests();
   
-  // Fix static equation aria-hidden focusability after MathJax loads
-  fixStaticEquationAccessibility();
+  // Setup sticky observer
+  setupStickyObserver();
   
   console.log('Bond Calculator ready');
 }
@@ -69,59 +69,28 @@ function init() {
  * Set up skip link handlers for accessibility
  */
 function setupSkipLinks() {
-  // Skip to data entry (first input field)
-  const skipToDataEntry = document.querySelector('a[href="#coupon-rate"]');
-  if (skipToDataEntry) {
-    const handler = (e) => {
+  const skipToVisualizer = document.querySelector('a[href="#visualizer"]');
+  const skipToCalculator = document.querySelector('a[href="#calculator"]');
+  
+  // Skip to data table
+  if (skipToVisualizer) {
+    listen(skipToVisualizer, 'click', (e) => {
       e.preventDefault();
-      const firstInput = $('#coupon-rate');
-      if (firstInput) {
-        firstInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        firstInput.focus();
-        announceToScreenReader('Jumped to data entry fields');
-      }
-    };
-    listen(skipToDataEntry, 'click', handler);
-    skipToDataEntry.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        handler(e);
+      
+      // Switch to table view (updateButtonStates will handle focus)
+      setState({ viewMode: 'table' });
+      updateButtonStates();
+      
+      // Scroll the visualizer section into view
+      const section = $('#visualizer');
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     });
   }
   
-  // Skip to data table
-  const skipToVisualizer = document.querySelector('a[href="#visualizer"]');
-  if (skipToVisualizer) {
-    const handler = (e) => {
-      // Prevent default to handle it ourselves
-      e.preventDefault();
-      
-      // Switch to table view using state management
-      setState({ viewMode: 'table' });
-      updateButtonStates();
-      
-      // Focus the table immediately (no delay for keyboard users)
-      const table = $('#cash-flow-table');
-      if (table) {
-        // Scroll section into view first
-        table.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        // Focus the table (this moves both keyboard and SR focus)
-        table.focus();
-        // Announce to screen readers
-        announceToScreenReader('Jumped to data table');
-      }
-    };
-    
-    // Handle both click and keyboard activation
-    listen(skipToVisualizer, 'click', handler);
-    skipToVisualizer.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        handler(e);
-      }
-    });
-  }
+  // Skip to calculator - just use default behavior
+  // The browser will scroll to #calculator and focus it (it has tabindex="-1")
 }
 
 // =============================================================================
@@ -275,34 +244,48 @@ function setupViewToggle() {
     if (!btn) return;
     btn.tabIndex = 0;
     
-    btn.addEventListener('keydown', e => {
+    // Remove old listener if exists
+    if (btn._keydownListener) {
+      btn.removeEventListener('keydown', btn._keydownListener);
+    }
+    
+    // Create new listener
+    const keydownListener = (e) => {
       if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
         e.preventDefault();
         const next = btn === chartBtn ? tableBtn : chartBtn;
+        
+        // Don't allow switching to chart if it's disabled
+        if (next.disabled) {
+          return;
+        }
+        
         next.focus();
         setState({ viewMode: next.id === 'chart-view-btn' ? 'chart' : 'table' });
-        updateButtonStates();
+        updateButtonStates(false);  // Don't auto-focus - keep focus on button
       }
-    });
+    };
+    
+    // Store and add listener
+    btn._keydownListener = keydownListener;
+    btn.addEventListener('keydown', keydownListener);
   });
 }
 
 /**
  * Update button states based on current view and screen width
+ * @param {boolean} autoFocus - Whether to automatically focus the container
  */
-function updateButtonStates() {
+function updateButtonStates(autoFocus = true) {
   const chartBtn = $('#chart-view-btn');
   const tableBtn = $('#table-view-btn');
   const chartContainer = $('#chart-container');
   const tableContainer = $('#table-container');
   const legend = $('#chart-legend');
-  const helperText = $('#chart-helper-text');
   const isForced = document.body.classList.contains('force-table');
   const currentView = isForced ? 'table' : state.viewMode;
 
   if (!chartBtn || !tableBtn) return;
-
-  console.log(`updateButtonStates: isForced=${isForced}, chartBtn.disabled=${chartBtn.disabled}`);
 
   // Update active states
   chartBtn.classList.toggle('active', currentView === 'chart');
@@ -315,11 +298,6 @@ function updateButtonStates() {
   // Disable chart button when forced to table
   chartBtn.disabled = isForced;
   
-  // Show/hide helper text when chart is disabled
-  if (helperText) {
-    helperText.style.display = isForced ? 'block' : 'none';
-  }
-  
   // Show/hide containers based on view
   if (currentView === 'chart') {
     if (chartContainer) chartContainer.style.display = 'block';
@@ -329,7 +307,10 @@ function updateButtonStates() {
     // Announce change
     announceToScreenReader('Chart view active');
     
-    // DON'T move focus - let user stay on button to use arrow keys
+    // Only auto-focus if requested (not for keyboard navigation)
+    if (autoFocus) {
+      focusElement(chartContainer, 100);
+    }
     
   } else {
     if (tableContainer) tableContainer.style.display = 'block';
@@ -339,10 +320,11 @@ function updateButtonStates() {
     // Announce change
     announceToScreenReader('Table view active');
     
-    // DON'T move focus - let user stay on button to use arrow keys
+    // Only auto-focus if requested (not for keyboard navigation)
+    if (autoFocus) {
+      focusElement($('#cash-flow-table'), 100);
+    }
   }
-  
-  console.log(`After update: chartBtn.disabled=${chartBtn.disabled}`);
 }
 
 /**
@@ -507,8 +489,6 @@ function setupResizeListener() {
 function detectNarrowScreen() {
   const narrow = window.innerWidth <= 600;
   
-  console.log(`detectNarrowScreen: width=${window.innerWidth}, narrow=${narrow}`);
-  
   if (narrow) {
     document.body.classList.add('force-table');
     if (state.viewMode !== 'table') {
@@ -518,7 +498,7 @@ function detectNarrowScreen() {
     document.body.classList.remove('force-table');
   }
   
-  updateButtonStates();
+  updateButtonStates(false);  // Don't auto-focus on resize
 }
 
 // =============================================================================
@@ -556,94 +536,67 @@ function runSelfTests() {
       if (test.expected.price !== undefined) {
         const diff = Math.abs(result.bondPrice - test.expected.price);
         if (diff <= test.expected.tolerance) {
-          console.log(`✓  ${test.name} passed`);
+          console.log(`Ã¢Å“â€œ ${test.name} passed`);
         } else {
-          console.warn(`✗ ${test.name} failed: expected ${test.expected.price}, got ${result.bondPrice}`);
+          console.warn(`Ã¢Å“â€” ${test.name} failed: expected ${test.expected.price}, got ${result.bondPrice}`);
         }
       } else if (test.expected.priceShouldBe === 'greater than 100') {
         if (result.bondPrice > 100) {
-          console.log(`✓  ${test.name} passed`);
+          console.log(`Ã¢Å“â€œ ${test.name} passed`);
         } else {
-          console.warn(`✗ ${test.name} failed: price should be > 100, got ${result.bondPrice}`);
+          console.warn(`Ã¢Å“â€” ${test.name} failed: price should be > 100, got ${result.bondPrice}`);
         }
       } else if (test.expected.priceShouldBe === 'less than 100') {
         if (result.bondPrice < 100) {
-          console.log(`✓  ${test.name} passed`);
+          console.log(`Ã¢Å“â€œ ${test.name} passed`);
         } else {
-          console.warn(`✗ ${test.name} failed: price should be < 100, got ${result.bondPrice}`);
+          console.warn(`Ã¢Å“â€” ${test.name} failed: price should be < 100, got ${result.bondPrice}`);
         }
       }
     } catch (error) {
-      console.error(`✗ ${test.name} threw error:`, error);
+      console.error(`Ã¢Å“â€” ${test.name} threw error:`, error);
     }
   });
   
   console.log('Self-tests complete');
 }
 
+
 // =============================================================================
-// STATIC EQUATION ACCESSIBILITY FIX
+// STICKY CALCULATOR OBSERVER
 // =============================================================================
 
 /**
- * Fix aria-hidden focusability for static equation
- * Ensures MathJax assistive MathML elements are not focusable
+ * Detect when calculator becomes stuck and add visual feedback
  */
-function fixStaticEquationAccessibility() {
-  // Wait for MathJax 2.7.7 to finish rendering
-  if (typeof MathJax !== 'undefined' && MathJax.Hub) {
-    MathJax.Hub.Queue(function() {
-      const staticCard = document.getElementById('static-equation-card');
-      if (staticCard) {
-        fixAriaHiddenFocusability(staticCard);
-      }
-    });
-  } else {
-    // Fallback: try after a short delay
-    setTimeout(() => {
-      const staticCard = document.getElementById('static-equation-card');
-      if (staticCard) {
-        fixAriaHiddenFocusability(staticCard);
-      }
-    }, 1000);
-  }
-}
-
-/**
- * Fix aria-hidden focusability for a container's MathJax elements
- * @param {HTMLElement} container - Container with MathJax content
- */
-function fixAriaHiddenFocusability(container) {
-  // Fix 1: MathJax visual spans with role="presentation" need proper role for focusability
-  const presentationSpans = container.querySelectorAll('span.mjx-chtml[role="presentation"][tabindex="0"]');
-  presentationSpans.forEach(span => {
-    // Add role="application" for Math Explorer functionality
-    span.setAttribute('role', 'application');
-    span.setAttribute('aria-label', 'Interactive math equation. Press Enter to explore.');
-  });
+function setupStickyObserver() {
+  const wrapper = document.querySelector('.sticky-calculator-wrapper');
+  if (!wrapper) return;
   
-  // Fix 2: Remove aria-label from aria-hidden elements (not allowed by WCAG)
-  const ariaHiddenWithLabel = container.querySelectorAll('[aria-hidden="true"][aria-label]');
-  ariaHiddenWithLabel.forEach(element => {
-    element.removeAttribute('aria-label');
-  });
+  // Create a sentinel element at the top
+  const sentinel = document.createElement('div');
+  sentinel.style.position = 'absolute';
+  sentinel.style.top = '-1px';
+  sentinel.style.height = '1px';
+  sentinel.style.width = '100%';
+  sentinel.style.pointerEvents = 'none';
+  wrapper.insertBefore(sentinel, wrapper.firstChild);
   
-  // Fix 3: All aria-hidden elements should not be focusable
-  const ariaHiddenElements = container.querySelectorAll('[aria-hidden="true"]');
-  ariaHiddenElements.forEach(element => {
-    // Only set tabindex if not already set to -1
-    if (element.getAttribute('tabindex') !== '-1') {
-      element.setAttribute('tabindex', '-1');
-    }
-    
-    // Also fix any focusable children
-    const focusableChildren = element.querySelectorAll('[tabindex="0"], a, button, input, select, textarea');
-    focusableChildren.forEach(child => {
-      child.setAttribute('tabindex', '-1');
-    });
-  });
+  // Observe the sentinel
+  const observer = new IntersectionObserver(
+    ([entry]) => {
+      // When sentinel is not visible, calculator is stuck
+      if (entry.intersectionRatio < 1) {
+        wrapper.classList.add('is-stuck');
+      } else {
+        wrapper.classList.remove('is-stuck');
+      }
+    },
+    { threshold: [1], rootMargin: '0px' }
+  );
+  
+  observer.observe(sentinel);
 }
-
 
 // =============================================================================
 // CLEANUP

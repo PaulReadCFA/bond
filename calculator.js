@@ -72,33 +72,25 @@ function setupSkipLinks() {
   const skipToVisualizer = document.querySelector('a[href="#visualizer"]');
   const skipToCalculator = document.querySelector('a[href="#calculator"]');
   
-// Skip to data table
  // Skip to data table
-  if (skipToVisualizer) {
-    listen(skipToVisualizer, 'click', (e) => {
-      e.preventDefault();
-      
-      // Switch to table view first
-      setState({ viewMode: 'table' });
-      updateButtonStates(false);
-      
-      // Scroll the table into view
-      const tableContainer = $('#table-container');
-      if (tableContainer) {
-        tableContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+ if (skipToVisualizer) {
+  listen(skipToVisualizer, 'click', (e) => {
+    e.preventDefault();
+    
+    // Switch to table view first
+    setState({ viewMode: 'table' });
+    updateButtonStates(false);
+    
+    // Focus the table button - it will scroll itself into view
+    setTimeout(() => {
+      const tableBtn = $('#table-view-btn');
+      if (tableBtn) {
+        tableBtn.focus();  // .focus() automatically scrolls element into view
+        announceToScreenReader('Jumped to data table');
       }
-      
-      // Focus the table view button (last interactive element before table)
-      // This way, next Tab exits the iframe - same as natural tabbing
-      setTimeout(() => {
-        const tableBtn = $('#table-view-btn');
-        if (tableBtn) {
-          tableBtn.focus();
-          announceToScreenReader('Jumped to data table');
-        }
-      }, 600);
-    });
-  }
+    }, 100);
+  });
+}
   
   // Skip to calculator - just use default behavior
   // The browser will scroll to #calculator and focus it (it has tabindex="-1")

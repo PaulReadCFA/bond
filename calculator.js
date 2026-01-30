@@ -73,6 +73,7 @@ function setupSkipLinks() {
   const skipToCalculator = document.querySelector('a[href="#calculator"]');
   
 // Skip to data table
+ // Skip to data table
   if (skipToVisualizer) {
     listen(skipToVisualizer, 'click', (e) => {
       e.preventDefault();
@@ -81,11 +82,18 @@ function setupSkipLinks() {
       setState({ viewMode: 'table' });
       updateButtonStates(false);
       
-      // Scroll and focus the table
-    setTimeout(() => {
-        const table = $('#cash-flow-table');
-        if (table) {
-          table.focus();
+      // Scroll the table into view
+      const tableContainer = $('#table-container');
+      if (tableContainer) {
+        tableContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      
+      // Focus the table view button (last interactive element before table)
+      // This way, next Tab exits the iframe - same as natural tabbing
+      setTimeout(() => {
+        const tableBtn = $('#table-view-btn');
+        if (tableBtn) {
+          tableBtn.focus();
           announceToScreenReader('Jumped to data table');
         }
       }, 600);

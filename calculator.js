@@ -87,15 +87,15 @@ function setupSkipLinks() {
         section.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
       
-      // Focus the table after smooth scroll completes (~500ms)
-      // Using explicit focus here ensures proper screen reader announcement
+           // Scroll to table and announce to SR without moving focus
+      // This allows users to continue tabbing through and exit the iframe
       setTimeout(() => {
-        const table = $('#cash-flow-table');
-        if (table) {
-          table.focus();
-          announceToScreenReader('Jumped to data table');
+        const tableContainer = $('#table-container');
+        if (tableContainer) {
+          tableContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          announceToScreenReader('Jumped to cash flow data table');
         }
-      }, 600);
+      }, 100);
     });
   }
   

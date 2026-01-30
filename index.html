@@ -14,44 +14,43 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   
   <!-- MathJax 2.7.7 for MathML rendering - EXACT copy of dividend config -->
-  <script type="text/x-mathjax-config">
-    MathJax.Hub.Config({
-      MathML: {
-        extensions: ["content-mathml.js"]
-      },
-      "HTML-CSS": { 
-        scale: 95,
-        linebreaks: { automatic: true }
-      },
-      menuSettings: {
-        explorer: false  // Disable MathJax accessibility explorer (prevents tabindex)
-      },
-      MathEvents: {
-        removeElement: null  // Don't make equations focusable
-      },
-      skipStartupTypeset: false
-    });
-    
-    // Aggressive tabindex removal - run multiple times to catch all MathJax elements
-    function removeAllMathJaxTabindex() {
-      var mathJaxElements = document.querySelectorAll('.MathJax[tabindex], .MathJax_Display[tabindex], span[id^="MathJax-Element"][tabindex]');
-      mathJaxElements.forEach(function(el) {
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    MathML: {
+      extensions: ["content-mathml.js"]
+    },
+    "HTML-CSS": { 
+      scale: 95,
+      linebreaks: { automatic: true }
+    },
+    menuSettings: {
+      explorer: false
+    },
+    skipStartupTypeset: false
+  });
+  
+  // More comprehensive tabindex removal
+  function removeAllMathJaxTabindex() {
+    // Catch ALL possible MathJax elements with tabindex
+    document.querySelectorAll('[tabindex]').forEach(function(el) {
+      if (el.classList.contains('MathJax') || 
+          el.classList.contains('MathJax_Display') ||
+          el.id.startsWith('MathJax-') ||
+          el.tagName === 'MATH' ||
+          el.closest('.MathJax')) {
         el.removeAttribute('tabindex');
         el.setAttribute('aria-hidden', 'true');
-      });
-    }
-    
-    // Remove tabindex after MathJax finishes initial rendering
-    MathJax.Hub.Register.StartupHook("End", function () {
-      MathJax.Hub.Queue(function () {
-        removeAllMathJaxTabindex();
-        // Run again after a delay to catch stragglers
-        setTimeout(removeAllMathJaxTabindex, 100);
-        setTimeout(removeAllMathJaxTabindex, 500);
-        setTimeout(removeAllMathJaxTabindex, 1000);
-      });
+      }
     });
-  </script>
+  }
+  
+  MathJax.Hub.Register.StartupHook("End", function () {
+    removeAllMathJaxTabindex();
+    setTimeout(removeAllMathJaxTabindex, 100);
+    setTimeout(removeAllMathJaxTabindex, 500);
+    setTimeout(removeAllMathJaxTabindex, 1000);
+  });
+</script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=MML_HTMLorMML"></script>
 </head>
 <body>
@@ -281,7 +280,7 @@
           <div id="table-container" class="table-wrapper" style="display: none;"
                role="region"
                tabindex="-1">
-            <table id="cash-flow-table" class="data-table" aria-describedby="table-note">
+            <table id="cash-flow-table" class="data-table" tabindex="-1" aria-describedby="table-note">
               <!-- Populated by JavaScript -->
             </table>
             <p id="table-note" class="table-note">

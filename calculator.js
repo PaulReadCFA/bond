@@ -235,13 +235,13 @@ function setupViewToggle() {
       // Normal behavior - allow chart view
       setState({ viewMode: 'chart' });
       updateButtonStates();
-    }, true); // Use capture phase
+    }, false); // Use capture phase
   }
 
-  listen(tableBtn, 'click', () => {
-    setState({ viewMode: 'table' });
-    updateButtonStates();
-  });
+ listen(tableBtn, 'click', () => {
+  setState({ viewMode: 'table' });
+  updateButtonStates(false);  // <-- Don't focus table, just show it
+});
 
   // Keyboard navigation between toggle buttons
   [chartBtn, tableBtn].forEach(btn => {

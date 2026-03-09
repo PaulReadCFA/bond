@@ -3,7 +3,7 @@
  * Renders bond price and analysis results
  */
 
-import { formatCurrency, createElement, setHTML } from './utils.js';
+import { formatCurrency, createElement } from './utils.js';
 
 /**
  * Render results and analysis section

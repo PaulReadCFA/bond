@@ -1118,7 +1118,17 @@ button[title]:hover::before {
   }
 }
 
-/* Narrow-screen force-table - Switch at 600px */
+/*
+ * Narrow-screen force-table — overrides at ≤600px.
+ *
+ * Why this block exists separately from the consolidated DISABLED BUTTON STATE
+ * block above: the .force-table class is added/removed dynamically by
+ * detectNarrowScreen() in calculator.js based on viewport width. When active,
+ * it must win over the .active class styles (which use box-shadow and
+ * background-color) regardless of JavaScript execution order. The !important
+ * declarations mirror the disabled block intentionally — the chart button is
+ * both disabled and visually suppressed at this breakpoint.
+ */
 @media (max-width: 600px) {
   .force-table #chart-view-btn,
   .force-table #chart-view-btn:hover,

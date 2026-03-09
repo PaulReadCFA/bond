@@ -113,8 +113,18 @@ export function renderDynamicEquation(calculations, params) {
         // Fix accessibility: ensure aria-hidden assistive MathML is not focusable
         fixAriaHiddenFocusability(innerContainer);
         
-        // MATHJAX JUMP FIX: Unlock heights AFTER MathJax completes
-        // Wait 200ms to ensure MathJax is fully done
+        // MathJax 2.7 does not expose a post-layout callback — Hub.Queue fires
+        // after typesetting is complete but before the browser has performed the
+        // reflow that gives MathJax elements their final dimensions. Unlocking
+        // the container heights synchronously here causes a visible jump because
+        // the card collapses then re-expands as the browser catches up.
+        //
+        // 200ms is a conservative guard derived from manual testing across
+        // Chrome, Firefox, and Safari at varying equation complexities. A
+        // MutationObserver on mjx-container size changes was trialled but proved
+        // unreliable because MathJax modifies element dimensions across multiple
+        // microtasks. This is a known limitation of MathJax 2.x; MathJax 3
+        // provides a proper TypesetPromise API that would eliminate this timeout.
         setTimeout(function() {
           // Clear outer container locks
           if (outerContainer) {

@@ -40,17 +40,14 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
   
   // Make canvas focusable and add keyboard navigation
   canvas.setAttribute('tabindex', '0');
-  canvas.setAttribute('role', 'application');
+  canvas.setAttribute('role', 'img');
   canvas.setAttribute('aria-roledescription', 'interactive chart');
   canvas.setAttribute(
     'aria-label',
-    'Interactive bond cash flow chart showing present value, coupon payments, principal repayment, and yield to maturity over time. Use Left and Right arrow keys to navigate between time periods. Home goes to first period, End goes to last period.'
+    'Interactive bond cash flow chart showing present value, coupon payments, principal repayment, and yield to maturity over time. Press Tab to focus, then use Left and Right arrow keys to navigate between time periods. Home goes to first period, End goes to last period.'
   );
 
   const ctx = canvas.getContext('2d');
-  
-  // Respect prefers-reduced-motion for chart animations
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   
   // Prepare data for Chart.js
   const labels = cashFlows.map(cf => cf.yearLabel);
@@ -116,7 +113,9 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      animation: prefersReducedMotion ? false : { duration: 400 },
+      animation: {
+        duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 400
+      },
       interaction: {
         mode: 'index',
         intersect: false
@@ -336,7 +335,7 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
           });
-          const displayValue = total < 0 ? `-${formattedValue}` : formattedValue;
+          const displayValue = total < 0 ? `−${formattedValue}` : formattedValue;
           
           // All labels at the same Y position
           ctx.fillText(displayValue, x, labelY);

@@ -18,14 +18,10 @@
 
 /* ==========================================================================
    MATHJAX ACCESSIBILITY FIX
-   MathJax 2.7.x injects assistive MathML elements with aria-hidden="true" but
-   still leaves them reachable by keyboard focus and pointer events. The
-   !important declarations below are required to override MathJax's own inline
-   styles, which take precedence over class-based rules. This implements the
-   standard sr-only visibility pattern to satisfy WCAG 4.1.2 (Name, Role, Value)
-   — aria-hidden elements must not be focusable.
    ========================================================================== */
+/* Ensure MathJax assistive MML (aria-hidden) is not focusable - WCAG 4.1.2 */
 mjx-assistive-mml[aria-hidden="true"] {
+  /* Use sr-only pattern to ensure it's truly hidden and non-focusable */
   position: absolute !important;
   clip: rect(0 0 0 0) !important;
   width: 1px !important;
@@ -99,7 +95,7 @@ mjx-assistive-mml[aria-hidden="true"] * {
 
 .analysis-details {
   padding-top: 0.5rem;
-  border-top: 1px solid var(--color-purple-300);
+  border-top: 1px solid var(--color-gray-200);
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
@@ -174,35 +170,16 @@ mjx-assistive-mml[aria-hidden="true"] * {
   position: relative;
 }
 
-/*
- * Border values use !important here because some Chromium-based browsers apply
- * a high-specificity UA stylesheet rule to input[type="number"] that overrides
- * class-level border declarations without it. This was confirmed via computed
- * styles showing #d1d5db (--color-gray-300) instead of the intended #8b93a7
- * despite correct cascade order. The !important is scoped to border/border-color
- * only and does not affect layout properties.
- */
 .input-field-inline {
   flex: 1;
   width: 100%;
   padding: 0.4rem 0.5rem;
   padding-right: 1.5rem;
-  border: 1px solid #8b93a7 !important;
+  border: 1px solid #8b93a7;
   border-radius: 0.375rem;
   font-size: 0.875rem;
   text-align: right;
   box-sizing: border-box;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-.input-field-inline:hover {
-  border-color: #6b7594 !important;
-}
-
-.input-field-inline:focus {
-  outline: none;
-  border-color: var(--color-blue-interactive) !important;
-  box-shadow: 0 0 0 3px rgba(60, 106, 229, 0.1);
 }
 
 .input-suffix-inline {
@@ -482,7 +459,7 @@ mjx-assistive-mml[aria-hidden="true"] math * {
 
 
 /* ==========================================================================
-   9. VIEW CONTROLS - Button Position Fix
+   8. VIEW CONTROLS - Button Position Fix
    ========================================================================== */
 
 /* Override: Keep buttons in consistent position */
@@ -546,7 +523,7 @@ mjx-assistive-mml[aria-hidden="true"] math * {
 /* Chart and table are already properly sized */
 
 /* ==========================================================================
-   10. TABLE IMPROVEMENTS - Cleaner, Tidier Styling
+   9. TABLE IMPROVEMENTS - Cleaner, Tidier Styling
    ========================================================================== */
 
 /* Override base table styling for cleaner look */
@@ -591,18 +568,25 @@ mjx-assistive-mml[aria-hidden="true"] math * {
   line-height: 1.5;
 }
 
-/* Better zebra striping – higher contrast for close-zoom legibility */
+/* Zebra striping - starts from row 2 to preserve orange first-row */
 .data-table tbody tr:nth-child(even) {
-  background-color: #eef1f5;
+  background-color: #f0f4f8;
 }
 
 .data-table tbody tr:nth-child(odd) {
   background-color: #ffffff;
 }
 
+/* First row orange always overrides zebra */
+.data-table tbody tr:first-child,
+.data-table tbody tr:first-child:nth-child(even),
+.data-table tbody tr:first-child:nth-child(odd) {
+  background-color: #fff7ed;
+}
+
 /* Smoother hover effect */
 .data-table tbody tr:hover {
-  background-color: #dde3ec !important;
+  background-color: #f0f4f8 !important;
   transition: background-color 0.15s ease;
 }
 
@@ -621,19 +605,14 @@ mjx-assistive-mml[aria-hidden="true"] math * {
   font-weight: 600;
 }
 
-/* Period 0 row (initial purchase) - subtle highlight */
-/* First row - orange for PV/purchase */
-.data-table tbody tr:first-child {
-  background-color: #fff7ed;
-}
-
+/* First row hover */
 .data-table tbody tr:first-child:hover {
   background-color: #ffedd5 !important;
 }
 
-/* Final period row - neutral coloring */
+/* Final period row - always striped for clear separation before footer */
 .data-table tbody tr:last-child {
-  background-color: inherit;
+  background-color: #f0f4f8;
 }
 
 .data-table tbody tr:last-child:hover {
@@ -685,18 +664,7 @@ mjx-assistive-mml[aria-hidden="true"] math * {
   width: 100%;
 }
 
-/*
- * Mobile card layout — responsive table reflow at ≤768px.
- *
- * Why !important is used here:
- * The desktop table uses display:table / display:table-cell, which are set by
- * the browser UA stylesheet at high specificity. Overriding display on table
- * child elements (thead, tbody, tr, td) requires !important because the UA
- * cascade cannot be beaten by class selectors alone for these specific
- * elements. This is a well-documented pattern for responsive table reflows.
- * The sr-only pattern on thead keeps column headers accessible to screen
- * readers via the ARIA roles restored in table.js updateTableSemantics().
- */
+/* Responsive card-style layout at narrow widths */
 @media (max-width: 768px) {
   /* Hide the table header visually but keep for screen readers */
   .data-table thead {
@@ -806,9 +774,8 @@ mjx-assistive-mml[aria-hidden="true"] math * {
     font-weight: 600;
     flex: 1;
   }
-} /* end @media (max-width: 768px) */
+}
 
-/* Very narrow phones – reduce font size further */
 @media (max-width: 400px) {
   .data-table {
     font-size: 0.625rem;
@@ -823,17 +790,40 @@ mjx-assistive-mml[aria-hidden="true"] math * {
 
 
 
-/* Use Lato for all content – matches body font */
+/* Use consistent system font for all content */
 .result-value,
 .info-value,
 .data-table,
 .legend-item,
 .input-field-inline {
-  font-family: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 }
 
 /* ==========================================================================
-   12. VALIDATION ERROR STATE
+   10. FINAL TWEAKS
+   ========================================================================== */
+
+/* Card 1: Left-align the intro text */
+.equation-intro {
+  text-align: left;
+}
+
+/* Chart legend: Remove borders and increase swatch size */
+.legend-color {
+  width: 1rem;
+  height: 1rem;
+  border: none;
+  border-left: none !important;
+  border-right: none !important;
+}
+
+/* Dashed line legend item - slightly wider */
+.legend-color.legend-dashed-line {
+  width: 2rem;
+}
+
+/* ==========================================================================
+   11. VALIDATION ERROR STATE
    ========================================================================== */
 
 /* Make validation summary focusable and visible when focused */
@@ -863,29 +853,4 @@ mjx-assistive-mml[aria-hidden="true"] math * {
   z-index: 10;
   white-space: nowrap;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-
-
-/* ==========================================================================
-   11. FINAL TWEAKS
-   ========================================================================== */
-
-/* Card 1: Left-align the intro text */
-.equation-intro {
-  text-align: left;
-}
-
-/* Chart legend: Remove borders and increase swatch size */
-.legend-color {
-  width: 1rem;
-  height: 1rem;
-  border: none;
-  border-left: none !important;
-  border-right: none !important;
-}
-
-/* Dashed line legend item - slightly wider */
-.legend-color.legend-dashed-line {
-  width: 2rem;
 }

@@ -6,14 +6,9 @@
   <title>Bond Valuation Calculator | CFA Institute</title>
   <meta name="description" content="Interactive bond valuation calculator demonstrating present value calculations for coupon bonds">
   
-  <!-- Lato font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;600;700&display=swap" rel="stylesheet">
-
   <!-- Styles -->
-  <link rel="stylesheet" href="cfa-base.css?v=20260309">
-  <link rel="stylesheet" href="bond-specific.css?v=20260309">
+  <link rel="stylesheet" href="cfa-base.css?v=20251218">
+  <link rel="stylesheet" href="bond-specific.css?v=20251218">
   
   <!-- Chart.js for visualization -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -67,14 +62,14 @@
   </noscript>
   <div class="container">
     <!-- Skip Links for Accessibility -->
-    <nav aria-label="Skip links">
+    <nav role="navigation" aria-label="Skip links">
       <a href="#coupon-rate" class="skip-link">Skip to data entry</a>
       <a href="#visualizer" class="skip-link">Skip to data table</a>
     </nav>
     <main class="content">
       <!-- Card 0: Static Formula (variables only) -->
-      <section class="card" id="static-equation-card" aria-label="General bond pricing formula">
-        <div class="equation-container" role="math" aria-label="General bond pricing formula">
+      <section class="card" id="static-equation-card">
+        <div class="equation-container" role="region" aria-label="General bond pricing formula">
           <math xmlns="http://www.w3.org/1998/Math/MathML" display="block" role="math">
             <mrow>
               <msub>
@@ -135,14 +130,14 @@
       </section>
       
       <!-- Card 1: Dynamic Equation -->
-<section id="equation-card" class="card" aria-labelledby="equation-heading">
-  <h4 id="equation-heading" class="card-title">Bond Valuation Equation</h4>
+<section id="equation-card" class="card">
+  <h4 class="card-title">Bond Valuation Equation</h4>
   <p class="equation-intro">
     This dynamic equation gives the price of a coupon bond based on your input in the Bond Cash Flow Calculator.
   </p>
   
   <!-- Dynamic equation with actual values -->
-  <div class="equation-container" role="group" aria-label="Bond valuation equation with current values" id="dynamic-equation-container">
+  <div class="equation-container" role="region" aria-label="Bond valuation equation" id="dynamic-equation-container">
     <div id="dynamic-mathml-equation">
       <!-- Populated by JavaScript -->
     </div>
@@ -150,11 +145,11 @@
 </section>
 
       <!-- Card 2: Calculator -->
-      <section class="card" id="calculator" tabindex="-1" aria-labelledby="calculator-heading">
-        <h4 id="calculator-heading" class="card-title">Bond Cash Flow Calculator</h4>
+      <section class="card" id="calculator" tabindex="-1">
+        <h4 class="card-title">Bond Cash Flow Calculator</h4>
           <div class="card-content">
             <!-- Instructional note -->
-            <p class="input-instructions">
+            <p class="input-instructions" style="font-size: 0.875rem; color: var(--color-gray-600); margin-bottom: 1rem;">
               Enter your bond details below. The calculations and visualizations will update automatically as you change the values.
             </p>
             
@@ -184,12 +179,12 @@
                   <div class="input-with-suffix-inline">
                     <input 
                       type="number" 
-                      id="coupon-rate" inputmode="decimal" aria-describedby="inputHelp coupon-rate-error" 
+                      id="coupon-rate" 
                       class="input-field-inline"
+                      inputmode="decimal"
                       min="0" max="10" step="0.1" value="8.6">
                     <span class="input-suffix-inline" id="coupon-rate-suffix" aria-hidden="true">%</span>
                   </div>
-                  <span id="coupon-rate-error" aria-live="polite" class="sr-only"></span>
                 </div>
 
                 <div class="input-inline">
@@ -199,12 +194,12 @@
                   <div class="input-with-suffix-inline">
                     <input 
                       type="number" 
-                      id="ytm" inputmode="decimal" aria-describedby="inputHelp ytm-error" 
+                      id="ytm" 
                       class="input-field-inline"
+                      inputmode="decimal"
                       min="0" max="10" step="0.1" value="6.5">
                     <span class="input-suffix-inline" id="ytm-suffix" aria-hidden="true">%</span>
                   </div>
-                  <span id="ytm-error" aria-live="polite" class="sr-only"></span>
                 </div>
 
                 <div class="input-inline">
@@ -214,18 +209,17 @@
                   <div class="input-with-suffix-inline">
                     <input 
                       type="number" 
-                      id="years" inputmode="numeric" aria-describedby="inputHelp years-error" 
+                      id="years" 
                       class="input-field-inline"
+                      inputmode="numeric"
                       min="1" max="5" step="1" value="5">
                     <span class="input-suffix-inline" id="years-suffix" aria-hidden="true">&nbsp;</span>
                   </div>
-                  <span id="years-error" aria-live="polite" class="sr-only"></span>
                 </div>
               </div>
 
               <!-- Validation summary -->
-              <!-- role=alert already implies aria-live=assertive; aria-live attribute is redundant -->
-              <div id="validation-summary" class="validation-summary" role="alert" tabindex="-1" style="display: none;">
+              <div id="validation-summary" class="validation-summary" role="alert" tabindex="-1" aria-live="assertive" style="display: none;">
                 <div class="validation-title">Please correct the following:</div>
                 <ul id="validation-list"></ul>
               </div>
@@ -234,27 +228,13 @@
         </section>
 
       <!-- Card 3: Visualizer (Full Width) -->
-      <section class="card" id="visualizer" tabindex="-1" aria-labelledby="visualizer-heading">
-        <h4 id="visualizer-heading" class="card-title">Bond Cash Flows</h4>
+      <section class="card" id="visualizer" tabindex="-1">
+        <h4 class="card-title">Bond Cash Flows</h4>
         <div class="card-content">
           <!-- View toggle buttons -->
           <div class="view-controls">
-            <!-- Legend – own landmark region so screen readers treat it separately from chart controls -->
-            <!--
-              Inline styles on legend swatches and variable labels (c, r, T) are intentional:
-              - Legend colour swatches use background-color because the colour IS the content
-                (it maps to the chart series). Abstracting to a class would make the mapping
-                harder to follow and the colours are already CSS variables.
-              - The italic coloured variable labels (r, T, c) inside input labels and legend
-                text use inline colour to create a direct visual link between the symbol on
-                screen and the corresponding chart series colour. These are presentational
-                micro-labels, not prose, so inline style is appropriate.
-              - The dashed-line legend swatch requires a one-off border trick that has no
-                reusable CSS class equivalent.
-              - noscript styles are inline because the stylesheet may not load without JS.
-            -->
             <div role="region" aria-label="Chart legend">
-              <div class="legend" id="chart-legend" role="list" aria-label="Bond chart legend">
+              <div class="legend" id="chart-legend" role="list">
                 <span class="legend-item" role="listitem">
                   <span class="legend-color" style="background-color: var(--color-bond-purchase);"></span>
                   Present value of bond <span style="font-style: normal; color: inherit;">(<span style="color: #b95b1d;">PV</span>)</span>
@@ -274,7 +254,7 @@
               </div>
             </div>
             
-            <div class="button-group" role="toolbar" aria-label="View options">
+            <div class="button-group" role="toolbar">
               <button id="chart-view-btn" class="toggle-btn active" aria-pressed="true">
                 Chart
               </button>
@@ -304,7 +284,6 @@
           <!-- Table container -->
           <div id="table-container" class="table-wrapper" style="display: none;"
                role="region"
-               aria-label="Bond cash flow table"
                tabindex="-1">
             <table id="cash-flow-table" class="data-table">
               <!-- Populated by JavaScript -->
@@ -317,8 +296,8 @@
       </section>
 
       <!-- Card 2: Results & Analysis -->
-      <section class="card" id="results-card" aria-labelledby="results-heading">
-        <h4 id="results-heading" class="card-title">Results and Analysis</h4>
+      <section class="card" id="results-card">
+        <h4 class="card-title">Results and Analysis</h4>
         <div class="card-content">
           <div id="results-content">
             <!-- Populated by JavaScript -->
@@ -347,7 +326,7 @@
   </div>
 
   <!-- JavaScript Modules -->
-  <script type="module" src="calculator.js?v=20260309"></script>
+  <script type="module" src="calculator.js?v=20251218"></script>
   <script>
   // Simple MathML support check
   const supportsMathML = CSS.supports('math-style: normal');

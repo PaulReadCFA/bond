@@ -9,7 +9,6 @@
 import { state, setState, subscribe } from './modules/state.js';
 import { calculateBondMetrics } from './modules/calculations.js';
 import { 
-  validateAllInputs, 
   validateField, 
   updateFieldError, 
   updateValidationSummary,
@@ -20,8 +19,7 @@ import {
   listen, 
   focusElement, 
   announceToScreenReader,
-  debounce,
-  formatCurrency
+  debounce
 } from './modules/utils.js';
 import { renderChart, shouldShowLabels, destroyChart } from './modules/chart.js';
 import { renderTable } from './modules/table.js';
@@ -36,6 +34,7 @@ import { renderDynamicEquation } from './modules/equation.js';
  * Initialize the calculator when DOM is ready
  */
 function init() {
+  console.log('Bond Calculator initializing...');
   
   // Set up input event listeners
   setupInputListeners();
@@ -61,6 +60,7 @@ function init() {
   // Setup sticky observer
   setupStickyObserver();
   
+  console.log('Bond Calculator ready');
 }
 
 /**
@@ -112,19 +112,23 @@ function setupInputListeners() {
     const input = $(`#${id}`);
     if (!input) return;
     
-    // Block non-numeric keystrokes (type="number" helps but not all browsers enforce it)
+    // Block non-numeric key input
+    // Allow: digits, decimal point (not for years), backspace, delete,
+    // tab, enter, arrow keys, home/end, and minus (browser handles range)
     listen(input, 'keydown', (e) => {
+      const isYears = field === 'years';
       const allowed = [
-        'Backspace', 'Delete', 'Tab', 'Escape', 'Enter',
+        'Backspace', 'Delete', 'Tab', 'Enter',
         'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
-        'Home', 'End', '.', '-'
+        'Home', 'End'
       ];
-      const isDigit = /^\d$/.test(e.key);
-      if (!isDigit && !allowed.includes(e.key) && !e.ctrlKey && !e.metaKey) {
-        e.preventDefault();
-      }
+      if (allowed.includes(e.key)) return;
+      if (e.key >= '0' && e.key <= '9') return;
+      if (!isYears && e.key === '.') return;  // decimal for rates
+      if (e.ctrlKey || e.metaKey) return;     // allow copy/paste shortcuts
+      e.preventDefault();
     });
-
+    
     // Update state on input change (debounced)
     const debouncedUpdate = debounce(() => {
       const value = parseFloat(input.value);
@@ -225,6 +229,7 @@ function setupViewToggle() {
         e.stopPropagation();
         e.stopImmediatePropagation();
         
+        console.log('Chart button blocked - narrow screen detected');
         
         // Visual feedback: briefly highlight table button
         if (tableBtn) {
@@ -295,7 +300,7 @@ function updateButtonStates(autoFocus = true) {
   const tableBtn = $('#table-view-btn');
   const chartContainer = $('#chart-container');
   const tableContainer = $('#table-container');
-  const legend = $('#chart-legend');
+  const legend = document.querySelector('[aria-label="Chart legend"]');
   const isForced = document.body.classList.contains('force-table');
   const currentView = isForced ? 'table' : state.viewMode;
 
@@ -469,17 +474,10 @@ function detectNarrowScreen() {
 // =============================================================================
 
 /**
- * Run self-tests to verify calculations on every page load.
- *
- * Rationale for keeping in production:
- * These are lightweight numeric assertions (<1ms total) that guard against
- * accidental breakage of the core bond-pricing formula — e.g. from a
- * dependency update or a copy-paste error in calculations.js. Failures
- * surface as console.warn, which is silent to end-users but visible to
- * developers monitoring the console. Removing them would eliminate a
- * zero-cost regression safety net on a financial calculation tool.
+ * Run self-tests to verify calculations
  */
 function runSelfTests() {
+  console.log('Running self-tests...');
   
   const tests = [
     {
@@ -506,16 +504,19 @@ function runSelfTests() {
       if (test.expected.price !== undefined) {
         const diff = Math.abs(result.bondPrice - test.expected.price);
         if (diff <= test.expected.tolerance) {
+          console.log(`✓ ${test.name} passed`);
         } else {
           console.warn(`✗ ${test.name} failed: expected ${test.expected.price}, got ${result.bondPrice}`);
         }
       } else if (test.expected.priceShouldBe === 'greater than 100') {
         if (result.bondPrice > 100) {
+          console.log(`✓ ${test.name} passed`);
         } else {
           console.warn(`✗ ${test.name} failed: price should be > 100, got ${result.bondPrice}`);
         }
       } else if (test.expected.priceShouldBe === 'less than 100') {
         if (result.bondPrice < 100) {
+          console.log(`✓ ${test.name} passed`);
         } else {
           console.warn(`✗ ${test.name} failed: price should be < 100, got ${result.bondPrice}`);
         }
@@ -525,6 +526,7 @@ function runSelfTests() {
     }
   });
   
+  console.log('Self-tests complete');
 }
 
 
@@ -573,6 +575,7 @@ function setupStickyObserver() {
  */
 function cleanup() {
   destroyChart();
+  console.log('Calculator cleanup complete');
 }
 
 // Register cleanup

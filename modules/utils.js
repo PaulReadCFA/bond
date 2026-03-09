@@ -40,10 +40,9 @@ export function debounce(fn, wait = 300) {
 /**
  * Format number as currency
  * @param {number} value - Numeric value
- * @param {boolean} signed - Include sign for negative values (deprecated, always true now)
  * @returns {string} Formatted currency string
  */
-export function formatCurrency(value, signed = true) {
+export function formatCurrency(value) {
   const absValue = Math.abs(value);
   const formatted = absValue.toLocaleString('en-US', {
     minimumFractionDigits: 2,
@@ -81,15 +80,6 @@ export function createElement(tag, attrs = {}, content = '') {
   }
   
   return element;
-}
-
-/**
- * Set HTML content safely
- * @param {Element} element - Target element
- * @param {string} html - HTML content
- */
-export function setHTML(element, html) {
-  element.innerHTML = html;
 }
 
 /**

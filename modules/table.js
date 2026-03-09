@@ -3,7 +3,7 @@
  * Renders accessible data table for bond cash flows
  */
 
-import { $, formatCurrency, announceToScreenReader } from './utils.js';
+import { $, formatCurrency, announceToScreenReader, debounce } from './utils.js';
 
 /**
  * Strip USD prefix from formatted currency (for tables with USD in header)
@@ -112,17 +112,6 @@ export function renderTable(cashFlows, bondPrice, periods, periodicCoupon, ytm) 
 
   // Optional: announce the switch to screen-reader users
   announceToScreenReader('Table view loaded with bond cash flows.');
-}
-
-/**
- * Simple debounce helper
- */
-function debounce(fn, wait) {
-  let timeout;
-  return function(...args) {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => fn.apply(this, args), wait);
-  };
 }
 
 /**

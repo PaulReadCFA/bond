@@ -328,14 +328,9 @@ canvas[tabindex]:focus {
   background-color: var(--color-blue-interactive);
   color: white;
   font-weight: 600;
-  border-color: transparent;  /* Make border invisible for cleaner look */
-  border-width: 2px;  /* Keep border width to maintain button size */
-  box-shadow: 0 0 0 2px #000000;  /* Black outline for active state */
-}
-
-.toggle-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  border-color: transparent;
+  border-width: 2px;
+  box-shadow: 0 0 0 2px #000000;
 }
 
 /* ==========================================================================
@@ -427,31 +422,30 @@ button[title]:hover::before {
 
 /* ==========================================================================
    DISABLED BUTTON STATE
+   The :disabled pseudo-class covers native disabled attribute.
+   The [disabled] attribute selector and :hover/:focus/:active overrides are
+   required because some browsers (notably older WebKit) do not automatically
+   suppress hover/focus styles on disabled elements, and because JavaScript
+   sets `disabled` as an attribute directly rather than via the property in
+   some edge cases. The !important declarations override .active and inline
+   style overrides that could otherwise re-enable visual affordance on a
+   non-interactive element — a WCAG 1.4.3 / 1.4.11 concern.
    ========================================================================== */
-/* Disabled button state */
 .toggle-btn:disabled,
-.model-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  pointer-events: none;
-  background-color: var(--color-gray-300) !important;
-  color: var(--color-gray-500) !important;
-  border-color: var(--color-gray-300) !important;
-  box-shadow: none !important;
-}
-
-/* Additional specificity for disabled chart button */
+.toggle-btn[disabled],
+.model-btn:disabled,
+.model-btn[disabled],
 #chart-view-btn[disabled],
 #chart-view-btn[disabled]:hover,
 #chart-view-btn[disabled]:focus,
 #chart-view-btn[disabled]:active {
   opacity: 0.4 !important;
-  pointer-events: none !important;
   cursor: not-allowed !important;
-  box-shadow: none !important;
+  pointer-events: none !important;
   background-color: var(--color-gray-300) !important;
   color: var(--color-gray-500) !important;
   border-color: var(--color-gray-300) !important;
+  box-shadow: none !important;
 }
 
 /* ==========================================================================
@@ -547,6 +541,12 @@ button[title]:hover::before {
 /* ==========================================================================
    8. EQUATION & FORMULA DISPLAY
    ========================================================================== */
+.input-instructions {
+  font-size: 1rem;
+  color: var(--color-gray-600);
+  margin-bottom: 1rem;
+}
+
 .equation-intro {
   font-size: 1rem;
   color: var(--color-gray-700);

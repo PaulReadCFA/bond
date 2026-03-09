@@ -3,8 +3,6 @@
  * Renders accessible data table for bond cash flows
  */
 
-console.log('TABLE.JS VERSION: 2024-12-18-11:30 - NO COLORS IN CELLS');
-
 import { $, formatCurrency, announceToScreenReader } from './utils.js';
 
 /**

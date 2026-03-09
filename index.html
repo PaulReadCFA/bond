@@ -154,7 +154,7 @@
         <h4 id="calculator-heading" class="card-title">Bond Cash Flow Calculator</h4>
           <div class="card-content">
             <!-- Instructional note -->
-            <p class="input-instructions" style="color: var(--color-gray-600); margin-bottom: 1rem;">
+            <p class="input-instructions">
               Enter your bond details below. The calculations and visualizations will update automatically as you change the values.
             </p>
             
@@ -189,7 +189,7 @@
                       min="0" max="10" step="0.1" value="8.6">
                     <span class="input-suffix-inline" id="coupon-rate-suffix" aria-hidden="true">%</span>
                   </div>
-                  <span id="coupon-rate-error" role="alert" class="sr-only"></span>
+                  <span id="coupon-rate-error" aria-live="polite" class="sr-only"></span>
                 </div>
 
                 <div class="input-inline">
@@ -204,7 +204,7 @@
                       min="0" max="10" step="0.1" value="6.5">
                     <span class="input-suffix-inline" id="ytm-suffix" aria-hidden="true">%</span>
                   </div>
-                  <span id="ytm-error" role="alert" class="sr-only"></span>
+                  <span id="ytm-error" aria-live="polite" class="sr-only"></span>
                 </div>
 
                 <div class="input-inline">
@@ -219,12 +219,13 @@
                       min="1" max="5" step="1" value="5">
                     <span class="input-suffix-inline" id="years-suffix" aria-hidden="true">&nbsp;</span>
                   </div>
-                  <span id="years-error" role="alert" class="sr-only"></span>
+                  <span id="years-error" aria-live="polite" class="sr-only"></span>
                 </div>
               </div>
 
               <!-- Validation summary -->
-              <div id="validation-summary" class="validation-summary" role="alert" tabindex="-1" aria-live="assertive" style="display: none;">
+              <!-- role=alert already implies aria-live=assertive; aria-live attribute is redundant -->
+              <div id="validation-summary" class="validation-summary" role="alert" tabindex="-1" style="display: none;">
                 <div class="validation-title">Please correct the following:</div>
                 <ul id="validation-list"></ul>
               </div>
@@ -239,6 +240,19 @@
           <!-- View toggle buttons -->
           <div class="view-controls">
             <!-- Legend – own landmark region so screen readers treat it separately from chart controls -->
+            <!--
+              Inline styles on legend swatches and variable labels (c, r, T) are intentional:
+              - Legend colour swatches use background-color because the colour IS the content
+                (it maps to the chart series). Abstracting to a class would make the mapping
+                harder to follow and the colours are already CSS variables.
+              - The italic coloured variable labels (r, T, c) inside input labels and legend
+                text use inline colour to create a direct visual link between the symbol on
+                screen and the corresponding chart series colour. These are presentational
+                micro-labels, not prose, so inline style is appropriate.
+              - The dashed-line legend swatch requires a one-off border trick that has no
+                reusable CSS class equivalent.
+              - noscript styles are inline because the stylesheet may not load without JS.
+            -->
             <div role="region" aria-label="Chart legend">
               <div class="legend" id="chart-legend" role="list" aria-label="Bond chart legend">
                 <span class="legend-item" role="listitem">

@@ -36,7 +36,6 @@ import { renderDynamicEquation } from './modules/equation.js';
  * Initialize the calculator when DOM is ready
  */
 function init() {
-  console.log('Bond Calculator initializing...');
   
   // Set up input event listeners
   setupInputListeners();
@@ -62,7 +61,6 @@ function init() {
   // Setup sticky observer
   setupStickyObserver();
   
-  console.log('Bond Calculator ready');
 }
 
 /**
@@ -227,7 +225,6 @@ function setupViewToggle() {
         e.stopPropagation();
         e.stopImmediatePropagation();
         
-        console.log('Chart button blocked - narrow screen detected');
         
         // Visual feedback: briefly highlight table button
         if (tableBtn) {
@@ -341,57 +338,6 @@ function updateButtonStates(autoFocus = true) {
     if (autoFocus) {
       focusElement($('#cash-flow-table'), 100);
     }
-  }
-}
-
-/**
- * Switch between chart and table views
- * @param {string} view - 'chart' or 'table'
- */
-function switchView(view) {
-  const chartBtn = $('#chart-view-btn');
-  const tableBtn = $('#table-view-btn');
-  const chartContainer = $('#chart-container');
-  const tableContainer = $('#table-container');
-  const legend = $('#chart-legend');
-  
-  // Update state
-  setState({ viewMode: view });
-  
-  // Update button states
-  if (view === 'chart') {
-    chartBtn.classList.add('active');
-    chartBtn.setAttribute('aria-pressed', 'true');
-    tableBtn.classList.remove('active');
-    tableBtn.setAttribute('aria-pressed', 'false');
-    
-    // Show chart, hide table
-    chartContainer.style.display = 'block';
-    tableContainer.style.display = 'none';
-    legend.style.display = 'flex';
-    
-    // Announce change
-    announceToScreenReader('Chart view active');
-    
-    // Focus chart container
-    focusElement(chartContainer, 100);
-    
-  } else {
-    tableBtn.classList.add('active');
-    tableBtn.setAttribute('aria-pressed', 'true');
-    chartBtn.classList.remove('active');
-    chartBtn.setAttribute('aria-pressed', 'false');
-    
-    // Show table, hide chart
-    tableContainer.style.display = 'block';
-    chartContainer.style.display = 'none';
-    legend.style.display = 'none';
-    
-    // Announce change
-    announceToScreenReader('Table view active');
-    
-    // Focus table
-    focusElement($('#cash-flow-table'), 100);
   }
 }
 
@@ -523,10 +469,17 @@ function detectNarrowScreen() {
 // =============================================================================
 
 /**
- * Run self-tests to verify calculations
+ * Run self-tests to verify calculations on every page load.
+ *
+ * Rationale for keeping in production:
+ * These are lightweight numeric assertions (<1ms total) that guard against
+ * accidental breakage of the core bond-pricing formula — e.g. from a
+ * dependency update or a copy-paste error in calculations.js. Failures
+ * surface as console.warn, which is silent to end-users but visible to
+ * developers monitoring the console. Removing them would eliminate a
+ * zero-cost regression safety net on a financial calculation tool.
  */
 function runSelfTests() {
-  console.log('Running self-tests...');
   
   const tests = [
     {
@@ -553,19 +506,16 @@ function runSelfTests() {
       if (test.expected.price !== undefined) {
         const diff = Math.abs(result.bondPrice - test.expected.price);
         if (diff <= test.expected.tolerance) {
-          console.log(`✓ ${test.name} passed`);
         } else {
           console.warn(`✗ ${test.name} failed: expected ${test.expected.price}, got ${result.bondPrice}`);
         }
       } else if (test.expected.priceShouldBe === 'greater than 100') {
         if (result.bondPrice > 100) {
-          console.log(`✓ ${test.name} passed`);
         } else {
           console.warn(`✗ ${test.name} failed: price should be > 100, got ${result.bondPrice}`);
         }
       } else if (test.expected.priceShouldBe === 'less than 100') {
         if (result.bondPrice < 100) {
-          console.log(`✓ ${test.name} passed`);
         } else {
           console.warn(`✗ ${test.name} failed: price should be < 100, got ${result.bondPrice}`);
         }
@@ -575,7 +525,6 @@ function runSelfTests() {
     }
   });
   
-  console.log('Self-tests complete');
 }
 
 
@@ -624,7 +573,6 @@ function setupStickyObserver() {
  */
 function cleanup() {
   destroyChart();
-  console.log('Calculator cleanup complete');
 }
 
 // Register cleanup

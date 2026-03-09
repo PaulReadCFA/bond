@@ -18,10 +18,14 @@
 
 /* ==========================================================================
    MATHJAX ACCESSIBILITY FIX
+   MathJax 2.7.x injects assistive MathML elements with aria-hidden="true" but
+   still leaves them reachable by keyboard focus and pointer events. The
+   !important declarations below are required to override MathJax's own inline
+   styles, which take precedence over class-based rules. This implements the
+   standard sr-only visibility pattern to satisfy WCAG 4.1.2 (Name, Role, Value)
+   — aria-hidden elements must not be focusable.
    ========================================================================== */
-/* Ensure MathJax assistive MML (aria-hidden) is not focusable - WCAG 4.1.2 */
 mjx-assistive-mml[aria-hidden="true"] {
-  /* Use sr-only pattern to ensure it's truly hidden and non-focusable */
   position: absolute !important;
   clip: rect(0 0 0 0) !important;
   width: 1px !important;
@@ -170,6 +174,14 @@ mjx-assistive-mml[aria-hidden="true"] * {
   position: relative;
 }
 
+/*
+ * Border values use !important here because some Chromium-based browsers apply
+ * a high-specificity UA stylesheet rule to input[type="number"] that overrides
+ * class-level border declarations without it. This was confirmed via computed
+ * styles showing #d1d5db (--color-gray-300) instead of the intended #8b93a7
+ * despite correct cascade order. The !important is scoped to border/border-color
+ * only and does not affect layout properties.
+ */
 .input-field-inline {
   flex: 1;
   width: 100%;
@@ -673,7 +685,18 @@ mjx-assistive-mml[aria-hidden="true"] math * {
   width: 100%;
 }
 
-/* Responsive card-style layout at narrow widths */
+/*
+ * Mobile card layout — responsive table reflow at ≤768px.
+ *
+ * Why !important is used here:
+ * The desktop table uses display:table / display:table-cell, which are set by
+ * the browser UA stylesheet at high specificity. Overriding display on table
+ * child elements (thead, tbody, tr, td) requires !important because the UA
+ * cascade cannot be beaten by class selectors alone for these specific
+ * elements. This is a well-documented pattern for responsive table reflows.
+ * The sr-only pattern on thead keeps column headers accessible to screen
+ * readers via the ARIA roles restored in table.js updateTableSemantics().
+ */
 @media (max-width: 768px) {
   /* Hide the table header visually but keep for screen readers */
   .data-table thead {

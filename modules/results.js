@@ -97,13 +97,13 @@ function createAnalysisBox(calculations, params) {
   const analysisText = createElement('div');
   
   if (bondType.type === 'par') {
-    analysisText.innerHTML = `Trading at par.<br>Coupon rate (<span style="font-style: italic;">c</span>) at ${couponRate.toFixed(2)}% = yield-to-maturity (<span style="font-style: italic;">r</span>) at ${ytm.toFixed(2)}%`;
+    analysisText.innerHTML = `Trading at par.<br>Coupon rate (<span style="font-style: italic;">c</span>) at ${couponRate.toFixed(2)}% = yield to maturity (<span style="font-style: italic;">r</span>) at ${ytm.toFixed(2)}%`;
   } else if (bondType.type === 'premium') {
     analysisText.innerHTML = `Trading ${formatCurrency(bondType.difference)} above par.<br>` +
-      `Coupon rate (<span style="font-style: italic;">c</span>) at ${couponRate.toFixed(2)}% &gt; yield-to-maturity (<span style="font-style: italic;">r</span>) at ${ytm.toFixed(2)}%`;
+      `Coupon rate (<span style="font-style: italic;">c</span>) at ${couponRate.toFixed(2)}% &gt; yield to maturity (<span style="font-style: italic;">r</span>) at ${ytm.toFixed(2)}%`;
   } else {
     analysisText.innerHTML = `Trading ${formatCurrency(bondType.difference)} below par.<br>` +
-      `Yield-to-maturity (<span style="font-style: italic;">r</span>) at ${ytm.toFixed(2)}% &gt; coupon rate (<span style="font-style: italic;">c</span>) at ${couponRate.toFixed(2)}%`;
+      `Yield to maturity (<span style="font-style: italic;">r</span>) at ${ytm.toFixed(2)}% &gt; coupon rate (<span style="font-style: italic;">c</span>) at ${couponRate.toFixed(2)}%`;
   }
   
   content.appendChild(analysisText);

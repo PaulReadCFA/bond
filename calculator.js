@@ -114,6 +114,19 @@ function setupInputListeners() {
     const input = $(`#${id}`);
     if (!input) return;
     
+    // Block non-numeric keystrokes (type="number" helps but not all browsers enforce it)
+    listen(input, 'keydown', (e) => {
+      const allowed = [
+        'Backspace', 'Delete', 'Tab', 'Escape', 'Enter',
+        'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
+        'Home', 'End', '.', '-'
+      ];
+      const isDigit = /^\d$/.test(e.key);
+      if (!isDigit && !allowed.includes(e.key) && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+      }
+    });
+
     // Update state on input change (debounced)
     const debouncedUpdate = debounce(() => {
       const value = parseFloat(input.value);

@@ -40,14 +40,17 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
   
   // Make canvas focusable and add keyboard navigation
   canvas.setAttribute('tabindex', '0');
-  canvas.setAttribute('role', 'img');
+  canvas.setAttribute('role', 'application');
   canvas.setAttribute('aria-roledescription', 'interactive chart');
   canvas.setAttribute(
     'aria-label',
-    'Interactive bond cash flow chart showing present value, coupon payments, principal repayment, and yield to maturity over time. Press Tab to focus, then use Left and Right arrow keys to navigate between time periods. Home goes to first period, End goes to last period.'
+    'Interactive bond cash flow chart showing present value, coupon payments, principal repayment, and yield to maturity over time. Use Left and Right arrow keys to navigate between time periods. Home goes to first period, End goes to last period.'
   );
 
   const ctx = canvas.getContext('2d');
+  
+  // Respect prefers-reduced-motion for chart animations
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   
   // Prepare data for Chart.js
   const labels = cashFlows.map(cf => cf.yearLabel);
@@ -96,7 +99,7 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
         },
         // YTM horizontal line
         ...(ytm !== null ? [{
-          label: 'Yield-to-maturity (r)',
+          label: 'Yield to maturity (r)',
           data: labels.map(() => ytm),
           type: 'line',
           borderColor: '#7a46ff',
@@ -113,6 +116,7 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      animation: prefersReducedMotion ? false : { duration: 400 },
       interaction: {
         mode: 'index',
         intersect: false
@@ -147,8 +151,8 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
               const isInitialPeriod = index === 0;
               
               // YTM line - use italic r
-              if (context.dataset.label === 'Yield-to-maturity (r)') {
-                return `Yield-to-maturity (r): ${value.toFixed(2)}%`;
+              if (context.dataset.label === 'Yield to maturity (r)') {
+                return `Yield to maturity (r): ${value.toFixed(2)}%`;
               }
               
               // For period 0, use italic PV
@@ -170,7 +174,7 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
               const index = context[0].dataIndex;
               const total = totalData[index];
               // Only show total for cash flow bars, not YTM line
-              if (context[0].dataset.label !== 'Yield-to-maturity (r)') {
+              if (context[0].dataset.label !== 'Yield to maturity (r)') {
                 return `Total: ${formatCurrency(total, true)}`;
               }
               return '';
@@ -332,7 +336,7 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
           });
-          const displayValue = total < 0 ? `−${formattedValue}` : formattedValue;
+          const displayValue = total < 0 ? `-${formattedValue}` : formattedValue;
           
           // All labels at the same Y position
           ctx.fillText(displayValue, x, labelY);
@@ -474,8 +478,8 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
         
         ctx.save();
         
-        // Text parts: "Yield-to-maturity (" + "r" (italic) + ") %"
-        const beforeR = 'Yield-to-maturity (';
+        // Text parts: "Yield to maturity (" + "r" (italic) + ") %"
+        const beforeR = 'Yield to maturity (';
         const rText = 'r';
         const afterR = ') %';
         
@@ -500,7 +504,7 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
         // Draw text in parts (now drawing horizontally in rotated context)
         let currentX = -totalWidth / 2;
         
-        // Draw "Yield-to-maturity ("
+        // Draw "Yield to maturity ("
         ctx.fillStyle = '#7a46ff';
         ctx.font = "600 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif";
         ctx.textAlign = 'left';
@@ -728,7 +732,7 @@ function announceDataPoint(cashFlow, total, ytm) {
   const principalLabel = isInitialPeriod ? 'Present value bond price (PV)' : 'Principal repayment (FV)';
   
   const announcement = `Period ${cashFlow.yearLabel} years. ` +
-    `Yield-to-maturity (r): ${ytm ? ytm.toFixed(2) : '0'}%. ` +
+    `Yield to maturity (r): ${ytm ? ytm.toFixed(2) : '0'}%. ` +
     `Coupon payment (PMT): ${formatCurrency(cashFlow.couponPayment, true)}. ` +
     `${principalLabel}: ${formatCurrency(cashFlow.principalPayment, true)}. ` +
     `Total: ${formatCurrency(total, true)}.`;

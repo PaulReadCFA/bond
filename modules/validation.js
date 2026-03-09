@@ -20,7 +20,7 @@ const VALIDATION_RULES = {
     min: 0,
     max: 10,
     required: true,
-    label: 'Yield-to-maturity',
+    label: 'Yield to maturity',
     unit: '%'
   },
   years: {
@@ -83,12 +83,19 @@ export function updateFieldError(fieldId, errorMessage) {
   const input = $(`#${fieldId}`);
   if (!input) return;
   
+  // Update aria-invalid on the input
   if (errorMessage) {
     input.setAttribute('aria-invalid', 'true');
     input.classList.add('error');
   } else {
     input.removeAttribute('aria-invalid');
     input.classList.remove('error');
+  }
+
+  // Populate the per-field sr-only error span (referenced by aria-describedby)
+  const errorSpan = $(`#${fieldId}-error`);
+  if (errorSpan) {
+    errorSpan.textContent = errorMessage || '';
   }
 }
 

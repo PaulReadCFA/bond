@@ -51,8 +51,9 @@ export function formatCurrency(value, signed = true) {
   });
   
   if (value < 0) {
-    // Use Unicode minus sign (U+2212) for accessibility
-    return `−USD ${formatted}`;
+    // Use Unicode minus sign U+2212 (−), not ASCII hyphen-minus (-)
+    // Screen readers announce it as "minus"; it's the correct mathematical symbol
+    return `\u2212USD ${formatted}`;
   }
   return `USD ${formatted}`;
 }

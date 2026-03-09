@@ -1,3 +1,6 @@
+/* Google Fonts – Lato (300, 400, 600, 700) */
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;600;700&display=swap');
+
 /* ==========================================================================
    CFA Calculator Base Styles
    Shared foundation for all CFA Institute calculators
@@ -79,6 +82,11 @@ kbd {
   --color-warning: #b95b1d;
   --color-warning-bg: #fff7ed;
   
+  /* Input border – meets WCAG contrast on white */
+  --color-input-border: #8b93a7;
+  --color-input-border-hover: #6b7594;
+  --color-input-border-focus: var(--color-blue-interactive);
+
   /* Legacy aliases for compatibility - DEPRECATED, use specific colors above */
   --color-primary: #3c6ae5;
   --color-dark: #06005a;
@@ -109,14 +117,13 @@ html {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   background-color: var(--color-gray-50);
   color: var(--color-gray-800);
   line-height: 1.5;
   padding: 0 1.5rem 1.5rem;
   min-height: 100vh;
-  /* Smooth font scaling for zoom */
-  font-size: clamp(0.875rem, 1vw + 0.5rem, 1rem);
+  font-size: 16px;
 }
 
 /* ==========================================================================
@@ -253,16 +260,16 @@ canvas[tabindex]:focus {
 }
 
 .card-title {
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 1.25rem;
+  font-family: 'Lato', Georgia, 'Times New Roman', serif;
+  font-size: 1.5rem; /* 24px */
   color: var(--color-gray-800);
   margin-bottom: 0.75rem;
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: 0.01em;
 }
 
 .card-content {
-  font-size: 0.875rem;
+  font-size: 1rem;
   color: rgba(0, 0, 0, 0.8);
 }
 
@@ -473,19 +480,19 @@ button[title]:hover::before {
 .input-field {
   width: 100%;
   padding: 0.5rem 0.75rem;
-  border: 1px solid var(--color-gray-300);
+  border: 1px solid var(--color-input-border);
   border-radius: 0.375rem;
   font-size: 0.875rem;
   transition: all 0.2s;
 }
 
 .input-field:hover {
-  border-color: var(--color-gray-400);
+  border-color: var(--color-input-border-hover);
 }
 
 .input-field:focus {
   outline: none;
-  border-color: var(--color-blue-interactive);
+  border-color: var(--color-input-border-focus);
   box-shadow: 0 0 0 3px rgba(60, 106, 229, 0.1);
 }
 
@@ -541,7 +548,7 @@ button[title]:hover::before {
    8. EQUATION & FORMULA DISPLAY
    ========================================================================== */
 .equation-intro {
-  font-size: 0.875rem;
+  font-size: 1rem;
   color: var(--color-gray-700);
   margin-bottom: 1rem;
 }
@@ -1162,11 +1169,29 @@ button[title]:hover::before {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  * {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
     scroll-behavior: auto !important;
+  }
+
+  /* Disable Chart.js bar/line animations */
+  canvas {
+    animation: none !important;
+  }
+
+  /* Kill MathJax scale transitions */
+  mjx-container {
+    transition: none !important;
+  }
+
+  /* Disable sticky-state visual transition */
+  .sticky-calculator-wrapper {
+    transition: none !important;
   }
 }
 

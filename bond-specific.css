@@ -294,13 +294,10 @@ math {
   overflow-y: hidden !important;
   display: block !important;
   box-sizing: border-box !important;
-  
-  /* Initial scale to prevent layout shift - JS will adjust if needed */
-  transform: scale(0.85);
   transform-origin: left center;
   
-  /* Smooth transitions for scale changes */
-  transition: transform 0.2s ease-out;
+  /* Transition restored by JS after MathJax finishes rendering */
+  transition: none;
 }
 
 /* Print: always show equation at full size */

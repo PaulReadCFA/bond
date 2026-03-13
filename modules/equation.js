@@ -107,24 +107,20 @@ export function renderDynamicEquation(calculations, params) {
     window.MathJax.Hub.Queue(
       ["Typeset", window.MathJax.Hub, innerContainer],
       function() {
+        // Suppress transition before adjustScale runs to avoid flash of intermediate sizes
+        const mjxContainer = innerContainer.querySelector('.MathJax_Display, .MathJax');
+        if (mjxContainer) {
+          mjxContainer.style.transition = 'none';
+        }
+
         // After MathJax renders, set up responsive scaling
         setupResponsiveScaling(innerContainer);
         
         // Fix accessibility: ensure aria-hidden assistive MathML is not focusable
         fixAriaHiddenFocusability(innerContainer);
         
-        // MathJax 2.7 does not expose a post-layout callback — Hub.Queue fires
-        // after typesetting is complete but before the browser has performed the
-        // reflow that gives MathJax elements their final dimensions. Unlocking
-        // the container heights synchronously here causes a visible jump because
-        // the card collapses then re-expands as the browser catches up.
-        //
-        // 200ms is a conservative guard derived from manual testing across
-        // Chrome, Firefox, and Safari at varying equation complexities. A
-        // MutationObserver on mjx-container size changes was trialled but proved
-        // unreliable because MathJax modifies element dimensions across multiple
-        // microtasks. This is a known limitation of MathJax 2.x; MathJax 3
-        // provides a proper TypesetPromise API that would eliminate this timeout.
+        // MATHJAX JUMP FIX: Unlock heights AFTER MathJax completes
+        // Wait 200ms to ensure MathJax is fully done
         setTimeout(function() {
           // Clear outer container locks
           if (outerContainer) {
@@ -140,6 +136,11 @@ export function renderDynamicEquation(calculations, params) {
             parentCard.style.minHeight = '';
             parentCard.style.maxHeight = '';
             parentCard.style.overflow = '';
+          }
+
+          // Restore smooth transition now that final scale is set
+          if (mjxContainer) {
+            mjxContainer.style.transition = 'transform 0.2s ease-out';
           }
         }, 200);
       }

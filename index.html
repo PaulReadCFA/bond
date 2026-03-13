@@ -67,84 +67,7 @@
       <a href="#visualizer" class="skip-link">Skip to data table</a>
     </nav>
     <main class="content">
-      <!-- Card 0: Static Formula (variables only) -->
-      <section class="card" id="static-equation-card">
-        <div class="equation-container" role="region" aria-label="General bond pricing formula">
-          <math xmlns="http://www.w3.org/1998/Math/MathML" display="block" role="math">
-            <mrow>
-              <msub>
-                <mi mathcolor="#b95b1d">PV</mi>
-                <mtext mathcolor="#b95b1d">Coupon bond</mtext>
-              </msub>
-              <mo>=</mo>
-
-              <mfrac linethickness="1.2px">
-                <mi mathvariant="bold" mathcolor="#3c6ae5">PMT</mi>
-                <mrow class="denominator-r">
-                  <mi mathcolor="#7a46ff">r</mi>
-                </mrow>
-              </mfrac>
-
-              <mo>×</mo>
-
-              <mrow>
-                <mo fence="true" stretchy="true" symmetric="true">[</mo>
-                <mrow>
-                  <mn>1</mn>
-                  <mo>−</mo>
-                  <mfrac>
-                    <mn>1</mn>
-                    <msup>
-                      <mrow>
-                        <mo>(</mo>
-                        <mn>1</mn>
-                        <mo>+</mo>
-                        <mi mathcolor="#7a46ff">r</mi>
-                        <mo>)</mo>
-                      </mrow>
-                      <mi mathcolor="#15803d">T</mi>
-                    </msup>
-                  </mfrac>
-                </mrow>
-                <mo fence="true" stretchy="true" symmetric="true">]</mo>
-              </mrow>
-
-              <mo>+</mo>
-
-              <mfrac>
-                <mi mathcolor="#0079a6" mathvariant="bold">FV</mi>
-                <msup>
-                  <mrow>
-                    <mo>(</mo>
-                    <mn>1</mn>
-                    <mo>+</mo>
-                    <mi mathcolor="#7a46ff">r</mi>
-                    <mo>)</mo>
-                  </mrow>
-                  <mi mathcolor="#15803d">T</mi>
-                </msup>
-              </mfrac>
-            </mrow>
-          </math>
-        </div>
-      </section>
-      
-      <!-- Card 1: Dynamic Equation -->
-<section id="equation-card" class="card">
-  <h4 class="card-title">Bond Valuation Equation</h4>
-  <p class="equation-intro">
-    This dynamic equation gives the price of a coupon bond based on your input in the Bond Cash Flow Calculator.
-  </p>
-  
-  <!-- Dynamic equation with actual values -->
-  <div class="equation-container" role="region" aria-label="Bond valuation equation" id="dynamic-equation-container">
-    <div id="dynamic-mathml-equation">
-      <!-- Populated by JavaScript -->
-    </div>
-  </div>
-</section>
-
-      <!-- Card 2: Calculator -->
+      <!-- Card 1: Calculator -->
       <section class="card" id="calculator" tabindex="-1">
         <h4 class="card-title">Bond Cash Flow Calculator</h4>
           <div class="card-content">
@@ -227,6 +150,19 @@
           </div>
         </section>
 
+      <!-- Card 2: Dynamic Equation -->
+      <section id="equation-card" class="card">
+        <h4 class="card-title">Bond Valuation Equation</h4>
+        <p class="equation-intro">
+          This dynamic equation gives the price of a coupon bond based on your input in the Bond Cash Flow Calculator.
+        </p>
+        <div class="equation-container" role="region" aria-label="Bond valuation equation" id="dynamic-equation-container">
+          <div id="dynamic-mathml-equation">
+            <!-- Populated by JavaScript -->
+          </div>
+        </div>
+      </section>
+
       <!-- Card 3: Visualizer (Full Width) -->
       <section class="card" id="visualizer" tabindex="-1">
         <h4 class="card-title">Bond Cash Flows</h4>
@@ -295,7 +231,7 @@
         </div>
       </section>
 
-      <!-- Card 2: Results & Analysis -->
+      <!-- Card 4: Results & Analysis -->
       <section class="card" id="results-card">
         <h4 class="card-title">Results and Analysis</h4>
         <div class="card-content">

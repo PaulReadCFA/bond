@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bond Valuation Formula | CFA Institute</title>
+
+  <style>
+    /* ==========================================================
+       Reset & base
+    ========================================================== */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem;
+    }
+
+    /* ==========================================================
+       Equation container — mirrors bond-specific.css section 5
+    ========================================================== */
+    .equation-container {
+      width: 100%;
+      padding: 0.5rem;
+      background: white;
+      border: 1px solid #e5e7eb;   /* --color-gray-200 */
+      border-radius: 0.5rem;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      container-type: inline-size;
+      container-name: equation;
+    }
+
+    /* MathML font */
+    math {
+      font-family: 'STIX Two Math', 'Cambria Math', 'Latin Modern Math', serif;
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #1f2937;   /* --color-gray-800 */
+      display: block;
+      text-align: center;
+    }
+
+    /* Responsive scaling */
+    @media (max-width: 768px) {
+      math { font-size: 0.95rem; }
+      .equation-container { padding: 0.75rem; }
+    }
+
+    @media (max-width: 640px) {
+      math { font-size: 0.85rem; }
+      .equation-container { padding: 0.5rem; }
+    }
+
+    @media (max-width: 480px) {
+      math { font-size: 0.75rem; }
+      .equation-container { padding: 0.25rem; }
+    }
+
+    @container equation (max-width: 600px) {
+      math { font-size: 0.75em; }
+    }
+
+    @container equation (max-width: 400px) {
+      math { font-size: 0.55em; }
+    }
+
+    /* MathJax WCAG: aria-hidden elements must not be focusable */
+    mjx-assistive-mml[aria-hidden="true"],
+    mjx-assistive-mml[aria-hidden="true"] * {
+      pointer-events: none !important;
+      user-select: none !important;
+    }
+
+    .denominator-r {
+      padding-top: 0.25em;
+    }
+  </style>
+
+  <!-- MathJax 2.7.7 -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      MathML: {
+        extensions: ["content-mathml.js"]
+      },
+      "HTML-CSS": {
+        scale: 95,
+        linebreaks: { automatic: true }
+      },
+      menuSettings: {
+        explorer: false
+      },
+      skipStartupTypeset: false
+    });
+
+    function removeAllMathJaxTabindex() {
+      document.querySelectorAll('[tabindex]').forEach(function(el) {
+        if (el.classList.contains('MathJax') ||
+            el.classList.contains('MathJax_Display') ||
+            el.id.startsWith('MathJax-') ||
+            el.tagName === 'MATH' ||
+            el.closest('.MathJax')) {
+          el.removeAttribute('tabindex');
+          el.setAttribute('aria-hidden', 'true');
+        }
+      });
+    }
+
+    MathJax.Hub.Register.StartupHook("End", function () {
+      removeAllMathJaxTabindex();
+      setTimeout(removeAllMathJaxTabindex, 100);
+      setTimeout(removeAllMathJaxTabindex, 500);
+      setTimeout(removeAllMathJaxTabindex, 1000);
+    });
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=MML_HTMLorMML"></script>
+</head>
+<body>
+  <div class="equation-container" role="region" aria-label="General bond pricing formula">
+    <math xmlns="http://www.w3.org/1998/Math/MathML" display="block" role="math">
+      <mrow>
+        <msub>
+          <mi mathcolor="#b95b1d">PV</mi>
+          <mtext mathcolor="#b95b1d">Coupon bond</mtext>
+        </msub>
+        <mo>=</mo>
+
+        <mfrac linethickness="1.2px">
+          <mi mathvariant="bold" mathcolor="#3c6ae5">PMT</mi>
+          <mrow class="denominator-r">
+            <mi mathcolor="#7a46ff">r</mi>
+          </mrow>
+        </mfrac>
+
+        <mo>×</mo>
+
+        <mrow>
+          <mo fence="true" stretchy="true" symmetric="true">[</mo>
+          <mrow>
+            <mn>1</mn>
+            <mo>−</mo>
+            <mfrac>
+              <mn>1</mn>
+              <msup>
+                <mrow>
+                  <mo>(</mo>
+                  <mn>1</mn>
+                  <mo>+</mo>
+                  <mi mathcolor="#7a46ff">r</mi>
+                  <mo>)</mo>
+                </mrow>
+                <mi mathcolor="#15803d">T</mi>
+              </msup>
+            </mfrac>
+          </mrow>
+          <mo fence="true" stretchy="true" symmetric="true">]</mo>
+        </mrow>
+
+        <mo>+</mo>
+
+        <mfrac>
+          <mi mathcolor="#0079a6" mathvariant="bold">FV</mi>
+          <msup>
+            <mrow>
+              <mo>(</mo>
+              <mn>1</mn>
+              <mo>+</mo>
+              <mi mathcolor="#7a46ff">r</mi>
+              <mo>)</mo>
+            </mrow>
+            <mi mathcolor="#15803d">T</mi>
+          </msup>
+        </mfrac>
+      </mrow>
+    </math>
+  </div>
+</body>
+</html>

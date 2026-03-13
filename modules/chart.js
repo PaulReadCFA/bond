@@ -287,6 +287,17 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
       }
     },
     plugins: [{
+      id: 'canvasBackground',
+      beforeDraw: (chart) => {
+        const ctx = chart.ctx;
+        ctx.save();
+        ctx.globalCompositeOperation = 'destination-over';
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, chart.width, chart.height);
+        ctx.restore();
+      }
+    },
+      {
       // Custom plugin to draw labels on top of stacked bars
       id: 'stackedBarLabels',
       afterDatasetsDraw: (chart) => {

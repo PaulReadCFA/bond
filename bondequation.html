@@ -48,51 +48,26 @@
     }
 
     @media (max-width: 768px) {
-      math {
-        font-size: 0.95rem;
-      }
-
-      .equation-container {
-        padding: 0.75rem;
-      }
+      math { font-size: 0.95rem; }
+      .equation-container { padding: 0.75rem; }
     }
 
     @media (max-width: 640px) {
-      math {
-        font-size: 0.85rem;
-      }
-
-      .equation-container {
-        padding: 0.5rem;
-      }
+      math { font-size: 0.85rem; }
+      .equation-container { padding: 0.5rem; }
     }
 
     @media (max-width: 480px) {
-      math {
-        font-size: 0.75rem;
-      }
-
-      .equation-container {
-        padding: 0.25rem;
-      }
+      math { font-size: 0.75rem; }
+      .equation-container { padding: 0.25rem; }
     }
 
     @container equation (max-width: 600px) {
-      math {
-        font-size: 0.75em;
-      }
+      math { font-size: 0.75em; }
     }
 
     @container equation (max-width: 400px) {
-      math {
-        font-size: 0.55em;
-      }
-    }
-
-    mjx-assistive-mml[aria-hidden="true"],
-    mjx-assistive-mml[aria-hidden="true"] * {
-      pointer-events: none !important;
-      user-select: none !important;
+      math { font-size: 0.55em; }
     }
   </style>
 
@@ -102,13 +77,11 @@
         extensions: ["content-mathml.js"]
       },
       "HTML-CSS": {
-        scale: 95,
+        scale: 100,
         linebreaks: { automatic: true }
       },
-      menuSettings: {
-        explorer: false
-      },
-      showMathMenu: false,
+      showProcessingMessages: false,
+      messageStyle: "none",
       skipStartupTypeset: false
     });
 
@@ -122,11 +95,12 @@
       removeMathJaxTabindex();
       setTimeout(removeMathJaxTabindex, 100);
       setTimeout(removeMathJaxTabindex, 500);
-      setTimeout(removeMathJaxTabindex, 1000);
     });
   </script>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=MML_HTMLorMML"></script>
 </head>
+
 <body>
   <div class="equation-container">
     <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
@@ -145,7 +119,7 @@
         <mo>×</mo>
 
         <mrow>
-          <mo fence="true" stretchy="true" symmetric="true">[</mo>
+          <mo>[</mo>
           <mrow>
             <mn>1</mn>
             <mo>−</mo>
@@ -163,7 +137,7 @@
               </msup>
             </mfrac>
           </mrow>
-          <mo fence="true" stretchy="true" symmetric="true">]</mo>
+          <mo>]</mo>
         </mrow>
 
         <mo>+</mo>

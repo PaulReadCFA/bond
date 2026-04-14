@@ -14,6 +14,11 @@
   --color-bond-yield: var(--color-purple-bold);        /* #7a46ff - Yield to maturity */
   --color-bond-face: var(--color-teal-data);           /* #0079a6 - Face value */
   --color-bond-purchase: var(--color-orange-deep);     /* #b95b1d - Initial purchase */
+  /* Cash-flow table: darker text for WCAG AA on white / light row backgrounds */
+  --bond-cashflow-text-ytm: #4c1d95;
+  --bond-cashflow-text-pmt: #1e3a8a;
+  --bond-cashflow-text-fv: #115e59;
+  --bond-cashflow-text-pv: #9a3412;
 }
 
 /* ==========================================================================
@@ -53,18 +58,20 @@ mjx-assistive-mml[aria-hidden="true"] * {
 }
 
 .result-title.price {
-  font-size: 1.125rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--color-orange-darker);
+  letter-spacing: normal;
+  text-transform: none;
 }
 
 .result-title.analysis {
-  font-size: 0.8125rem;
+  font-size: 1rem;
   font-weight: 600;
   color: #8b4513;
-  text-transform: uppercase;
-  letter-spacing: 0.025em;
   margin-bottom: 0.75rem;
+  letter-spacing: normal;
+  text-transform: none;
 }
 
 .result-value {
@@ -102,7 +109,7 @@ mjx-assistive-mml[aria-hidden="true"] * {
 }
 
 .result-detail {
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 400;
   color: var(--color-gray-700);
   line-height: 1.5;
@@ -194,6 +201,17 @@ mjx-assistive-mml[aria-hidden="true"] * {
   font-size: 0.875rem;
 }
 
+#calculator .input-section {
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+#calculator .validation-summary {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+}
+
 @media (max-width: 640px) {
   .input-group-inline {
     flex-direction: column;
@@ -203,11 +221,24 @@ mjx-assistive-mml[aria-hidden="true"] * {
   
   .input-inline {
     width: 100%;
+    max-width: 100%;
+    flex-wrap: wrap;
+    white-space: normal;
+    align-items: flex-start;
+    box-sizing: border-box;
+  }
+
+  .input-label-inline {
+    flex: 1 1 100%;
+    max-width: 100%;
+    min-width: 0;
+    white-space: normal;
   }
   
   .input-with-suffix-inline {
     width: 100%;
-    max-width: 12rem;
+    max-width: 100%;
+    box-sizing: border-box;
   }
 }
 
@@ -481,7 +512,7 @@ mjx-assistive-mml[aria-hidden="true"] math * {
   pointer-events: none;
 }
 
-/* On mobile, buttons take full width */
+/* Mobile: legend stacked; Chart/Table pair right (≤640px). Full-width equal buttons ≤380px (WCAG touch). */
 @media (max-width: 640px) {
   .view-controls {
     flex-direction: column;
@@ -498,7 +529,28 @@ mjx-assistive-mml[aria-hidden="true"] math * {
   }
   
   .view-controls .button-group {
+    width: auto;
+    max-width: 100%;
+    align-self: flex-end;
+    justify-content: flex-end;
+  }
+
+  .view-controls .button-group .toggle-btn,
+  .view-controls .button-group .model-btn {
+    flex: 0 0 auto;
+  }
+}
+
+@media (max-width: 380px) {
+  .view-controls .button-group {
+    align-self: stretch;
     width: 100%;
+  }
+
+  .view-controls .button-group .toggle-btn,
+  .view-controls .button-group .model-btn {
+    flex: 1;
+    min-width: 0;
   }
 }
 
@@ -646,7 +698,7 @@ mjx-assistive-mml[aria-hidden="true"] math * {
 }
 
 #visualizer .chart-wrapper {
-  padding: 0 1.25rem;
+  padding: 0;
 }
 
 #visualizer .table-wrapper {
@@ -800,11 +852,6 @@ mjx-assistive-mml[aria-hidden="true"] math * {
    10. FINAL TWEAKS
    ========================================================================== */
 
-/* Card 1: Left-align the intro text */
-.equation-intro {
-  text-align: left;
-}
-
 /* Chart legend: Remove borders and increase swatch size */
 .legend-color {
   width: 1rem;
@@ -848,6 +895,9 @@ mjx-assistive-mml[aria-hidden="true"] math * {
   border-radius: 0.5rem;
   font-weight: 600;
   z-index: 10;
-  white-space: nowrap;
+  white-space: normal;
+  text-align: center;
+  max-width: min(22rem, calc(100% - 2rem));
+  box-sizing: border-box;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }

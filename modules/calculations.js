@@ -90,19 +90,19 @@ export function analyzeBondType(bondPrice, faceValue, tolerance = 0.01) {
   if (Math.abs(difference) < tolerance) {
     return {
       type: 'par',
-      description: 'Par bond',
+      description: 'Par Bond',
       difference: 0
     };
   } else if (difference > 0) {
     return {
       type: 'premium',
-      description: 'Premium bond',
+      description: 'Premium Bond',
       difference: difference
     };
   } else {
     return {
       type: 'discount',
-      description: 'Discount bond',
+      description: 'Discount Bond',
       difference: Math.abs(difference)
     };
   }

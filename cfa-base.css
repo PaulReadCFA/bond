@@ -197,9 +197,9 @@ body {
 }
 
 /* Focus rings for keyboard navigation */
-section[tabindex]:focus,
-table[tabindex]:focus,
-canvas[tabindex]:focus {
+section[tabindex]:focus-visible,
+table[tabindex]:focus-visible,
+canvas[tabindex]:focus-visible {
   outline: 2px solid var(--color-blue-interactive);
   outline-offset: 4px;
 }
@@ -257,6 +257,7 @@ canvas[tabindex]:focus {
   border-radius: 1rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   padding: 1.25rem;
+  --card-padding-x: 1.25rem;
 }
 
 .card-title {
@@ -405,18 +406,42 @@ button[title]:hover::before {
 .button-group {
   display: flex;
   gap: 0.5rem;
+  flex-shrink: 0;
   margin-left: auto;
 }
 
+/* Chart/Table strip: right-aligned ≤640px; full-width equal targets ≤380px (WCAG touch). */
 @media (max-width: 640px) {
-  .button-group {
+  .view-controls .button-group,
+  .card-header-with-controls .button-group {
+    width: auto;
+    max-width: 100%;
+    align-self: flex-end;
+    justify-content: flex-end;
     margin-left: 0;
+  }
+
+  .view-controls .button-group .toggle-btn,
+  .view-controls .button-group .model-btn,
+  .card-header-with-controls .button-group .toggle-btn,
+  .card-header-with-controls .button-group .model-btn {
+    flex: 0 0 auto;
+  }
+}
+
+@media (max-width: 380px) {
+  .view-controls .button-group,
+  .card-header-with-controls .button-group {
+    align-self: stretch;
     width: 100%;
   }
-  
-  .toggle-btn,
-  .model-btn {
+
+  .view-controls .button-group .toggle-btn,
+  .view-controls .button-group .model-btn,
+  .card-header-with-controls .button-group .toggle-btn,
+  .card-header-with-controls .button-group .model-btn {
     flex: 1;
+    min-width: 0;
   }
 }
 
@@ -541,16 +566,13 @@ button[title]:hover::before {
 /* ==========================================================================
    8. EQUATION & FORMULA DISPLAY
    ========================================================================== */
-.input-instructions {
-  font-size: 1rem;
-  color: var(--color-gray-600);
-  margin-bottom: 1rem;
-}
-
 .equation-intro {
   font-size: 1rem;
-  color: var(--color-gray-700);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--color-gray-600);
   margin-bottom: 1rem;
+  text-align: left;
 }
 
 .equation-container {
@@ -564,7 +586,7 @@ button[title]:hover::before {
   hyphens: none;
 }
 
-.equation-container:focus {
+.equation-container:focus-visible {
   outline: 2px solid var(--color-blue-interactive);
   outline-offset: 2px;
 }
@@ -623,6 +645,8 @@ button[title]:hover::before {
   font-size: 1rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
+  letter-spacing: normal;
+  text-transform: none;
 }
 
 .result-value {
@@ -664,12 +688,13 @@ button[title]:hover::before {
 .chart-wrapper {
   height: 28rem;
   position: relative;
-  border-radius: 0.5rem;
-  background: var(--color-gray-50);
-  border: 1px solid var(--color-gray-200);
+  border-radius: 0;
+  width: 100%;
+  background: transparent;
+  border: none;
 }
 
-.chart-wrapper:focus {
+.chart-wrapper:focus-visible {
   outline: 2px solid var(--color-blue-interactive);
   outline-offset: 2px;
 }
@@ -678,6 +703,20 @@ button[title]:hover::before {
   .chart-wrapper {
     height: 24rem;
   }
+}
+
+/* Full-width chart: cancel horizontal card padding (inherits --card-padding-x from .card) */
+#visualizer #chart-container.chart-wrapper,
+#visualizer #chart-container .chart-wrapper,
+#visualization-card #chart-container.chart-wrapper {
+  margin-left: calc(-1 * var(--card-padding-x, 1.25rem));
+  margin-right: calc(-1 * var(--card-padding-x, 1.25rem));
+  width: calc(100% + 2 * var(--card-padding-x, 1.25rem));
+  max-width: none;
+  box-sizing: border-box;
+  border-radius: 0;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
 }
 
 /* Legend */
@@ -790,7 +829,7 @@ button[title]:hover::before {
   font-weight: 600;
 }
 
-.data-table:focus {
+.data-table:focus-visible {
   outline: 2px solid var(--color-blue-interactive);
   outline-offset: 2px;
 }
@@ -1096,6 +1135,7 @@ button[title]:hover::before {
   
   .card {
     padding: 1rem;
+    --card-padding-x: 1rem;
   }
   
   .card-title {
@@ -1111,6 +1151,7 @@ button[title]:hover::before {
 @media (max-width: 480px) {
   .card {
     padding: 0.875rem;
+    --card-padding-x: 0.875rem;
   }
   
   .card-title {

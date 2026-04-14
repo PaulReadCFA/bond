@@ -112,12 +112,12 @@ function createAnalysisBox(calculations, params) {
   const breakdownDiv = createElement('div', { className: 'analysis-details' });
   
   const pvEquation = createElement('div');
-  pvEquation.innerHTML = `<span style="color: #a84f15;">PV</span> = <span style="color: #a84f15;">PV of bond price</span> (${formatCurrency(bondPrice)}) = coupon (${formatCurrency(pvCoupons)}) + face (${formatCurrency(pvFaceValue)})`;
+  pvEquation.innerHTML = `<span style="color: var(--bond-cashflow-text-pv);">PV</span> = <span style="color: var(--bond-cashflow-text-pv);">PV of bond price</span> (${formatCurrency(bondPrice)}) = coupon (${formatCurrency(pvCoupons)}) + face (${formatCurrency(pvFaceValue)})`;
   breakdownDiv.appendChild(pvEquation);
   
   // Add explanatory sentence
   const explanation = createElement('div', { className: 'result-detail' });
-  explanation.innerHTML = `The present value price of the bond (<span style="color: #a84f15;">PV</span>) is equal to the present value of all coupon payments plus the present value of the bond face value.`;
+  explanation.innerHTML = `The present value price of the bond (<span style="color: var(--bond-cashflow-text-pv);">PV</span>) is equal to the present value of all coupon payments plus the present value of the bond face value.`;
   breakdownDiv.appendChild(explanation);
   
   content.appendChild(breakdownDiv);

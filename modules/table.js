@@ -40,10 +40,10 @@ export function renderTable(cashFlows, bondPrice, periods, periodicCoupon, ytm) 
     <thead>
       <tr>
         <th scope="col" class="text-left">Year</th>
-        <th scope="col" class="text-right">Yield to maturity (<span style="color: #7a46ff; font-style: italic;">r</span>)</th>
-        <th scope="col" class="text-right">Coupon payment (<span style="color: #3c6ae5;">PMT</span>) (USD)</th>
-        <th scope="col" class="text-right">Principal repayment (<span style="color: #0079a6;">FV</span>) (USD)</th>
-        <th scope="col" class="text-right">Total cash flow (<span style="color: #3c6ae5;">PMT</span>) + (<span style="color: #0079a6;">FV</span>) (USD)</th>
+        <th scope="col" class="text-right">Yield to maturity (<span style="color: var(--bond-cashflow-text-ytm); font-style: italic;">r</span>)</th>
+        <th scope="col" class="text-right">Coupon payment (<span style="color: var(--bond-cashflow-text-pmt);">PMT</span>) (USD)</th>
+        <th scope="col" class="text-right">Principal repayment (<span style="color: var(--bond-cashflow-text-fv);">FV</span>) (USD)</th>
+        <th scope="col" class="text-right">Total cash flow (<span style="color: var(--bond-cashflow-text-pmt);">PMT</span>) + (<span style="color: var(--bond-cashflow-text-fv);">FV</span>) (USD)</th>
       </tr>
     </thead>
 
@@ -59,9 +59,9 @@ export function renderTable(cashFlows, bondPrice, periods, periodicCoupon, ytm) 
     html += `
       <tr>
         <td class="text-left" data-label="Year">${cf.yearLabel.toFixed(1)}</td>
-        <td class="text-right" data-label="Yield to maturity (r)">${ytm.toFixed(2)}%</td>
-        <td class="text-right" data-label="Coupon payment (PMT) (USD)">${formatCurrencyNoPrefix(cf.couponPayment)}</td>
-        <td class="text-right" data-label="Principal repayment (FV) (USD)">${formatCurrencyNoPrefix(cf.principalPayment)}</td>
+        <td class="text-right" data-label="Yield to maturity (r)" style="color: var(--bond-cashflow-text-ytm);">${ytm.toFixed(2)}%</td>
+        <td class="text-right" data-label="Coupon payment (PMT) (USD)" style="color: var(--bond-cashflow-text-pmt);">${formatCurrencyNoPrefix(cf.couponPayment)}</td>
+        <td class="text-right" data-label="Principal repayment (FV) (USD)" style="color: var(--bond-cashflow-text-fv);">${formatCurrencyNoPrefix(cf.principalPayment)}</td>
         <td class="text-right" data-label="Total Cash Flow (USD)"><strong>${formatCurrencyNoPrefix(cf.totalCashFlow)}</strong></td>
       </tr>`;
   });
@@ -75,9 +75,9 @@ export function renderTable(cashFlows, bondPrice, periods, periodicCoupon, ytm) 
     <tfoot>
       <tr style="background-color: #ffffff;">
         <td colspan="4" class="text-right">
-          <strong>Present value of bond (<span style="color: #b95b1d;">PV</span>) (USD):</strong>
+          <strong>Present value of bond (<span style="color: var(--bond-cashflow-text-pv);">PV</span>) (USD):</strong>
         </td>
-        <td class="text-right"><strong style="color: #b95b1d;">${formatCurrencyNoPrefix(bondPrice)}</strong></td>
+        <td class="text-right"><strong style="color: var(--bond-cashflow-text-pv);">${formatCurrencyNoPrefix(bondPrice)}</strong></td>
       </tr>
     </tfoot>
   `;

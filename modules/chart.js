@@ -95,13 +95,13 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
           order: 1  // Higher order = rendered behind
         },
         // YTM horizontal line
-        ...(ytm !== null ? [{
+        ...(ytm !== null && ytm !== undefined ? [{
           label: 'Yield to maturity (r)',
           data: labels.map(() => ytm),
           type: 'line',
           borderColor: '#7a46ff',
-          borderWidth: 3,
-          borderDash: [5, 5],
+          borderWidth: ytm === 0 ? 4 : 3,
+          borderDash: ytm === 0 ? [2, 3] : [5, 5],
           pointRadius: 0,
           pointHoverRadius: 0,
           fill: false,
@@ -251,8 +251,10 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
             display: false  // We'll draw this manually with italic 'r'
           },
           position: 'right',
-          min: 0,
-          max: ytm ? Math.max(12, ytm * 1.2) : 12,
+          min: ytm === 0 ? -0.5 : 0,
+          max: (ytm !== null && ytm !== undefined)
+            ? Math.max(12, ytm * 1.2)
+            : 12,
           ticks: {
             callback: function(value) {
               return value.toFixed(1);
@@ -410,7 +412,7 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
       // YTM line label plugin - shows "r = XX%" with purple border
       id: 'ytmLabel',
       afterDatasetsDraw: (chart) => {
-        if (!ytm) return;
+        if (ytm === null || ytm === undefined) return;
         
         const ctx = chart.ctx;
         const chartArea = chart.chartArea;
@@ -446,7 +448,10 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
         
         // Position: Center of chart, aligned with YTM line
         const boxX = chartArea.left + (chartArea.width / 2) - (boxWidth / 2);
-        const boxY = ytmY - (boxHeight / 2);
+        let boxY = ytmY - (boxHeight / 2);
+        const minBoxTop = chartArea.top + 2;
+        const maxBoxTop = chartArea.bottom - boxHeight - 2;
+        boxY = Math.min(Math.max(boxY, minBoxTop), maxBoxTop);
         
         // Draw white background
         ctx.fillStyle = 'white';

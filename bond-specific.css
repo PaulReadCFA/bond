@@ -901,3 +901,144 @@ mjx-assistive-mml[aria-hidden="true"] math * {
   box-sizing: border-box;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
+
+/* ==========================================================================
+   Moved from local cfa-base (Phase 2 unify) — explorer-only overrides
+   ========================================================================== */
+
+button[title]{
+  position: relative;
+}
+
+button[title]:hover::after{
+  content: attr(title);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-gray-900);
+  color: white;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  white-space: nowrap;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  pointer-events: none;
+}
+
+button[title]:hover::before{
+  content: '';
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--color-gray-900);
+  z-index: 1001;
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+button[title]:hover::after{
+    white-space: normal;
+    max-width: 240px;
+    text-align: center;
+  }
+}
+
+.toggle-btn:disabled,
+.toggle-btn[disabled],
+.model-btn:disabled,
+.model-btn[disabled],
+#chart-view-btn[disabled],
+#chart-view-btn[disabled]:hover,
+#chart-view-btn[disabled]:focus,
+#chart-view-btn[disabled]:active{
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+  background-color: var(--color-gray-300) !important;
+  color: var(--color-gray-500) !important;
+  border-color: var(--color-gray-300) !important;
+  box-shadow: none !important;
+}
+
+.equation-container mtext{
+  font-size: 0.9em;
+  word-spacing: -0.05em;
+}
+
+#results-content{
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.legend-color[style*="border-style: dashed"]{
+  background: none !important;
+  border: 2px dashed var(--color-purple-bold);
+}
+
+.data-table th.text-left,
+.data-table td.text-left{ text-align: left; }
+
+.data-table th.text-right,
+.data-table td.text-right{ text-align: right; }
+
+.data-table tbody tr:nth-child(even):hover{
+  background-color: var(--color-gray-50);
+}
+
+@media (max-width: 768px) {
+.table-card-layout #table-container{
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+  }
+
+.table-card-layout .data-table thead tr{
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+
+.table-card-layout .data-table td[data-label]:first-child::before{ 
+    display: none; 
+  }
+}
+
+@media (max-width: 600px) {
+.force-table #chart-view-btn,
+  .force-table #chart-view-btn:hover,
+  .force-table #chart-view-btn:focus,
+  .force-table #chart-view-btn:active{
+    opacity: 0.4 !important;
+    pointer-events: none !important;
+    cursor: not-allowed !important;
+    box-shadow: none !important;
+    background-color: var(--color-gray-300) !important;
+    color: var(--color-gray-500) !important;
+    border-color: var(--color-gray-300) !important;
+  }
+
+.force-table #table-view-btn{ 
+    opacity: 1; 
+    pointer-events: auto; 
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  canvas {
+    animation: none !important;
+  }
+
+  mjx-container {
+    transition: none !important;
+  }
+
+  .sticky-calculator-wrapper {
+    transition: none !important;
+  }
+}

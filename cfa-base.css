@@ -771,8 +771,10 @@ kbd {
 }
 
 /* Legend wrapper (first flex item): grow so Chart/Table hug the right; min-width
-   lets the row wrap cleanly. (.legend is nested — flex:1 on it had no effect.) */
-.view-controls > :first-child {
+   lets the row wrap cleanly. (.legend is nested — flex:1 on it had no effect.)
+   Buttons and .button-group are excluded: explorers without a legend would
+   otherwise stretch the first toggle button across the row. */
+.view-controls > :first-child:not(button):not(.button-group) {
   flex: 1 1 auto;
   min-width: 0;
 }
@@ -842,7 +844,7 @@ kbd {
     align-items: stretch;
   }
 
-  .view-controls > :first-child {
+  .view-controls > :first-child:not(button):not(.button-group) {
     flex: none;
     width: 100%;
     min-width: 0;

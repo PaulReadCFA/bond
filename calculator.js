@@ -462,14 +462,20 @@ function setupResizeListener() {
  */
 function detectNarrowScreen() {
   const narrow = window.innerWidth <= 600;
+  const helper = $('#chart-helper-text');
+  const chartBtn = $('#chart-view-btn');
   
   if (narrow) {
     document.body.classList.add('force-table');
     if (state.viewMode !== 'table') {
       setState({ viewMode: 'table' });
     }
+    if (helper) helper.style.display = 'block';
+    if (chartBtn) chartBtn.setAttribute('aria-describedby', 'chart-helper-text');
   } else {
     document.body.classList.remove('force-table');
+    if (helper) helper.style.display = 'none';
+    if (chartBtn) chartBtn.removeAttribute('aria-describedby');
   }
   
   updateButtonStates(false);  // Don't auto-focus on resize

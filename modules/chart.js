@@ -13,7 +13,17 @@ const CHART_FONT = {
   weight: '600'
 };
 const CHART_FONT_CSS = `${CHART_FONT.weight} ${CHART_FONT.size}px ${CHART_FONT.family}`;
-const CHART_FONT_ITALIC_CSS = `italic ${CHART_FONT.weight} ${CHART_FONT.size}px ${CHART_FONT.family}`;
+
+/** Variables are italicised by the Unicode math-italic glyph, not by font-style. */
+const ITALIC_r = '\u{1D45F}'; // 𝑟
+
+/** In pill labels only the variable carries colour; the operator and value stay neutral. */
+const LABEL_TEXT_COLOR = '#374151';
+
+/** Shared pill geometry so every label box has the same breathing space. */
+const LABEL_PAD_X = 8;
+const LABEL_PAD_Y = 5;
+const LABEL_BOX_HEIGHT = CHART_FONT.size + LABEL_PAD_Y * 2;
 
 
 // Bond Explorer Colors (matching CSS variables)
@@ -436,26 +446,21 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
         // Get the y-position of the YTM line
         const ytmY = y2Scale.getPixelForValue(ytm);
         
-        // Prepare text parts: "r" (italic) + " = " + "6.50%" (regular)
-        const rText = 'r';
+        // Prepare text parts: italic "r" glyph + " = " + "6.50%"
+        const rText = ITALIC_r;
         const equalsText = ' = ';
         const valueText = `${ytm.toFixed(2)}%`;
         
-        // Measure text with different fonts
-        ctx.font = CHART_FONT_ITALIC_CSS;
-        const rWidth = ctx.measureText(rText).width;
-        
         ctx.font = CHART_FONT_CSS;
+        const rWidth = ctx.measureText(rText).width;
         const equalsWidth = ctx.measureText(equalsText).width;
         const valueWidth = ctx.measureText(valueText).width;
         
         const totalWidth = rWidth + equalsWidth + valueWidth;
         
         // Box dimensions with padding
-        const paddingX = 8;
-        const paddingY = 5;
-        const boxWidth = totalWidth + (paddingX * 2);
-        const boxHeight = 24;
+        const boxWidth = totalWidth + (LABEL_PAD_X * 2);
+        const boxHeight = LABEL_BOX_HEIGHT;
         
         // Position: Center of chart, aligned with YTM line
         const boxX = chartArea.left + (chartArea.width / 2) - (boxWidth / 2);
@@ -475,18 +480,18 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
         
         // Draw text in parts
         const textY = boxY + (boxHeight / 2);
-        let currentX = boxX + paddingX;
+        let currentX = boxX + LABEL_PAD_X;
         
-        // Draw italic "r"
+        // Draw italic "r" in the YTM purple
         ctx.fillStyle = '#7a46ff';
-        ctx.font = CHART_FONT_ITALIC_CSS;
+        ctx.font = CHART_FONT_CSS;
         ctx.textAlign = 'left';
         ctx.textBaseline = 'middle';
         ctx.fillText(rText, currentX, textY);
         currentX += rWidth;
         
-        // Draw regular " = XX%"
-        ctx.font = CHART_FONT_CSS;
+        // Draw neutral " = XX%"
+        ctx.fillStyle = LABEL_TEXT_COLOR;
         ctx.fillText(equalsText + valueText, currentX, textY);
         
         ctx.restore();
@@ -504,17 +509,14 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
         
         ctx.save();
         
-        // Text parts: "Yield to maturity (" + "r" (italic) + ") %"
+        // Axis title carries the axis colour throughout; only "r" is italic
         const beforeR = 'Yield to maturity (';
-        const rText = 'r';
+        const rText = ITALIC_r;
         const afterR = ') %';
         
-        // Measure text with different fonts
         ctx.font = CHART_FONT_CSS;
         const beforeRWidth = ctx.measureText(beforeR).width;
         const afterRWidth = ctx.measureText(afterR).width;
-        
-        ctx.font = CHART_FONT_ITALIC_CSS;
         const rWidth = ctx.measureText(rText).width;
         
         const totalWidth = beforeRWidth + rWidth + afterRWidth;
@@ -539,12 +541,10 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
         currentX += beforeRWidth;
         
         // Draw italic "r"
-        ctx.font = CHART_FONT_ITALIC_CSS;
         ctx.fillText(rText, currentX, 0);
         currentX += rWidth;
         
         // Draw ") %"
-        ctx.font = CHART_FONT_CSS;
         ctx.fillText(afterR, currentX, 0);
         
         ctx.restore();

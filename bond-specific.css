@@ -14,6 +14,7 @@
   --color-bond-yield: var(--color-purple-bold);        /* #7a46ff - Yield to maturity */
   --color-bond-face: var(--color-teal-data);           /* #0079a6 - Face value */
   --color-bond-purchase: var(--color-orange-deep);     /* #b95b1d - Initial purchase */
+  --color-bond-term: #15803d;                          /* T - matches the MathML equation */
   /* Cash-flow table: darker text for WCAG AA on white / light row backgrounds */
   --bond-cashflow-text-ytm: #4c1d95;
   --bond-cashflow-text-pmt: #1e3a8a;
@@ -45,7 +46,7 @@ mjx-assistive-mml[aria-hidden="true"] * {
 }
 
 /* ==========================================================================
-   2. RESULT BOXES — Bond-Specific
+   2. RESULT BOXES — Bond-Specific
    ========================================================================== */
 .result-box.price {
   background-color: var(--color-bg-orange);
@@ -147,64 +148,18 @@ mjx-assistive-mml[aria-hidden="true"] * {
 }
 
 /* ==========================================================================
-   4. INPUT LAYOUT — Inline with Labels
+   4. INPUT LAYOUT — data entry comes from cfa-base.css
+   Only the label variable colours are bond-specific.
    ========================================================================== */
-.input-group-inline {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 2rem;
-}
-
-.input-inline {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  white-space: nowrap;
-}
-
-.input-label-inline {
-  font-size: 0.875rem;
-  color: var(--color-gray-700);
-  min-width: 120px;
-}
-
-.input-with-suffix-inline {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  width: 6rem;
-  position: relative;
-}
-
-.input-field-inline {
-  flex: 1;
-  width: 100%;
-  padding: 0.4rem 0.5rem;
-  padding-right: 1.5rem;
-  border: 1px solid #8b93a7;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-  text-align: right;
-  box-sizing: border-box;
-}
-
-.input-suffix-inline {
-  position: absolute;
-  right: 0.4rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--color-gray-500);
-  pointer-events: none;
-  width: 1.2rem;
-  text-align: right;
-  font-size: 0.875rem;
-}
+/* Label letters match this explorer's equation colours (white card only).
+   --color-bond-term keeps the green used by the MathML equation for T. */
+.label-var-coupon { color: var(--color-bond-coupon); }
+.label-var-yield  { color: var(--color-bond-yield); }
+.label-var-term   { color: var(--color-bond-term); }
 
 #calculator .input-section {
   max-width: 100%;
   min-width: 0;
-  overflow-x: hidden;
 }
 
 #calculator .validation-summary {
@@ -212,38 +167,8 @@ mjx-assistive-mml[aria-hidden="true"] * {
   margin-bottom: 0.75rem;
 }
 
-@media (max-width: 640px) {
-  .input-group-inline {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-  
-  .input-inline {
-    width: 100%;
-    max-width: 100%;
-    flex-wrap: wrap;
-    white-space: normal;
-    align-items: flex-start;
-    box-sizing: border-box;
-  }
-
-  .input-label-inline {
-    flex: 1 1 100%;
-    max-width: 100%;
-    min-width: 0;
-    white-space: normal;
-  }
-  
-  .input-with-suffix-inline {
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-  }
-}
-
 /* ==========================================================================
-   5. EQUATION DISPLAY — Bond-specific
+   5. EQUATION DISPLAY — Bond-specific
    ========================================================================== */
 
 /* Ensure MathJax assistive elements are not focusable (WCAG compliance) */
@@ -473,17 +398,6 @@ mjx-assistive-mml[aria-hidden="true"] math * {
   margin-bottom: 1rem;
 }
 
-/* ==========================================================================
-   RESPONSIVE TABLE - Bond-Specific (6 columns)
-   ========================================================================== */
-
-/* At very narrow widths, hide the Period column since Year is more meaningful */
-@media (max-width: 480px) {
-  .data-table th:first-child,
-  .data-table td:first-child {
-    display: none;
-  }
-}
 
 
 /* ==========================================================================
@@ -557,10 +471,6 @@ mjx-assistive-mml[aria-hidden="true"] math * {
 
 
 /* Ensure all interactive elements meet 44x44px minimum (WCAG 2.5.5) */
-.input-field-inline {
-  min-height: 44px;
-}
-
 .toggle-btn,
 .model-btn {
   min-height: 44px;
@@ -571,102 +481,6 @@ mjx-assistive-mml[aria-hidden="true"] math * {
 
 /* Chart and table are already properly sized */
 
-/* ==========================================================================
-   9. TABLE IMPROVEMENTS - Cleaner, Tidier Styling
-   ========================================================================== */
-
-/* Override base table styling for cleaner look */
-.data-table {
-  border: 1px solid var(--color-gray-200);
-  border-radius: 0.5rem;
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-/* Cleaner header styling */
-.data-table th {
-  background: linear-gradient(to bottom, #f9fafb 0%, #f3f4f6 100%);
-  border-bottom: 2px solid var(--color-gray-300);
-  font-size: 0.8125rem;
-  letter-spacing: 0.025em;
-  padding: 0.75rem 1rem;
-  font-weight: 700;
-  color: var(--color-gray-800);
-}
-
-/* Remove individual cell borders for cleaner look */
-.data-table th,
-.data-table td {
-  border-left: none;
-  border-right: none;
-}
-
-/* Keep only horizontal borders */
-.data-table tbody tr {
-  border-bottom: 1px solid var(--color-gray-200);
-}
-
-.data-table tbody tr:last-child {
-  border-bottom: none;
-}
-
-/* Improved cell padding and sizing */
-.data-table td {
-  padding: 0.625rem 1rem;
-  font-size: 0.875rem;
-  line-height: 1.5;
-}
-
-/* Zebra striping - starts from row 2 to preserve orange first-row */
-.data-table tbody tr:nth-child(even) {
-  background-color: #f0f4f8;
-}
-
-.data-table tbody tr:nth-child(odd) {
-  background-color: #ffffff;
-}
-
-/* First row orange always overrides zebra */
-.data-table tbody tr:first-child,
-.data-table tbody tr:first-child:nth-child(even),
-.data-table tbody tr:first-child:nth-child(odd) {
-  background-color: #fff7ed;
-}
-
-/* Smoother hover effect */
-.data-table tbody tr:hover {
-  background-color: #f0f4f8 !important;
-  transition: background-color 0.15s ease;
-}
-
-/* Footer styling - clean top border */
-.data-table tfoot tr {
-  border-top: 2px solid var(--color-gray-400);
-  background-color: #fff7ed; /* Orange for PV */
-}
-
-.data-table tfoot tr:hover {
-  background-color: #ffedd5;
-}
-
-.data-table tfoot td {
-  padding: 0.875rem 1rem;
-  font-weight: 600;
-}
-
-/* First row hover */
-.data-table tbody tr:first-child:hover {
-  background-color: #ffedd5 !important;
-}
-
-/* Final period row - always striped for clear separation before footer */
-.data-table tbody tr:last-child {
-  background-color: #f0f4f8;
-}
-
-.data-table tbody tr:last-child:hover {
-  background-color: var(--color-gray-50) !important;
-}
 
 /* Table note styling */
 .table-note {
@@ -706,135 +520,7 @@ mjx-assistive-mml[aria-hidden="true"] math * {
   margin: 0;
 }
 
-/* Table wrapper - NO scrolling needed */
-.table-wrapper {
-  overflow: visible;
-  max-width: 100%;
-  width: 100%;
-}
 
-/* Responsive card-style layout at narrow widths */
-@media (max-width: 768px) {
-  /* Hide the table header visually but keep for screen readers */
-  .data-table thead {
-    position: absolute !important;
-    clip: rect(0 0 0 0) !important;
-    height: 1px !important;
-    width: 1px !important;
-    margin: -1px !important;
-    padding: 0 !important;
-    overflow: hidden !important;
-    border: 0 !important;
-  }
-  
-  /* Make each row a card */
-  .data-table tbody tr {
-    display: block !important;
-    margin-bottom: 1rem;
-    border: 1px solid var(--color-gray-200);
-    border-radius: 0.5rem;
-    padding: 0.75rem;
-    background: white;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Reset all td to block first */
-  .data-table tbody td {
-    display: block;
-    border: none;
-  }
-  
-  /* First cell (Period) - Card Header */
-  .data-table tbody td:first-child {
-    display: block !important;
-    font-size: 1.125rem !important;
-    font-weight: 700 !important;
-    color: var(--color-primary-dark-blue) !important;
-    border-bottom: 2px solid var(--color-gray-300) !important;
-    margin-bottom: 0.75rem !important;
-    padding: 0 0 0.75rem 0 !important;
-    text-align: center !important;
-  }
-  
-  .data-table tbody td:first-child::before {
-    content: attr(data-label) !important;
-    display: block !important;
-  }
-  
-  /* All other cells - show as label: value rows */
-  .data-table tbody td:not(:first-child) {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    padding: 0.5rem 0 !important;
-    border: none !important;
-    border-bottom: 1px solid var(--color-gray-100) !important;
-    text-align: left !important;  /* Override inline text-align: right */
-  }
-  
-  .data-table tbody td:not(:first-child):last-child {
-    border-bottom: none !important;
-    padding-bottom: 0 !important;
-  }
-  
-  /* CRITICAL: Use data-label for mobile labels */
-  .data-table tbody tr td:not(:first-child)::before {
-    /* Label content from data-label attribute */
-    content: attr(data-label) ': ' !important;
-    
-    /* Label styling */
-    font-weight: 600 !important;
-    color: var(--color-gray-700) !important;
-    text-align: left !important;
-    flex: 0 0 auto !important;
-    margin-right: 0.5rem !important;
-    display: inline-block !important;
-    font-size: 0.875rem !important;
-  }
-  
-  /* The value itself */
-  .data-table tbody td:not(:first-child) {
-    font-size: 0.875rem !important;
-  }
-  
-  /* Footer styling */
-  .data-table tfoot {
-    display: block;
-    margin-top: 1rem;
-    padding: 1rem;
-    background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
-    border: 2px solid var(--color-gray-300);
-    border-radius: 0.5rem;
-  }
-  
-  .data-table tfoot tr {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .data-table tfoot td {
-    display: inline;
-    border: none;
-    padding: 0;
-  }
-  
-  .data-table tfoot td:first-child {
-    font-weight: 600;
-    flex: 1;
-  }
-}
-
-@media (max-width: 400px) {
-  .data-table {
-    font-size: 0.625rem;
-  }
-  
-  .data-table th,
-  .data-table td {
-    padding: 0.25rem 0.3rem;
-  }
-}
 
 
 
@@ -842,9 +528,7 @@ mjx-assistive-mml[aria-hidden="true"] math * {
 /* Use consistent system font for all content */
 .result-value,
 .info-value,
-.data-table,
-.legend-item,
-.input-field-inline {
+.legend-item {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 }
 
@@ -949,23 +633,6 @@ mjx-assistive-mml[aria-hidden="true"] math * {
   background-color: var(--color-gray-50);
 }
 
-@media (max-width: 768px) {
-.table-card-layout #table-container{
-    margin: 0;
-    padding: 0;
-    overflow: visible;
-  }
-
-.table-card-layout .data-table thead tr{
-    position: absolute;
-    top: -9999px;
-    left: -9999px;
-  }
-
-.table-card-layout .data-table td[data-label]:first-child::before{ 
-    display: none; 
-  }
-}
 
 @media (max-width: 600px) {
 .force-table #chart-view-btn,

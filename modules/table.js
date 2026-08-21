@@ -3,7 +3,7 @@
  * Renders accessible data table for bond cash flows
  */
 
-import { $, formatCurrency, announceToScreenReader, debounce } from './utils.js';
+import { $, formatCurrency, announceToScreenReader, applyTableRoles } from './utils.js';
 
 /**
  * Strip USD prefix from formatted currency (for tables with USD in header)
@@ -40,10 +40,10 @@ export function renderTable(cashFlows, bondPrice, periods, periodicCoupon, ytm) 
     <thead>
       <tr>
         <th scope="col" class="text-left">Year</th>
-        <th scope="col" class="text-right">Yield to maturity (<span style="color: var(--bond-cashflow-text-ytm); font-style: italic;">r</span>)</th>
-        <th scope="col" class="text-right">Coupon payment (<span style="color: var(--bond-cashflow-text-pmt);">PMT</span>) (USD)</th>
-        <th scope="col" class="text-right">Principal repayment (<span style="color: var(--bond-cashflow-text-fv);">FV</span>) (USD)</th>
-        <th scope="col" class="text-right">Total cash flow (<span style="color: var(--bond-cashflow-text-pmt);">PMT</span>) + (<span style="color: var(--bond-cashflow-text-fv);">FV</span>) (USD)</th>
+        <th scope="col" class="text-right table-var-3">Yield to maturity (𝑟)</th>
+        <th scope="col" class="text-right table-var-2">Coupon payment (PMT) (USD)</th>
+        <th scope="col" class="text-right table-var-4">Principal repayment (FV) (USD)</th>
+        <th scope="col" class="text-right">Total cash flow (PMT + FV) (USD)</th>
       </tr>
     </thead>
 
@@ -52,17 +52,17 @@ export function renderTable(cashFlows, bondPrice, periods, periodicCoupon, ytm) 
   // --------------------------------------------------------------
   // 2. Add a row for every cash-flow
   // --------------------------------------------------------------
-  cashFlows.forEach((cf, index) => {
-    const isInitial = index === 0;
-    const isFinal   = index === cashFlows.length - 1;
-
+  // data-label mirrors the column header: it becomes the visible label when the
+  // shared base reflows each row into a card below 768px. cell-value keeps the
+  // value as a single element so it stays on the right of that label.
+  cashFlows.forEach((cf) => {
     html += `
       <tr>
-        <td class="text-left" data-label="Year">${cf.yearLabel.toFixed(1)}</td>
-        <td class="text-right" data-label="Yield to maturity (r)" style="color: var(--bond-cashflow-text-ytm);">${ytm.toFixed(2)}%</td>
-        <td class="text-right" data-label="Coupon payment (PMT) (USD)" style="color: var(--bond-cashflow-text-pmt);">${formatCurrencyNoPrefix(cf.couponPayment)}</td>
-        <td class="text-right" data-label="Principal repayment (FV) (USD)" style="color: var(--bond-cashflow-text-fv);">${formatCurrencyNoPrefix(cf.principalPayment)}</td>
-        <td class="text-right" data-label="Total Cash Flow (USD)"><strong>${formatCurrencyNoPrefix(cf.totalCashFlow)}</strong></td>
+        <th scope="row" class="text-left" data-label="Year">${cf.yearLabel.toFixed(1)}</th>
+        <td class="text-right" data-label="Yield to maturity (𝑟)"><span class="cell-value table-var-3">${ytm.toFixed(2)}%</span></td>
+        <td class="text-right" data-label="Coupon payment (PMT) (USD)"><span class="cell-value table-var-2">${formatCurrencyNoPrefix(cf.couponPayment)}</span></td>
+        <td class="text-right" data-label="Principal repayment (FV) (USD)"><span class="cell-value table-var-4">${formatCurrencyNoPrefix(cf.principalPayment)}</span></td>
+        <td class="text-right" data-label="Total cash flow (PMT + FV) (USD)"><span class="cell-value"><strong>${formatCurrencyNoPrefix(cf.totalCashFlow)}</strong></span></td>
       </tr>`;
   });
 
@@ -73,11 +73,11 @@ export function renderTable(cashFlows, bondPrice, periods, periodicCoupon, ytm) 
     </tbody>
 
     <tfoot>
-      <tr style="background-color: #ffffff;">
-        <td colspan="4" class="text-right">
-          <strong>Present value of bond (<span style="color: var(--bond-cashflow-text-pv);">PV</span>) (USD):</strong>
-        </td>
-        <td class="text-right"><strong style="color: var(--bond-cashflow-text-pv);">${formatCurrencyNoPrefix(bondPrice)}</strong></td>
+      <tr>
+        <th scope="row" colspan="4" class="text-right">
+          Present value of bond (PV) (USD):
+        </th>
+        <td class="text-right"><strong>${formatCurrencyNoPrefix(bondPrice)}</strong></td>
       </tr>
     </tfoot>
   `;
@@ -86,111 +86,8 @@ export function renderTable(cashFlows, bondPrice, periods, periodicCoupon, ytm) 
   // 4. Inject the HTML **once** (no stray attributes)
   // --------------------------------------------------------------
   table.innerHTML = html;
-
-  // --------------------------------------------------------------
-  // 5. Add accessibility attributes **programmatically**
-  // --------------------------------------------------------------
-  // Make table focusable for skip links
-  table.setAttribute('tabindex', '-1');
-
-  // For mobile: Restore table semantics when using display:block
-  // CSS display:block breaks native table semantics, so we add ARIA roles
-  updateTableSemantics(table);
-  
-  // Update ARIA roles on window resize
-  // Store the listener so we can remove it if table is re-rendered
-  if (table._resizeListener) {
-    window.removeEventListener('resize', table._resizeListener);
-  }
-  
-  const resizeListener = debounce(() => {
-    updateTableSemantics(table);
-  }, 250);
-  
-  table._resizeListener = resizeListener;
-  window.addEventListener('resize', resizeListener);
+  applyTableRoles(table);
 
   // Optional: announce the switch to screen-reader users
   announceToScreenReader('Table view loaded with bond cash flows.');
-}
-
-/**
- * Update table semantics based on viewport width
- * @param {HTMLTableElement} table - The table element
- */
-function updateTableSemantics(table) {
-  const isMobile = window.innerWidth <= 768;
-  
-  if (isMobile) {
-    // Add ARIA roles to restore table semantics
-    restoreTableSemantics(table);
-  } else {
-    // Remove ARIA roles on desktop - native semantics work fine
-    removeTableSemantics(table);
-  }
-}
-
-/**
- * Restore table semantics on mobile when CSS uses display:block
- * @param {HTMLTableElement} table - The table element
- */
-function restoreTableSemantics(table) {
-  // When CSS uses display:block, native table semantics are lost
-  // We must explicitly restore them with ARIA roles
-  table.setAttribute('role', 'table');
-  
-  // Header section
-  const thead = table.querySelector('thead');
-  if (thead) {
-    thead.setAttribute('role', 'rowgroup');
-    thead.querySelectorAll('tr').forEach(tr => {
-      tr.setAttribute('role', 'row');
-      tr.querySelectorAll('th').forEach(th => {
-        th.setAttribute('role', 'columnheader');
-      });
-    });
-  }
-  
-  // Body section
-  const tbody = table.querySelector('tbody');
-  if (tbody) {
-    tbody.setAttribute('role', 'rowgroup');
-    tbody.querySelectorAll('tr').forEach(tr => {
-      tr.setAttribute('role', 'row');
-      tr.querySelectorAll('td').forEach(td => {
-        td.setAttribute('role', 'cell');
-      });
-    });
-  }
-  
-  // Footer section
-  const tfoot = table.querySelector('tfoot');
-  if (tfoot) {
-    tfoot.setAttribute('role', 'rowgroup');
-    tfoot.querySelectorAll('tr').forEach(tr => {
-      tr.setAttribute('role', 'row');
-      tr.querySelectorAll('td').forEach(td => {
-        td.setAttribute('role', 'cell');
-      });
-    });
-  }
-}
-
-/**
- * Remove ARIA table roles on desktop (native semantics work better)
- * @param {HTMLTableElement} table - The table element
- */
-function removeTableSemantics(table) {
-  // Remove role="table" from the table element itself
-  table.removeAttribute('role');
-  
-  // Remove all ARIA roles from table child elements
-  const elements = table.querySelectorAll('[role]');
-  elements.forEach(el => {
-    // Only remove table-related roles
-    const role = el.getAttribute('role');
-    if (['rowgroup', 'row', 'columnheader', 'cell'].includes(role)) {
-      el.removeAttribute('role');
-    }
-  });
 }

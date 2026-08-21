@@ -4,7 +4,7 @@
  */
 
 import { formatCurrency } from './utils.js';
-import { getChartTypography } from '../chart-typography.js';
+import { getChartTypography, fillTightParenVar } from '../chart-typography.js';
 
 /** Curriculum chart label convention: 13px / 600 / Lato at the 18px design root. */
 const CHART_FONT = { family: '', size: 13, weight: '600' };
@@ -517,43 +517,16 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
         
         ctx.save();
         
-        // Axis title carries the axis colour throughout; only "r" is italic
-        const beforeR = 'Yield to maturity (';
-        const rText = ITALIC_r;
-        const afterR = ') %';
-        
         ctx.font = CHART_FONT_CSS;
-        const beforeRWidth = ctx.measureText(beforeR).width;
-        const afterRWidth = ctx.measureText(afterR).width;
-        const rWidth = ctx.measureText(rText).width;
+        ctx.fillStyle = '#7a46ff';
+        ctx.textBaseline = 'middle';
         
-        const totalWidth = beforeRWidth + rWidth + afterRWidth;
-        
-        // Position: Right side, vertically centered, more space from axis
-        const titleX = chartArea.right + 50;  // Increased from 35 to 50 for more space
+        const titleX = chartArea.right + 50;
         const titleY = chartArea.top + (chartArea.height / 2);
         
-        // Rotate context for vertical text (clockwise for right side)
         ctx.translate(titleX, titleY);
-        ctx.rotate(Math.PI / 2);  // Changed from -Math.PI / 2 to Math.PI / 2
-        
-        // Draw text in parts (now drawing horizontally in rotated context)
-        let currentX = -totalWidth / 2;
-        
-        // Draw "Yield to maturity ("
-        ctx.fillStyle = '#7a46ff';
-        ctx.font = CHART_FONT_CSS;
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(beforeR, currentX, 0);
-        currentX += beforeRWidth;
-        
-        // Draw italic "r"
-        ctx.fillText(rText, currentX, 0);
-        currentX += rWidth;
-        
-        // Draw ") %"
-        ctx.fillText(afterR, currentX, 0);
+        ctx.rotate(Math.PI / 2);
+        fillTightParenVar(ctx, 'Yield to maturity (', ITALIC_r, ') %', 0, 0, 'center');
         
         ctx.restore();
       }

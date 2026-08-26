@@ -27,6 +27,15 @@ import { renderChart, shouldShowLabels, destroyChart } from './modules/chart.js'
 import { renderTable } from './modules/table.js';
 import { renderResults } from './modules/results.js';
 import { renderDynamicEquation } from './modules/equation.js';
+import { allFinite } from './validation-ui.js';
+import {
+  applyChartTableVisibility,
+  updateToggleButtonStates,
+  announceView,
+  VIEW_ANNOUNCEMENTS,
+} from './view-toggle.js';
+
+let lastAppliedView = null;
 
 // =============================================================================
 // INITIALIZATION
@@ -158,6 +167,8 @@ function setupInputListeners() {
       // Recalculate if no errors
       if (!hasErrors(errors)) {
         updateCalculations();
+      } else {
+        setState({ bondCalculations: null });
       }
     }, 300);
     
@@ -197,6 +208,15 @@ function updateCalculations() {
       years,
       frequency
     });
+    if (!allFinite(
+      calculations.bondPrice,
+      calculations.pvCoupons,
+      calculations.pvFaceValue,
+      calculations.periodicCoupon
+    )) {
+      setState({ bondCalculations: null });
+      return;
+    }
     
     // Update state with calculations
     setState({ bondCalculations: calculations });
@@ -267,7 +287,6 @@ function setupViewToggle() {
   // Keyboard navigation between toggle buttons
   [chartBtn, tableBtn].forEach(btn => {
     if (!btn) return;
-    btn.tabIndex = 0;
     
     // Remove old listener if exists
     if (btn._keydownListener) {
@@ -312,44 +331,35 @@ function updateButtonStates(autoFocus = true) {
 
   if (!chartBtn || !tableBtn) return;
 
-  // Update active states
-  chartBtn.classList.toggle('active', currentView === 'chart');
-  tableBtn.classList.toggle('active', currentView === 'table');
-  
-  // Update aria-pressed
-  chartBtn.setAttribute('aria-pressed', currentView === 'chart');
-  tableBtn.setAttribute('aria-pressed', currentView === 'table');
-  
-  // Disable chart button when forced to table
-  chartBtn.disabled = isForced;
-  
-  // Show/hide containers based on view
+  updateToggleButtonStates({
+    chartBtn,
+    tableBtn,
+    showingChart: currentView === 'chart',
+    forceTable: isForced,
+  });
+  applyChartTableVisibility({
+    chartEl: chartContainer,
+    tableEl: tableContainer,
+    canvas: $('#bond-chart'),
+    showChart: currentView === 'chart',
+  });
+
   if (currentView === 'chart') {
-    if (chartContainer) chartContainer.style.display = 'block';
-    if (tableContainer) tableContainer.style.display = 'none';
     if (legend) legend.style.display = 'flex';
-    
-    // Announce change
-    announceToScreenReader('Chart view active');
-    
-    // Only auto-focus if requested (not for keyboard navigation)
     if (autoFocus) {
       focusElement(chartContainer, 100);
     }
-    
   } else {
-    if (tableContainer) tableContainer.style.display = 'block';
-    if (chartContainer) chartContainer.style.display = 'none';
     if (legend) legend.style.display = 'none';
-    
-    // Announce change
-    announceToScreenReader('Table view active');
-    
-    // Only auto-focus if requested (not for keyboard navigation)
     if (autoFocus) {
       focusElement($('#cash-flow-table'), 100);
     }
   }
+
+  if (lastAppliedView && lastAppliedView !== currentView) {
+    announceView(VIEW_ANNOUNCEMENTS[currentView]);
+  }
+  lastAppliedView = currentView;
 }
 
 // =============================================================================
@@ -381,7 +391,7 @@ function handleStateChange(newState) {
   }
   
   if (!bondCalculations) {
-    // Clear displays if no calculations
+    clearCalculatedViews();
     return;
   }
   
@@ -420,6 +430,16 @@ function handleStateChange(newState) {
     bondCalculations.periodicCoupon,
     newState.ytm
   );
+}
+
+function clearCalculatedViews() {
+  destroyChart();
+  const results = $('#results-content');
+  if (results) results.innerHTML = '';
+  const equation = $('#dynamic-mathml-equation');
+  if (equation) equation.innerHTML = '';
+  const table = $('#cash-flow-table');
+  if (table) table.innerHTML = '';
 }
 
 // =============================================================================

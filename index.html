@@ -100,7 +100,7 @@
               </p>
 
               <!-- Validation above inputs: stable narrow-width layout when errors appear -->
-              <div id="validation-summary" class="validation-summary" role="alert" tabindex="-1" aria-live="assertive" style="display: none;">
+              <div id="validation-summary" class="validation-summary" tabindex="-1" style="display: none;">
                 <div class="validation-title">Please correct the following:</div>
                 <ul id="validation-list"></ul>
               </div>
@@ -194,16 +194,19 @@
               </div>
             </div>
             
-            <div class="button-group" role="toolbar">
-              <button id="chart-view-btn" class="toggle-btn active" aria-pressed="true">
+            <div class="button-group" role="toolbar" aria-label="Chart or table view" aria-describedby="view-toggle-help">
+              <button id="chart-view-btn" class="toggle-btn active" aria-pressed="true" aria-controls="chart-container">
                 Chart
               </button>
-              <button id="table-view-btn" class="toggle-btn" aria-pressed="false">
+              <button id="table-view-btn" class="toggle-btn" aria-pressed="false" aria-controls="table-container">
                 Table
               </button>
             </div>
             <p id="chart-helper-text" class="text-xs text-gray-500" style="display: none; margin-top: 0.5rem;">
               Chart view is not available at narrow screen widths. Showing table view.
+            </p>
+            <p id="view-toggle-help" class="sr-only">
+              Chart and Table act as a single toolbar: only one button is in the tab order at a time. Use left and right arrow keys to move between them. Table lists every value in one place.
             </p>
           </div>
 
@@ -223,6 +226,7 @@
 
           <!-- Table container -->
           <div id="table-container" class="table-wrapper table-card-layout" style="display: none;"
+               aria-hidden="true"
                role="region"
                aria-label="Bond cash flow table"
                tabindex="0">

@@ -189,7 +189,7 @@ mjx-container[aria-hidden="true"],
   border: 1px solid var(--color-gray-200);
   border-radius: 0.5rem;
   overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: visible;
   max-width: 100%;
   -webkit-overflow-scrolling: touch;
   container-type: inline-size;
@@ -247,7 +247,7 @@ math {
   margin: 0 !important;
   max-width: 100% !important;
   overflow-x: auto !important;
-  overflow-y: hidden !important;
+  overflow-y: visible !important;
   display: block !important;
   box-sizing: border-box !important;
   transform-origin: left center;
@@ -274,7 +274,7 @@ math {
 /* Ensure equation container allows horizontal scroll if needed */
 #dynamic-equation-container {
   overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: visible;
   -webkit-overflow-scrolling: touch;
   width: 100%;
   box-sizing: border-box;

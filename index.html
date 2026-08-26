@@ -34,17 +34,17 @@
     skipStartupTypeset: false
   });
   
-  // More comprehensive tabindex removal
+  // Remove MathJax-generated tabindex without hiding the rendered maths
   function removeAllMathJaxTabindex() {
-    // Catch ALL possible MathJax elements with tabindex
     document.querySelectorAll('[tabindex]').forEach(function(el) {
+      // Let MathJax a11y control tabindex inside the live-typeset equation.
+      if (el.closest && el.closest('#dynamic-equation-container')) return;
       if (el.classList.contains('MathJax') || 
           el.classList.contains('MathJax_Display') ||
           el.id.startsWith('MathJax-') ||
           el.tagName === 'MATH' ||
           el.closest('.MathJax')) {
         el.removeAttribute('tabindex');
-        el.setAttribute('aria-hidden', 'true');
       }
     });
   }
@@ -215,13 +215,19 @@
 
           <!-- Chart title for aria-labelledby -->
           <h4 id="bond-chart-title" class="sr-only">Bond cash flows over time</h4>
+          <p id="chart-keyboard-help" class="sr-only">
+            Use Left and Right arrow keys to move between periods. Home moves to the first period and End moves to the last period.
+          </p>
+          <p id="chart-point-announcement" class="sr-only" aria-live="polite" aria-atomic="true"></p>
 
           <!-- Chart container -->
           <div id="chart-container" class="chart-wrapper" 
                role="region" 
                aria-labelledby="bond-chart-title"
                tabindex="-1">
-            <canvas id="bond-chart"></canvas>
+            <canvas id="bond-chart" role="img"
+                    aria-labelledby="bond-chart-title"
+                    aria-describedby="chart-keyboard-help"></canvas>
           </div>
 
           <!-- Table container -->

@@ -149,16 +149,6 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
         mode: 'index',
         intersect: false
       },
-      onHover: (event, activeElements) => {
-        // Skip if keyboard focus already active
-        if (isKeyboardMode && document.activeElement === canvas) return;
-
-        // Announce hovered data point
-        if (activeElements.length > 0) {
-          const index = activeElements[0].index;
-          announceDataPoint(cashFlows[index], totalData[index], ytm);
-        }
-      },
       plugins: {
         title: {
           display: false
@@ -723,16 +713,8 @@ function showTooltipAtIndex(index) {
  * @param {number} ytm - Yield to maturity
  */
 function announceDataPoint(cashFlow, total, ytm) {
-  // Create or update live region for screen reader announcements
-  let liveRegion = document.getElementById('chart-live-region');
-  if (!liveRegion) {
-    liveRegion = document.createElement('div');
-    liveRegion.id = 'chart-live-region';
-    liveRegion.setAttribute('aria-live', 'polite');
-    liveRegion.setAttribute('aria-atomic', 'true');
-    liveRegion.className = 'sr-only';
-    document.body.appendChild(liveRegion);
-  }
+  const liveRegion = document.getElementById('chart-point-announcement');
+  if (!liveRegion || liveRegion.getAttribute('aria-hidden') === 'true') return;
   
   const isInitialPeriod = cashFlow.period === 0;
   const principalLabel = isInitialPeriod ? 'Present value bond price (PV)' : 'Principal repayment (FV)';

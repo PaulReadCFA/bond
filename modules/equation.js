@@ -118,6 +118,17 @@ export function renderDynamicEquation(calculations, params) {
         
         // Fix accessibility: ensure aria-hidden assistive MathML is not focusable
         fixAriaHiddenFocusability(innerContainer);
+
+        // Keep the region label in step with the current values so SR users hear
+        // the headline result without waiting for a live-region announcement
+        if (outerContainer) {
+          outerContainer.setAttribute(
+            'aria-label',
+            `Bond valuation equation. Coupon ${pmtFormatted} per period, ` +
+            `${periods} periods at ${rPercent}% per period, face value ${fvFormatted}. ` +
+            `Price: ${pvFormatted}.`
+          );
+        }
         
         // MATHJAX JUMP FIX: Unlock heights AFTER MathJax completes
         // Wait 200ms to ensure MathJax is fully done

@@ -343,6 +343,16 @@ function updateButtonStates(autoFocus = true) {
     canvas: $('#bond-chart'),
     showChart: currentView === 'chart',
   });
+  const chartPointAnnouncement = $('#chart-point-announcement');
+  if (chartPointAnnouncement) {
+    if (currentView === 'chart') {
+      chartPointAnnouncement.textContent = '';
+      chartPointAnnouncement.removeAttribute('aria-hidden');
+    } else {
+      chartPointAnnouncement.setAttribute('aria-hidden', 'true');
+      chartPointAnnouncement.textContent = '';
+    }
+  }
 
   if (currentView === 'chart') {
     if (legend) legend.style.display = 'flex';

@@ -77,7 +77,7 @@ export function renderTable(cashFlows, bondPrice, periods, periodicCoupon, ytm) 
         <th scope="row" colspan="4" class="text-right">
           Present value of bond (PV) (USD):
         </th>
-        <td class="text-right"><strong>${formatCurrencyNoPrefix(bondPrice)}</strong></td>
+        <td class="text-right" data-label="Total cash flow (PMT + FV) (USD)"><span class="cell-value"><strong>${formatCurrencyNoPrefix(bondPrice)}</strong></span></td>
       </tr>
     </tfoot>
   `;

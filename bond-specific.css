@@ -14,7 +14,7 @@
   --color-bond-yield: var(--color-purple-bold);        /* #7a46ff - Yield to maturity */
   --color-bond-face: var(--color-teal-data);           /* #0079a6 - Face value */
   --color-bond-purchase: var(--color-orange-deep);     /* #b95b1d - Initial purchase */
-  --color-bond-term: #15803d;                          /* T - matches the MathML equation */
+  --color-bond-term: var(--color-green-data);                          /* T - matches the MathML equation */
   /* Cash-flow table: darker text for WCAG AA on white / light row backgrounds */
   --bond-cashflow-text-ytm: #4c1d95;
   --bond-cashflow-text-pmt: #1e3a8a;
@@ -85,7 +85,7 @@ mjx-assistive-mml[aria-hidden="true"] * {
 .result-value-small {
   font-size: 0.875rem;
   color: var(--color-gray-700);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  font-family: 'Lato', sans-serif;
   font-weight: 400;
 }
 
@@ -400,86 +400,19 @@ mjx-assistive-mml[aria-hidden="true"] math * {
 
 
 
-/* ==========================================================================
-   8. VIEW CONTROLS - Button Position Fix
-   ========================================================================== */
-
-/* Override: Keep buttons in consistent position */
-.view-controls {
-  justify-content: flex-end;
-  gap: 1rem;
-}
-
-.view-controls .button-group {
-  flex-shrink: 0;
-  margin-left: 0;
-}
-
-.view-controls .legend {
-  margin-right: auto;
-  /* When hidden, use visibility instead of display to maintain layout space */
-}
-
+/* Preserve the legend's desktop space while JS hides it in table view. */
 .view-controls .legend[style*="display: none"] {
   display: flex !important;
   visibility: hidden;
   pointer-events: none;
 }
 
-/* Mobile: legend stacked; Chart/Table pair right (≤640px). Full-width equal buttons ≤380px (WCAG touch). */
 @media (max-width: 640px) {
-  .view-controls {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .view-controls .legend {
-    margin-bottom: 1rem;
-  }
-  
   .view-controls .legend[style*="display: none"] {
     display: none !important;
     visibility: visible;
   }
-  
-  .view-controls .button-group {
-    width: auto;
-    max-width: 100%;
-    align-self: flex-end;
-    justify-content: flex-end;
-  }
-
-  .view-controls .button-group .toggle-btn,
-  .view-controls .button-group .model-btn {
-    flex: 0 0 auto;
-  }
 }
-
-@media (max-width: 380px) {
-  .view-controls .button-group {
-    align-self: stretch;
-    width: 100%;
-  }
-
-  .view-controls .button-group .toggle-btn,
-  .view-controls .button-group .model-btn {
-    flex: 1;
-    min-width: 0;
-  }
-}
-
-
-
-/* Ensure all interactive elements meet 44x44px minimum (WCAG 2.5.5) */
-.toggle-btn,
-.model-btn {
-  min-height: 44px;
-  min-width: 44px;
-}
-
-/* Skip links already have 44px minimum in cfa-base.css */
-
-/* Chart and table are already properly sized */
 
 
 /* Table note styling */
@@ -500,36 +433,11 @@ mjx-assistive-mml[aria-hidden="true"] math * {
   overflow: visible;
 }
 
-/* Visualizer card specifically */
-#visualizer .card-content {
-  overflow: visible;
-  padding: 0;
-}
-
-/* Add padding back to inner elements */
-#visualizer .view-controls {
-  /* No extra padding needed */
-}
-
-#visualizer .chart-wrapper {
-  padding: 0;
-}
-
-#visualizer .table-wrapper {
-  padding: 0;
-  margin: 0;
-}
-
-
-
-
-
-
-/* Use consistent system font for all content */
+/* Use the shared Lato family for supporting content */
 .result-value,
 .info-value,
 .legend-item {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  font-family: 'Lato', sans-serif;
 }
 
 /* ==========================================================================
@@ -551,61 +459,8 @@ mjx-assistive-mml[aria-hidden="true"] math * {
 }
 
 /* ==========================================================================
-   11. VALIDATION ERROR STATE
-   ========================================================================== */
-
-/* Make validation summary focusable and visible when focused */
-.validation-summary:focus {
-  outline: 3px solid var(--color-red-700);
-  outline-offset: 2px;
-}
-
-/* Dim the results when there are validation errors */
-.has-validation-errors .card-content {
-  opacity: 0.5;
-  pointer-events: none;
-  position: relative;
-}
-
-.has-validation-errors .card-content::before {
-  content: 'Waiting for valid inputs...';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: var(--color-gray-900);
-  color: white;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  z-index: 10;
-  white-space: normal;
-  text-align: center;
-  max-width: min(22rem, calc(100% - 2rem));
-  box-sizing: border-box;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-/* ==========================================================================
    Moved from local cfa-base (Phase 2 unify) — explorer-only overrides
    ========================================================================== */
-
-.toggle-btn:disabled,
-.toggle-btn[disabled],
-.model-btn:disabled,
-.model-btn[disabled],
-#chart-view-btn[disabled],
-#chart-view-btn[disabled]:hover,
-#chart-view-btn[disabled]:focus,
-#chart-view-btn[disabled]:active{
-  opacity: 0.4 !important;
-  cursor: not-allowed !important;
-  pointer-events: none !important;
-  background-color: var(--color-gray-300) !important;
-  color: var(--color-gray-500) !important;
-  border-color: var(--color-gray-300) !important;
-  box-shadow: none !important;
-}
 
 .equation-container mtext{
   font-size: 0.9em;
@@ -621,37 +476,6 @@ mjx-assistive-mml[aria-hidden="true"] math * {
 .legend-color[style*="border-style: dashed"]{
   background: none !important;
   border: 2px dashed var(--color-purple-bold);
-}
-
-.data-table th.text-left,
-.data-table td.text-left{ text-align: left; }
-
-.data-table th.text-right,
-.data-table td.text-right{ text-align: right; }
-
-.data-table tbody tr:nth-child(even):hover{
-  background-color: var(--color-gray-50);
-}
-
-
-@media (max-width: 600px) {
-.force-table #chart-view-btn,
-  .force-table #chart-view-btn:hover,
-  .force-table #chart-view-btn:focus,
-  .force-table #chart-view-btn:active{
-    opacity: 0.4 !important;
-    pointer-events: none !important;
-    cursor: not-allowed !important;
-    box-shadow: none !important;
-    background-color: var(--color-gray-300) !important;
-    color: var(--color-gray-500) !important;
-    border-color: var(--color-gray-300) !important;
-  }
-
-.force-table #table-view-btn{ 
-    opacity: 1; 
-    pointer-events: auto; 
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

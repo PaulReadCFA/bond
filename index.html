@@ -9,7 +9,7 @@
   <!-- Google Fonts: Lato (was @import in local cfa-base; load via link for shared master) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
 
   <!-- Styles -->
   <link rel="stylesheet" href="cfa-base.css">
@@ -73,8 +73,8 @@
     </nav>
     <main class="content">
       <!-- Card 1: Calculator -->
-      <section class="card" id="calculator" tabindex="-1">
-        <h4 class="card-title">Bond Cash Flow Calculator</h4>
+      <section class="card" id="calculator" tabindex="-1" aria-labelledby="calculator-title">
+        <h4 class="card-title" id="calculator-title">Bond Cash Flow Calculator</h4>
           <div class="card-content">
             <!-- Instructional note (typography matches .equation-intro) -->
             <p class="equation-intro">
@@ -155,8 +155,8 @@
         </section>
 
       <!-- Card 2: Dynamic Equation -->
-      <section id="equation-card" class="card">
-        <h4 class="card-title">Bond Valuation Equation</h4>
+      <section id="equation-card" class="card" aria-labelledby="equation-title">
+        <h4 class="card-title" id="equation-title">Bond Valuation Equation</h4>
         <p class="equation-intro">
           This dynamic equation gives the price of a coupon bond based on your input in the Bond Cash Flow Calculator.
         </p>
@@ -168,8 +168,8 @@
       </section>
 
       <!-- Card 3: Visualizer (Full Width) -->
-      <section class="card" id="visualizer" tabindex="-1">
-        <h4 class="card-title">Bond Cash Flows</h4>
+      <section class="card" id="visualizer" tabindex="-1" aria-labelledby="visualizer-title">
+        <h4 class="card-title" id="visualizer-title">Bond Cash Flows</h4>
         <div class="card-content">
           <!-- View toggle buttons -->
           <div class="view-controls">
@@ -247,8 +247,8 @@
       </section>
 
       <!-- Card 4: Results & Analysis -->
-      <section class="card" id="results-card">
-        <h4 class="card-title">Results and Analysis</h4>
+      <section class="card" id="results-card" aria-labelledby="results-title">
+        <h4 class="card-title" id="results-title">Results and Analysis</h4>
         <div class="card-content">
           <div id="results-content">
             <!-- Populated by JavaScript -->

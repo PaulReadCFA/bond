@@ -9,6 +9,7 @@
 import { state, setState, subscribe } from './modules/state.js';
 import { calculateBondMetrics } from './modules/calculations.js';
 import { 
+  validateAllInputs,
   validateField, 
   updateFieldError, 
   updateValidationSummary,
@@ -518,56 +519,41 @@ function detectNarrowScreen() {
 /**
  * Run self-tests to verify calculations
  */
+function logSelfTest(name, passed, detail) {
+  if (passed) console.log(`✓ ${name}`);
+  else console.warn(`✗ ${name}${detail ? ': ' + detail : ''}`);
+}
+
 function runSelfTests() {
   console.log('Running self-tests...');
-  
-  const tests = [
-    {
-      name: 'Par bond pricing',
-      inputs: { faceValue: 100, couponRate: 6, ytm: 6, years: 5, frequency: 2 },
-      expected: { price: 100, tolerance: 0.2 }
-    },
-    {
-      name: 'Premium bond pricing',
-      inputs: { faceValue: 100, couponRate: 8, ytm: 6, years: 5, frequency: 2 },
-      expected: { priceShouldBe: 'greater than 100' }
-    },
-    {
-      name: 'Discount bond pricing',
-      inputs: { faceValue: 100, couponRate: 4, ytm: 6, years: 5, frequency: 2 },
-      expected: { priceShouldBe: 'less than 100' }
-    }
-  ];
-  
-  tests.forEach(test => {
-    try {
-      const result = calculateBondMetrics(test.inputs);
-      
-      if (test.expected.price !== undefined) {
-        const diff = Math.abs(result.bondPrice - test.expected.price);
-        if (diff <= test.expected.tolerance) {
-          console.log(`✓ ${test.name} passed`);
-        } else {
-          console.warn(`✗ ${test.name} failed: expected ${test.expected.price}, got ${result.bondPrice}`);
-        }
-      } else if (test.expected.priceShouldBe === 'greater than 100') {
-        if (result.bondPrice > 100) {
-          console.log(`✓ ${test.name} passed`);
-        } else {
-          console.warn(`✗ ${test.name} failed: price should be > 100, got ${result.bondPrice}`);
-        }
-      } else if (test.expected.priceShouldBe === 'less than 100') {
-        if (result.bondPrice < 100) {
-          console.log(`✓ ${test.name} passed`);
-        } else {
-          console.warn(`✗ ${test.name} failed: price should be < 100, got ${result.bondPrice}`);
-        }
-      }
-    } catch (error) {
-      console.error(`✗ ${test.name} threw error:`, error);
-    }
+
+  const defaults = calculateBondMetrics({
+    faceValue: 100, couponRate: 8.6, ytm: 6.5, years: 5, frequency: 1
   });
-  
+  logSelfTest('Defaults → price ≈ 108.73', Math.abs(defaults.bondPrice - 108.73) < 0.02, `got ${defaults.bondPrice}`);
+  logSelfTest('Valid outputs are finite', Number.isFinite(defaults.bondPrice));
+
+  const par = calculateBondMetrics({
+    faceValue: 100, couponRate: 6, ytm: 6, years: 5, frequency: 1
+  });
+  logSelfTest('Par bond prices at 100', Math.abs(par.bondPrice - 100) <= 0.2, `got ${par.bondPrice}`);
+
+  const premium = calculateBondMetrics({
+    faceValue: 100, couponRate: 8, ytm: 6, years: 5, frequency: 1
+  });
+  logSelfTest('Premium bond prices above 100', premium.bondPrice > 100, `got ${premium.bondPrice}`);
+
+  const discount = calculateBondMetrics({
+    faceValue: 100, couponRate: 4, ytm: 6, years: 5, frequency: 1
+  });
+  logSelfTest('Discount bond prices below 100', discount.bondPrice < 100, `got ${discount.bondPrice}`);
+
+  const empty = validateAllInputs({ couponRate: NaN, ytm: 6.5, years: 5 });
+  logSelfTest('Empty coupon rate is required', Boolean(empty.couponRate));
+
+  const range = validateAllInputs({ couponRate: 8.6, ytm: 6.5, years: 6 });
+  logSelfTest('Years above max is rejected', Boolean(range.years));
+
   console.log('Self-tests complete');
 }
 

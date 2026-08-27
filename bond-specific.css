@@ -61,7 +61,7 @@ mjx-assistive-mml[aria-hidden="true"] * {
 .result-title.price {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--color-orange-darker);
+  color: var(--color-orange-contrast);
   letter-spacing: normal;
   text-transform: none;
 }
@@ -69,7 +69,7 @@ mjx-assistive-mml[aria-hidden="true"] * {
 .result-title.analysis {
   font-size: 1rem;
   font-weight: 600;
-  color: #8b4513;
+  color: var(--color-orange-contrast);
   margin-bottom: 0.75rem;
   letter-spacing: normal;
   text-transform: none;

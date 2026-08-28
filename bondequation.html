@@ -83,19 +83,8 @@
       },
       showProcessingMessages: false,
       messageStyle: "none",
+      menuSettings: { explorer: true },
       skipStartupTypeset: false
-    });
-
-    function removeMathJaxTabindex() {
-      document.querySelectorAll(".MathJax, .MathJax_Display, [id^='MathJax-']").forEach(function (el) {
-        el.removeAttribute("tabindex");
-      });
-    }
-
-    MathJax.Hub.Register.StartupHook("End", function () {
-      removeMathJaxTabindex();
-      setTimeout(removeMathJaxTabindex, 100);
-      setTimeout(removeMathJaxTabindex, 500);
     });
   </script>
 

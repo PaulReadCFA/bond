@@ -48,9 +48,8 @@ function createPriceBox(bondPrice) {
   }, formatCurrency(bondPrice));
   valueContainer.appendChild(priceValue);
   
-  // Per $100 par text
-  const parText = createElement('span', { className: 'result-value-small' }, 
-    ' per $100 par'
+  const parText = createElement('span', { className: 'result-value-small' },
+    ' per USD100 par'
   );
   valueContainer.appendChild(parText);
   

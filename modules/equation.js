@@ -3,7 +3,8 @@
  * Renders equation with actual calculated values
  */
 
-import { formatCurrency } from './utils.js';
+import { formatCurrency, formatCurrencySpeech } from './utils.js';
+import { renderEquation } from '../equation-render.js';
 
 /**
  * Render dynamic equation with user's values
@@ -72,91 +73,43 @@ export function renderDynamicEquation(calculations, params) {
     </math>
   `;
   
-  // MATHJAX JUMP FIX: Lock heights BEFORE replacing content
-  // Lock the OUTER equation-container div (not just the inner one)
   const outerContainer = document.getElementById('dynamic-equation-container');
-  const parentCard = innerContainer.closest('.card');
-  
-  // Lock outer container (this is key - it prevents the equation box from resizing)
-  if (outerContainer) {
-    const outerHeight = outerContainer.getBoundingClientRect().height;
-    if (outerHeight > 0) {
-      outerContainer.style.height = `${outerHeight}px`;
-      outerContainer.style.minHeight = `${outerHeight}px`;
-      outerContainer.style.maxHeight = `${outerHeight}px`;
-      outerContainer.style.overflow = 'hidden';
-    }
-  }
-  
-  // Also lock parent card to prevent card from resizing
-  if (parentCard) {
-    const cardHeight = parentCard.getBoundingClientRect().height;
-    if (cardHeight > 0) {
-      parentCard.style.height = `${cardHeight}px`;
-      parentCard.style.minHeight = `${cardHeight}px`;
-      parentCard.style.maxHeight = `${cardHeight}px`;
-      parentCard.style.overflow = 'hidden';
-    }
-  }
-  
-  // NOW replace content (containers are locked at correct size)
-  innerContainer.innerHTML = mathML;
-  
-  // Tell MathJax 2.7.7 to re-render the updated equation
-  if (window.MathJax && window.MathJax.Hub) {
-    window.MathJax.Hub.Queue(
-      ["Typeset", window.MathJax.Hub, innerContainer],
-      function() {
-        // Suppress transition before adjustScale runs to avoid flash of intermediate sizes
-        const mjxContainer = innerContainer.querySelector('.MathJax_Display, .MathJax');
-        if (mjxContainer) {
-          mjxContainer.style.transition = 'none';
-        }
 
-        // After MathJax renders, set up responsive scaling
-        setupResponsiveScaling(innerContainer);
-        
-        // Fix accessibility: ensure aria-hidden assistive MathML is not focusable
-        fixAriaHiddenFocusability(innerContainer);
+  // The shared mount holds the card's height and hides the raw MathML while
+  // MathJax typesets, so the cards below stay put.
+  renderEquation(innerContainer, mathML, {
+    onTypeset: function() {
+      // Suppress transition before adjustScale runs to avoid flash of intermediate sizes
+      const mjxContainer = innerContainer.querySelector('.MathJax_Display, .MathJax');
+      if (mjxContainer) {
+        mjxContainer.style.transition = 'none';
+      }
 
-        // Keep the region label in step with the current values so SR users hear
-        // the headline result without waiting for a live-region announcement
-        if (outerContainer) {
-          outerContainer.setAttribute(
-            'aria-label',
-            `Bond valuation equation. Coupon ${pmtFormatted} per period, ` +
-            `${periods} periods at ${rPercent}% per period, face value ${fvFormatted}. ` +
-            `Price: ${pvFormatted}.`
-          );
-        }
-        
-        // MATHJAX JUMP FIX: Unlock heights AFTER MathJax completes
-        // Wait 200ms to ensure MathJax is fully done
+      // After MathJax renders, set up responsive scaling
+      setupResponsiveScaling(innerContainer);
+
+      // Fix accessibility: ensure aria-hidden assistive MathML is not focusable
+      fixAriaHiddenFocusability(innerContainer);
+
+      // Keep the region label in step with the current values so SR users hear
+      // the headline result without waiting for a live-region announcement
+      if (outerContainer) {
+        outerContainer.setAttribute(
+          'aria-label',
+          `Bond valuation equation. Coupon ${formatCurrencySpeech(periodicCoupon)} per period, ` +
+          `${periods} periods at ${rPercent}% per period, face value ${formatCurrencySpeech(faceValue)}. ` +
+          `Price: ${formatCurrencySpeech(bondPrice)}.`
+        );
+      }
+
+      // Restore smooth transition now that the final scale is set
+      if (mjxContainer) {
         setTimeout(function() {
-          // Clear outer container locks
-          if (outerContainer) {
-            outerContainer.style.height = '';
-            outerContainer.style.minHeight = '';
-            outerContainer.style.maxHeight = '';
-            outerContainer.style.overflow = '';
-          }
-          
-          // Clear parent card locks
-          if (parentCard) {
-            parentCard.style.height = '';
-            parentCard.style.minHeight = '';
-            parentCard.style.maxHeight = '';
-            parentCard.style.overflow = '';
-          }
-
-          // Restore smooth transition now that final scale is set
-          if (mjxContainer) {
-            mjxContainer.style.transition = 'transform 0.2s ease-out';
-          }
+          mjxContainer.style.transition = 'transform 0.2s ease-out';
         }, 200);
       }
-    );
-  }
+    },
+  });
   
   // Note: MathML is already accessible to screen readers, no need for aria-live announcement
 }

@@ -3,7 +3,8 @@
  * Renders accessible data table for bond cash flows
  */
 
-import { $, formatCurrency, announceToScreenReader, applyTableRoles } from './utils.js';
+import { $, formatCurrency, announceToScreenReader } from './utils.js';
+import { applyTableRoles } from '../table-roles.js';
 
 /**
  * Strip USD prefix from formatted currency (for tables with USD in header)

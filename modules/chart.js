@@ -531,9 +531,10 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
         
         ctx.save();
         
-        // Match table note styling with curriculum chart font
-        const noteText = 'Note: Negative values indicate cash outflows (money paid out).';
-        ctx.font = CHART_FONT_CSS;
+        // Match the HTML table note: only "Note:" is italic.
+        const noteLabel = 'Note:';
+        const noteRest = ' Negative values indicate cash outflows (money paid out).';
+        ctx.font = `italic ${CHART_FONT_CSS}`;
         
         // Position below x-axis title (55px gap to clear "Time (years)" label)
         const noteHeight = 30;
@@ -549,7 +550,12 @@ export function renderChart(cashFlows, showLabels = true, ytm = null, periodicCo
           ctx.fillStyle = '#374151';
           ctx.textAlign = 'left';
           ctx.textBaseline = 'middle';
-          ctx.fillText(noteText, 10, noteY + (noteHeight / 2));
+          const noteX = 10;
+          const noteMid = noteY + (noteHeight / 2);
+          ctx.fillText(noteLabel, noteX, noteMid);
+          const noteLabelWidth = ctx.measureText(noteLabel).width;
+          ctx.font = CHART_FONT_CSS;
+          ctx.fillText(noteRest, noteX + noteLabelWidth, noteMid);
         }
         
         ctx.restore();
